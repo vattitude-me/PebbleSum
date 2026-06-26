@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { MathProblem, generateProblems } from "@/lib/math-engine";
-import { Stage } from "@/lib/stages";
+import { Stage, getStageById } from "@/lib/stages";
 import {
   UserProgress,
   saveProgress,
@@ -135,6 +135,38 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
       setUserAnswer((a) => a + digit);
     }
   };
+
+  const handleChoiceSelect = useCallback((choice: number) => {
+    if (feedback !== null) return;
+
+    const problem = problems[currentIndex];
+    const isCorrect = choice === problem.answer;
+
+    if (isCorrect) {
+      setCorrectCount((c) => c + 1);
+      setComboCount((c) => c + 1);
+      setFeedback("correct");
+      if (comboCount > 0 && comboCount % 3 === 2) {
+        setShowEncouragement(encouragements[Math.floor(Math.random() * encouragements.length)]);
+      }
+    } else {
+      setFeedback("wrong");
+      setComboCount(0);
+      setHearts((h) => Math.max(0, h - 1));
+      setShowEncouragement("");
+    }
+
+    setTimeout(() => {
+      setFeedback(null);
+      setUserAnswer("");
+      setShowEncouragement("");
+      if (currentIndex + 1 >= problems.length || (!isCorrect && hearts <= 1)) {
+        finishSession(isCorrect ? correctCount + 1 : correctCount);
+      } else {
+        setCurrentIndex((i) => i + 1);
+      }
+    }, isCorrect ? 500 : 800);
+  }, [currentIndex, problems, correctCount, hearts, comboCount, feedback]);
 
   const finishSession = (finalCorrect: number) => {
     setIsFinished(true);
@@ -335,15 +367,27 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
       {/* Problem display */}
       <div className={`practice__problem ${feedback === "correct" ? "practice__problem--correct" : feedback === "wrong" ? "practice__problem--wrong" : ""}`}>
-        <div className={`practice__problem-text ${isYoung ? "practice__problem-text--large" : ""}`}>
-          <span>{problem.displayParts.left}</span>
-          <span className="practice__operator">{problem.displayParts.operator}</span>
-          <span>{problem.displayParts.right}</span>
-          <span className="practice__equals">=</span>
-          <span className="practice__answer-slot">
-            {userAnswer || "?"}
-          </span>
-        </div>
+        {problem.problemType === "equation" ? (
+          <div className={`practice__problem-text ${isYoung ? "practice__problem-text--large" : ""}`}>
+            <span>{problem.displayParts.left}</span>
+            <span className="practice__operator">{problem.displayParts.operator}</span>
+            <span>{problem.displayParts.right}</span>
+            <span className="practice__equals">=</span>
+            <span className="practice__answer-slot">
+              {userAnswer || "?"}
+            </span>
+          </div>
+        ) : problem.problemType === "identify" || problem.problemType === "count" ? (
+          <div className="practice__visual-problem">
+            <p className="practice__visual-question">{problem.question}</p>
+            <div className="practice__visual-objects">{problem.visual}</div>
+          </div>
+        ) : problem.problemType === "sequence" ? (
+          <div className="practice__visual-problem">
+            <p className="practice__visual-question">{problem.question}</p>
+            <div className="practice__sequence">{problem.displayParts.left}</div>
+          </div>
+        ) : null}
 
         {feedback === "correct" && (
           <div className="practice__feedback practice__feedback--correct animate-pop-in">
@@ -364,19 +408,35 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         )}
       </div>
 
-      {/* Numpad Input */}
-      <div className="practice__numpad">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9", "del", "0", "go"].map((key) => (
-          <button
-            key={key}
-            onClick={() => handleNumpad(key)}
-            disabled={feedback !== null}
-            className={`practice__numpad-btn ${key === "go" ? "practice__numpad-btn--go" : ""} ${key === "del" ? "practice__numpad-btn--del" : ""} ${isYoung ? "practice__numpad-btn--large" : ""}`}
-          >
-            {key === "del" ? "⌫" : key === "go" ? "✓" : key}
-          </button>
-        ))}
-      </div>
+      {/* Multiple choice input for visual/sequence problems */}
+      {problem.choices ? (
+        <div className="practice__choices">
+          {problem.choices.map((choice) => (
+            <button
+              key={choice}
+              onClick={() => handleChoiceSelect(choice)}
+              disabled={feedback !== null}
+              className={`practice__choice-btn ${isYoung ? "practice__choice-btn--large" : ""}`}
+            >
+              {choice}
+            </button>
+          ))}
+        </div>
+      ) : (
+        /* Numpad Input for equation problems */
+        <div className="practice__numpad">
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "del", "0", "go"].map((key) => (
+            <button
+              key={key}
+              onClick={() => handleNumpad(key)}
+              disabled={feedback !== null}
+              className={`practice__numpad-btn ${key === "go" ? "practice__numpad-btn--go" : ""} ${key === "del" ? "practice__numpad-btn--del" : ""} ${isYoung ? "practice__numpad-btn--large" : ""}`}
+            >
+              {key === "del" ? "⌫" : key === "go" ? "✓" : key}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

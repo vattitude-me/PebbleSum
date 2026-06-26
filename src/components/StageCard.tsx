@@ -11,11 +11,13 @@ interface StageCardProps {
 
 export default function StageCard({ stage, isUnlocked, isCurrent, onStart }: StageCardProps) {
   const categoryColors: Record<string, string> = {
-    "Motor Skills & Counting": "from-green-400 to-emerald-500",
-    "Basic Addition": "from-blue-400 to-cyan-500",
-    "Advanced Addition & Subtraction": "from-purple-400 to-indigo-500",
-    "Multiplication & Division": "from-orange-400 to-amber-500",
-    "Fractions & Order of Operations": "from-pink-400 to-rose-500",
+    "Number Recognition": "from-green-400 to-emerald-500",
+    "Counting": "from-teal-400 to-green-500",
+    "Sequencing": "from-cyan-400 to-teal-500",
+    "Addition": "from-blue-400 to-cyan-500",
+    "Subtraction": "from-purple-400 to-indigo-500",
+    "Multiplication": "from-orange-400 to-amber-500",
+    "Division": "from-pink-400 to-rose-500",
   };
 
   const gradient = categoryColors[stage.category] || "from-gray-400 to-gray-500";
