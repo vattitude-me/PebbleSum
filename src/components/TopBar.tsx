@@ -1,5 +1,7 @@
 "use client";
 
+import Logo from "@/components/Logo";
+
 interface TopBarProps {
   coins: number;
   streak: number;
@@ -13,7 +15,7 @@ export default function TopBar({ coins, streak, hearts, xp, level, onSettingsCli
   return (
     <header className="top-bar">
       <div className="top-bar__left">
-        <img src="/assets/icons/icon-logo-pebblesum.png" alt="PebbleSum" className="top-bar__logo" />
+        <Logo size="sm" />
       </div>
       <div className="top-bar__stats">
         {streak > 0 && (

@@ -52,6 +52,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   return (
     <div className="onboarding">
+      <div className="onboarding__container">
       <div className="onboarding__progress">
         {Array.from({ length: totalSteps }).map((_, i) => (
           <div key={i} className={`onboarding__dot ${i <= step ? "onboarding__dot--active" : ""}`} />
@@ -61,7 +62,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       <div className="onboarding__card animate-pop-in" key={step}>
         {step === 0 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-wave.png" alt="Hi!" className="onboarding__mascot" />
+            <img src="/assets/icons/icon-pencil.png" alt="Write your name" className="onboarding__mascot" />
             <h2 className="onboarding__title">What&apos;s your name?</h2>
             <p className="onboarding__subtitle">Let&apos;s get to know each other!</p>
             <input
@@ -116,7 +117,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         {step === 3 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-celebrate.png" alt="Let's go!" className="onboarding__mascot" />
+            <img src="/assets/icons/icon-pebble-celebrate-left.png" alt="Let's go!" className="onboarding__mascot" />
             <h2 className="onboarding__title">Daily goal</h2>
             <p className="onboarding__subtitle">How much will you practice each day?</p>
             <div className="onboarding__goal-grid">
@@ -154,6 +155,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <img src="/assets/icons/icon-arrow-right.png" alt="Next" className="onboarding__btn-icon" />
           )}
         </button>
+      </div>
       </div>
     </div>
   );

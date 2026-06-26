@@ -174,7 +174,7 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
       <div className="practice-complete">
         <div className="practice-complete__header">
           <img
-            src={`/assets/icons/${perfect ? "icon-pebble-celebrate.png" : "icon-pebble-wave.png"}`}
+            src={`/assets/icons/${perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
             alt="Pebble"
             className="practice-complete__mascot"
           />

@@ -39,8 +39,8 @@ export default function HomeDashboard({
   };
 
   const getMascotState = () => {
-    if (todayCompleted) return "icon-pebble-celebrate.png";
-    if (progress.streak >= 7) return "icon-pebble-celebrate.png";
+    if (todayCompleted) return "icon-pebble-celebrate-left.png";
+    if (progress.streak >= 7) return "icon-pebble-celebrate-left.png";
     return "icon-pebble-wave.png";
   };
 
