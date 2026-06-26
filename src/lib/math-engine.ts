@@ -18,23 +18,25 @@ function generateCounting(stageId: string): MathProblem {
   if (stageId === "5A") max = 30;
   if (stageId === "4A") max = 100;
 
-  const answer = rand(1, max);
+  const addend = rand(1, Math.min(3, max));
+  const base = rand(1, max - addend);
+  const answer = base + addend;
   return {
     id: generateId(),
-    question: `What number comes after ${answer - 1}?`,
+    question: `${base} + ${addend} = ?`,
     answer,
-    displayParts: { left: String(answer - 1), operator: "+ 1 =", right: "?" },
+    displayParts: { left: String(base), operator: "+", right: String(addend) },
   };
 }
 
 function generateAddition3A(): MathProblem {
-  const addend = rand(1, 3);
-  const base = rand(1, 10);
+  const a = rand(1, 5);
+  const b = rand(1, 5);
   return {
     id: generateId(),
-    question: `${base} + ${addend} = ?`,
-    answer: base + addend,
-    displayParts: { left: String(base), operator: "+", right: String(addend) },
+    question: `${a} + ${b} = ?`,
+    answer: a + b,
+    displayParts: { left: String(a), operator: "+", right: String(b) },
   };
 }
 
@@ -128,42 +130,60 @@ function generateOrderOfOpsF(): MathProblem {
   };
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function generateProblems(stageId: string, count: number): MathProblem[] {
   const problems: MathProblem[] = [];
+  const seen = new Set<number>();
+
   for (let i = 0; i < count; i++) {
-    switch (stageId) {
-      case "6A":
-      case "5A":
-      case "4A":
-        problems.push(generateCounting(stageId));
-        break;
-      case "3A":
-        problems.push(generateAddition3A());
-        break;
-      case "2A":
-        problems.push(generateAddition2A());
-        break;
-      case "A":
-        problems.push(generateAdditionA());
-        break;
-      case "B":
-        problems.push(generateSubtractionB());
-        break;
-      case "C":
-        problems.push(generateMultiplicationC());
-        break;
-      case "D":
-        problems.push(generateDivisionD());
-        break;
-      case "E":
-        problems.push(generateFractionsE());
-        break;
-      case "F":
-        problems.push(generateOrderOfOpsF());
-        break;
-      default:
-        problems.push(generateAddition3A());
-    }
+    let problem: MathProblem;
+    let attempts = 0;
+    do {
+      switch (stageId) {
+        case "6A":
+        case "5A":
+        case "4A":
+          problem = generateCounting(stageId);
+          break;
+        case "3A":
+          problem = generateAddition3A();
+          break;
+        case "2A":
+          problem = generateAddition2A();
+          break;
+        case "A":
+          problem = generateAdditionA();
+          break;
+        case "B":
+          problem = generateSubtractionB();
+          break;
+        case "C":
+          problem = generateMultiplicationC();
+          break;
+        case "D":
+          problem = generateDivisionD();
+          break;
+        case "E":
+          problem = generateFractionsE();
+          break;
+        case "F":
+          problem = generateOrderOfOpsF();
+          break;
+        default:
+          problem = generateAddition3A();
+      }
+      attempts++;
+    } while (seen.has(problem.answer * 1000 + parseInt(problem.displayParts.left)) && attempts < 10);
+
+    seen.add(problem.answer * 1000 + parseInt(problem.displayParts.left));
+    problems.push(problem);
   }
-  return problems;
+  return shuffle(problems);
 }

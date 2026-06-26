@@ -114,24 +114,28 @@ export default function Home() {
   if (screen === "practice") {
     const currentStage = STAGES.find((s) => s.id === progress.currentStageId)!;
     return (
-      <PracticeView
-        stage={currentStage}
-        progress={progress}
-        gameState={gameState}
-        ageGroup={ageGroup}
-        onComplete={handlePracticeComplete}
-        onBack={handlePracticeBack}
-      />
+      <div className={`app-shell app-shell--${ageGroup}`}>
+        <PracticeView
+          stage={currentStage}
+          progress={progress}
+          gameState={gameState}
+          ageGroup={ageGroup}
+          onComplete={handlePracticeComplete}
+          onBack={handlePracticeBack}
+        />
+      </div>
     );
   }
 
   if (screen === "settings") {
     return (
-      <SettingsPage
-        settings={settings}
-        onSettingsChange={setSettings}
-        onBack={() => setScreen("home")}
-      />
+      <div className={`app-shell app-shell--${ageGroup}`}>
+        <SettingsPage
+          settings={settings}
+          onSettingsChange={setSettings}
+          onBack={() => setScreen("home")}
+        />
+      </div>
     );
   }
 
@@ -139,14 +143,7 @@ export default function Home() {
 
   return (
     <div className={`app-shell app-shell--${ageGroup}`}>
-      <TopBar
-        coins={gameState.coins}
-        streak={progress.streak}
-        hearts={gameState.hearts}
-        xp={progress.xp}
-        level={level}
-        onSettingsClick={() => setScreen("settings")}
-      />
+      <TopBar onSettingsClick={() => setScreen("settings")} />
 
       <main className="app-shell__content">
         {screen === "home" && profile && (

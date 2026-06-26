@@ -47,15 +47,19 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background: #1a1a2e;
   color: var(--foreground);
   font-family: 'Nunito', 'Comic Sans MS', 'Chalkboard SE', Arial, sans-serif;
-  overflow-x: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100dvh;
+  height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -240,22 +244,19 @@ body {
   border-bottom: 1px solid rgba(108, 92, 231, 0.06);
 }
 
-.top-bar__logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-}
-
-.top-bar__stats {
+.top-bar__left {
   display: flex;
-  gap: 8px;
   align-items: center;
 }
 
 .top-bar__settings {
   background: none;
   border: none;
-  padding: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   cursor: pointer;
   transition: background 0.2s;
@@ -269,28 +270,6 @@ body {
   width: 24px;
   height: 24px;
 }
-
-/* Stat Chips */
-.stat-chip {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  background: rgba(108, 92, 231, 0.06);
-}
-
-.stat-chip__icon {
-  width: 18px;
-  height: 18px;
-}
-
-.stat-chip--streak { background: rgba(253, 121, 168, 0.1); color: #e84393; }
-.stat-chip--coins { background: rgba(253, 203, 110, 0.15); color: #d68910; }
-.stat-chip--hearts { background: rgba(225, 112, 85, 0.1); color: #e17055; }
-.stat-chip--xp { background: rgba(108, 92, 231, 0.1); color: var(--primary); }
 
 /* ========================================
    BOTTOM NAVIGATION
@@ -442,13 +421,16 @@ body {
   transform: translateY(-30px);
 }
 
-.splash-screen__logo .logo__word-pebble,
+.splash-screen__logo .logo__word-pebble {
+  color: #2c3e7a;
+}
+
 .splash-screen__logo .logo__word-sum {
-  color: white;
+  color: #6c5ce7;
 }
 
 .splash-screen__logo .logo__tagline {
-  color: rgba(255, 255, 255, 0.8);
+  color: #4a3ab5;
 }
 
 .splash-screen__mascot {
@@ -486,6 +468,7 @@ body {
    ======================================== */
 
 .onboarding {
+  width: 100%;
   min-height: 100dvh;
   display: flex;
   align-items: center;
@@ -494,6 +477,7 @@ body {
 }
 
 .onboarding__container {
+  position: relative;
   width: 100%;
   max-width: var(--app-max-width);
   height: 100dvh;
@@ -503,7 +487,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 56px var(--spacing-lg) var(--spacing-xl);
+  padding: 48px var(--spacing-md);
+  margin: 0 auto;
+}
+
+.onboarding__container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 0;
+}
+
+.onboarding__container > * {
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 480px) {
@@ -543,7 +543,6 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 400px;
 }
 
 .onboarding__step {
@@ -576,7 +575,6 @@ body {
 
 .onboarding__input {
   width: 100%;
-  max-width: 280px;
   padding: 16px 20px;
   font-size: 18px;
   font-weight: 600;
@@ -597,7 +595,6 @@ body {
   grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   width: 100%;
-  max-width: 320px;
 }
 
 .onboarding__age-btn {
@@ -774,7 +771,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  background: url('/assets/backgrounds/dashboard_background1.png') center/cover no-repeat fixed;
+  background: url('/assets/backgrounds/dashboard_background.png') center/cover no-repeat fixed;
   min-height: 100%;
   margin: calc(-1 * var(--spacing-md));
   padding: var(--spacing-md);
@@ -1133,14 +1130,14 @@ body {
    ======================================== */
 
 .practice {
-  min-height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: var(--spacing-md);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
   background: var(--background);
-  max-width: var(--app-max-width);
-  margin: 0 auto;
   width: 100%;
+  overflow: hidden;
 }
 
 .practice--young {
@@ -1216,10 +1213,10 @@ body {
 /* Progress bar */
 .practice__progress-bar {
   width: 100%;
-  height: 10px;
+  height: 6px;
   background: #f0ecfa;
-  border-radius: 5px;
-  margin-bottom: var(--spacing-md);
+  border-radius: 3px;
+  margin-bottom: var(--spacing-sm);
   overflow: hidden;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 }
@@ -1251,12 +1248,13 @@ body {
   justify-content: center;
   background: white;
   border-radius: var(--radius-xl);
-  padding: var(--spacing-xl) var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   box-shadow: var(--card-shadow-lg);
   transition: all 0.3s;
   position: relative;
-  min-height: 180px;
+  min-height: 0;
+  max-height: 280px;
 }
 
 .practice__problem--correct {
@@ -1336,14 +1334,15 @@ body {
 .practice__numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  max-width: 300px;
+  gap: 8px;
+  max-width: 280px;
   margin: 0 auto;
   width: 100%;
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .practice__numpad-btn {
-  height: 60px;
+  height: 56px;
   border: none;
   border-radius: var(--radius-sm);
   background: white;
@@ -1402,7 +1401,7 @@ body {
 
 /* Practice Complete */
 .practice-complete {
-  min-height: 100dvh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1410,9 +1409,8 @@ body {
   padding: var(--spacing-xl) var(--spacing-lg);
   background: var(--background);
   animation: pop-in 0.4s ease-out;
-  max-width: var(--app-max-width);
-  margin: 0 auto;
   width: 100%;
+  overflow: hidden;
 }
 
 .practice-complete__header {
@@ -2158,12 +2156,10 @@ body {
    ======================================== */
 
 .settings-page {
-  min-height: 100dvh;
   padding: var(--spacing-md);
-  background: var(--background);
-  max-width: var(--app-max-width);
-  margin: 0 auto;
-  width: 100%;
+  padding-top: var(--spacing-lg);
+  overflow-y: auto;
+  flex: 1;
 }
 
 .settings-page__header {

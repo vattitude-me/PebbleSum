@@ -14,7 +14,7 @@ export default function Logo({ size = "md", showTagline = false }: LogoProps) {
 
   return (
     <div className={`logo ${sizeClasses[size]}`}>
-      <img src="/assets/icons/icon-pebble-wave.png" alt="PebbleSum" className="logo__icon" />
+      
       <div className="logo__text">
         <span className="logo__word-pebble">Pebble</span>
         <span className="logo__word-sum">Sum</span>

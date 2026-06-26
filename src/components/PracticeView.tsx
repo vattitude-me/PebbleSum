@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { MathProblem, generateProblems } from "@/lib/math-engine";
 import { Stage } from "@/lib/stages";
 import {
@@ -12,7 +12,7 @@ import {
   SessionRecord,
 } from "@/lib/progress-store";
 import { getNextStage } from "@/lib/stages";
-import { AgeGroup, GameState, saveGameState, addCoins } from "@/lib/user-store";
+import { AgeGroup, GameState, saveGameState } from "@/lib/user-store";
 
 interface PracticeViewProps {
   stage: Stage;
@@ -37,6 +37,7 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
   const [hearts, setHearts] = useState(gameState.hearts);
   const [comboCount, setComboCount] = useState(0);
   const [showEncouragement, setShowEncouragement] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isFinished) return;
@@ -45,6 +46,32 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
     }, 1000);
     return () => clearInterval(interval);
   }, [startTime, isFinished]);
+
+  // Focus the container on mount and after each question advance
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, [currentIndex]);
+
+  // Keyboard event handling
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isFinished || feedback !== null) return;
+
+      if (e.key >= "0" && e.key <= "9") {
+        e.preventDefault();
+        setUserAnswer((a) => a + e.key);
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        setUserAnswer((a) => a.slice(0, -1));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        handleSubmitRef.current();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFinished, feedback]);
 
   const encouragements = [
     "Great job! 🌟",
@@ -56,7 +83,7 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
   ];
 
   const handleSubmit = useCallback(() => {
-    if (!userAnswer.trim()) return;
+    if (!userAnswer.trim() || feedback !== null) return;
 
     const problem = problems[currentIndex];
     const isCorrect = parseInt(userAnswer) === problem.answer;
@@ -84,8 +111,11 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
       } else {
         setCurrentIndex((i) => i + 1);
       }
-    }, 1000);
-  }, [userAnswer, currentIndex, problems, correctCount, hearts, comboCount]);
+    }, isCorrect ? 500 : 800);
+  }, [userAnswer, currentIndex, problems, correctCount, hearts, comboCount, feedback]);
+
+  const handleSubmitRef = useRef(handleSubmit);
+  handleSubmitRef.current = handleSubmit;
 
   const handleNumpad = (digit: string) => {
     if (feedback !== null) return;
@@ -232,7 +262,12 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
   const isYoung = ageGroup === "young";
 
   return (
-    <div className={`practice ${isYoung ? "practice--young" : ""}`}>
+    <div
+      ref={containerRef}
+      tabIndex={-1}
+      className={`practice ${isYoung ? "practice--young" : ""}`}
+      style={{ outline: "none" }}
+    >
       {/* Practice Header */}
       <div className="practice__header">
         <button onClick={onBack} className="practice__close">
