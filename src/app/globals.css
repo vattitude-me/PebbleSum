@@ -81,6 +81,33 @@
   border-top-color: rgba(162, 155, 254, 0.1);
 }
 
+.theme-space .dashboard__overlay {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(26, 26, 46, 0.7) 0%, rgba(26, 26, 46, 0.85) 100%);
+  z-index: 0;
+}
+
+.theme-space .dashboard__primary-action,
+.theme-space .dashboard__journey-card {
+  background: var(--card-bg);
+}
+
+.theme-space .dashboard__stat-chip {
+  background: var(--card-bg);
+}
+
+.theme-space .dashboard__level-strip {
+  background: rgba(45, 45, 68, 0.85);
+  border-color: rgba(162, 155, 254, 0.3);
+}
+
+.theme-space .dashboard__level-strip--unlocked {
+  background: var(--card-bg);
+  border-color: var(--primary);
+}
+
 /* Theme: Candy */
 .theme-candy {
   --background: #fff0f6;
@@ -994,220 +1021,97 @@ body {
 }
 
 /* ========================================
-   DASHBOARD
+   DASHBOARD — Redesigned Layout
    ======================================== */
 
 .dashboard {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  background: url('/assets/backgrounds/dashboard_background.png') center/cover no-repeat;
-  min-height: 100%;
+  min-height: calc(100% + var(--nav-height) + var(--spacing-lg));
   margin: calc(-1 * var(--spacing-md));
+  margin-bottom: calc(-1 * (var(--nav-height) + var(--spacing-lg)));
+  padding: 0;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: url('/assets/backgrounds/dashboard_background.png') center/cover no-repeat;
+}
+
+.dashboard__overlay {
+  display: none;
+}
+
+.dashboard__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
   padding: var(--spacing-md);
-  border-radius: 16px;
+  min-height: 100%;
+}
+
+/* Header */
+.dashboard__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .dashboard__greeting {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 .dashboard__greeting-hello {
-  font-size: 14px;
-  color: #040404;
+  font-size: 13px;
+  color: #666;
   font-weight: 500;
+  margin: 0;
 }
 
 .dashboard__greeting-name {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--foreground);
+  margin: 0;
 }
 
-.dashboard__greeting-mascot {
-  position: relative;
-}
-
-.dashboard__mascot-img {
-  width: 64px;
-  height: 64px;
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Daily Card */
-.dashboard__daily-card {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  padding: var(--spacing-lg);
-  min-height: 120px;
-  box-shadow: var(--card-shadow-xl);
-}
-
-.dashboard__daily-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.9;
-}
-
-.dashboard__daily-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dashboard__daily-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.dashboard__daily-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.dashboard__daily-title {
-  font-size: 20px;
-  font-weight: 800;
-  color: white;
-}
-
-.dashboard__daily-meta {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.dashboard__goal-bar {
-  margin-top: 8px;
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.dashboard__goal-fill {
-  height: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.dashboard__start-btn {
+/* Stats Strip — horizontal row of chips */
+.dashboard__stats-strip {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 28px;
-  height: 52px;
-  background: white;
-  color: var(--primary);
-  border: none;
-  border-radius: 99px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 0 rgba(108, 92, 231, 0);
-  transition: all 0.2s;
-  animation: pulse-glow 2.5s infinite;
 }
 
-.dashboard__start-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
-}
-
-.dashboard__start-btn:active {
-  transform: scale(0.97);
-}
-
-.dashboard__start-icon {
-  width: 22px;
-  height: 22px;
-}
-
-.dashboard__complete-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: white;
+.dashboard__stat-chip {
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.dashboard__complete-icon {
-  width: 28px;
-  height: 28px;
-}
-
-/* Streak Pill (top-right) */
-.dashboard__streak-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 5px;
+  padding: 6px 12px;
   background: white;
   border-radius: 99px;
-  box-shadow: var(--card-shadow-lg);
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.08);
 }
 
-.dashboard__streak-icon {
-  width: 22px;
-  height: 22px;
-}
-
-.dashboard__streak-value {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--foreground);
-}
-
-/* Progress Row (Coins + XP bar) */
-.dashboard__progress-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #ffffff94;
-  border-radius: var(--radius-md);
-  padding: 14px var(--spacing-md);
-  box-shadow: var(--card-shadow-lg);
-}
-
-.dashboard__coins-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.dashboard__coins-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.dashboard__coins-value {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--foreground);
-}
-
-.dashboard__xp-inline {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.dashboard__stat-chip--xp {
   flex: 1;
+  gap: 8px;
 }
 
-.dashboard__xp-level {
-  font-size: 13px;
+.dashboard__stat-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.dashboard__stat-value {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.dashboard__xp-label {
+  font-size: 12px;
   font-weight: 700;
   color: var(--primary);
   flex-shrink: 0;
@@ -1215,138 +1119,333 @@ body {
 
 .dashboard__xp-bar {
   flex: 1;
-  height: 10px;
-  background: #f0ecfa;
-  border-radius: 5px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.dashboard__xp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-light));
-  border-radius: 5px;
-  transition: width 0.5s ease;
-  box-shadow: 0 1px 4px rgba(108, 92, 231, 0.3);
-}
-
-.dashboard__xp-count {
-  font-size: 12px;
-  color: #999;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-/* World/Journey Card */
-.dashboard__world-card {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.dashboard__world-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--card-shadow-xl);
-}
-
-.dashboard__world-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-}
-
-.dashboard__world-content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px var(--spacing-md);
-  background: white;
-  border: 1px solid rgba(108, 92, 231, 0.1);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--card-shadow-lg);
-}
-
-.dashboard__world-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(46, 204, 113, 0.15));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.dashboard__world-icon {
-  font-size: 24px;
-}
-
-.dashboard__world-info {
-  flex: 1;
-}
-
-.dashboard__world-name {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--foreground);
-  line-height: 1.3;
-}
-
-.dashboard__world-desc {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
-}
-
-.dashboard__world-progress {
-  font-size: 12px;
-  color: var(--primary);
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-.dashboard__world-arrow {
-  width: 24px;
-  height: 24px;
-  opacity: 0.5;
-  flex-shrink: 0;
-}
-
-/* Mastery */
-.dashboard__mastery {
-  background: white;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-md);
-  box-shadow: var(--card-shadow-lg);
-}
-
-.dashboard__mastery-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.dashboard__mastery-bar {
   height: 8px;
   background: #f0ecfa;
   border-radius: 4px;
   overflow: hidden;
 }
 
-.dashboard__mastery-fill {
+.dashboard__xp-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--success), #2ecc71);
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
   border-radius: 4px;
-  transition: width 0.5s;
+  transition: width 0.5s ease;
 }
 
-.dashboard__mastery-text {
+/* Primary Action Section */
+.dashboard__primary-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg) var(--spacing-md);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow-lg);
+}
+
+.dashboard__goal-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dashboard__goal-label {
   font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   color: #888;
-  margin-top: 6px;
+}
+
+.dashboard__goal-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard__goal-bar {
+  flex: 1;
+  height: 8px;
+  background: #f0ecfa;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.dashboard__goal-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.dashboard__goal-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.dashboard__practice-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 32px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(108, 92, 231, 0.35);
+  transition: all 0.2s;
+  animation: pulse-glow 2.5s infinite;
+}
+
+.dashboard__practice-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(108, 92, 231, 0.45);
+}
+
+.dashboard__practice-btn:active {
+  transform: scale(0.97);
+}
+
+.dashboard__practice-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(10);
+}
+
+/* Goal Complete State */
+.dashboard__goal-complete {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.dashboard__goal-complete-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--success), #2ecc71);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard__complete-img {
+  width: 28px;
+  height: 28px;
+  filter: brightness(10);
+}
+
+.dashboard__goal-complete-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dashboard__goal-complete-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.dashboard__goal-complete-sub {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+/* Level Clear Strip — compact secondary element */
+.dashboard__level-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius-md);
+  border: 1.5px dashed #d4ccf0;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+
+.dashboard__level-strip--unlocked {
+  background: white;
+  border: 1.5px solid var(--primary);
+  opacity: 1;
+  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.12);
+}
+
+.dashboard__level-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard__level-strip-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #ede8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.dashboard__level-strip--unlocked .dashboard__level-strip-badge {
+  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
+}
+
+.dashboard__level-strip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.dashboard__level-strip-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2d2d44;
+}
+
+.dashboard__level-strip-meta {
+  font-size: 11px;
+  color: #888;
+}
+
+.dashboard__level-strip-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard__level-strip-bar {
+  flex: 1;
+  height: 5px;
+  background: #e8e0ff;
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 80px;
+}
+
+.dashboard__level-strip-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a29bfe, #6c5ce7);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.dashboard__level-strip-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.dashboard__level-strip-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
+  color: white;
+  white-space: nowrap;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+  flex-shrink: 0;
+}
+
+.dashboard__level-strip-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(108, 92, 231, 0.4);
+}
+
+.dashboard__level-strip-btn:active {
+  transform: translateY(0);
+}
+
+/* Journey Card — compact navigation */
+.dashboard__journey-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard__journey-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--card-shadow-lg);
+}
+
+.dashboard__journey-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard__journey-icon {
+  font-size: 28px;
+}
+
+.dashboard__journey-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dashboard__journey-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.dashboard__journey-progress {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  margin: 0;
+}
+
+.dashboard__journey-arrow {
+  width: 20px;
+  height: 20px;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+/* Mascot — bottom corner */
+.dashboard__mascot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-right: 4px;
+}
+
+.dashboard__mascot-img {
+  width: 120px;
+  height: 120px;
 }
 
 

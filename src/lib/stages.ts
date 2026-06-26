@@ -4,8 +4,10 @@ export interface Stage {
   description: string;
   category: string;
   sctSeconds: number;
+  levelClearSeconds: number;
   questionsPerDay: number;
-  unlockRequirement: number;
+  levelClearQuestions: number;
+  practiceSessionsRequired: number;
 }
 
 export const STAGES: Stage[] = [
@@ -15,8 +17,10 @@ export const STAGES: Stage[] = [
     description: "Count objects from 1 to 10",
     category: "Motor Skills & Counting",
     sctSeconds: 300,
+    levelClearSeconds: 180,
     questionsPerDay: 10,
-    unlockRequirement: 0,
+    levelClearQuestions: 10,
+    practiceSessionsRequired: 3,
   },
   {
     id: "5A",
@@ -24,8 +28,10 @@ export const STAGES: Stage[] = [
     description: "Count objects from 1 to 30",
     category: "Motor Skills & Counting",
     sctSeconds: 300,
+    levelClearSeconds: 180,
     questionsPerDay: 10,
-    unlockRequirement: 3,
+    levelClearQuestions: 10,
+    practiceSessionsRequired: 3,
   },
   {
     id: "4A",
@@ -33,8 +39,10 @@ export const STAGES: Stage[] = [
     description: "Count and write numbers up to 100",
     category: "Motor Skills & Counting",
     sctSeconds: 360,
+    levelClearSeconds: 200,
     questionsPerDay: 15,
-    unlockRequirement: 3,
+    levelClearQuestions: 15,
+    practiceSessionsRequired: 3,
   },
   {
     id: "3A",
@@ -42,8 +50,10 @@ export const STAGES: Stage[] = [
     description: "Simple addition with small numbers",
     category: "Basic Addition",
     sctSeconds: 300,
+    levelClearSeconds: 180,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "2A",
@@ -51,8 +61,10 @@ export const STAGES: Stage[] = [
     description: "Addition with numbers up to 10",
     category: "Basic Addition",
     sctSeconds: 360,
+    levelClearSeconds: 200,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "A",
@@ -60,8 +72,10 @@ export const STAGES: Stage[] = [
     description: "Addition with two-digit numbers",
     category: "Advanced Addition & Subtraction",
     sctSeconds: 420,
+    levelClearSeconds: 240,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "B",
@@ -69,8 +83,10 @@ export const STAGES: Stage[] = [
     description: "Basic and 2-digit subtraction",
     category: "Advanced Addition & Subtraction",
     sctSeconds: 420,
+    levelClearSeconds: 240,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "C",
@@ -78,8 +94,10 @@ export const STAGES: Stage[] = [
     description: "Multiplication tables and multi-digit",
     category: "Multiplication & Division",
     sctSeconds: 480,
+    levelClearSeconds: 270,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "D",
@@ -87,8 +105,10 @@ export const STAGES: Stage[] = [
     description: "Division with and without remainders",
     category: "Multiplication & Division",
     sctSeconds: 480,
+    levelClearSeconds: 270,
     questionsPerDay: 20,
-    unlockRequirement: 3,
+    levelClearQuestions: 20,
+    practiceSessionsRequired: 3,
   },
   {
     id: "E",
@@ -96,8 +116,10 @@ export const STAGES: Stage[] = [
     description: "Operations with fractions and decimals",
     category: "Fractions & Order of Operations",
     sctSeconds: 600,
+    levelClearSeconds: 360,
     questionsPerDay: 15,
-    unlockRequirement: 3,
+    levelClearQuestions: 15,
+    practiceSessionsRequired: 3,
   },
   {
     id: "F",
@@ -105,8 +127,10 @@ export const STAGES: Stage[] = [
     description: "BODMAS and mixed operations",
     category: "Fractions & Order of Operations",
     sctSeconds: 600,
+    levelClearSeconds: 360,
     questionsPerDay: 15,
-    unlockRequirement: 3,
+    levelClearQuestions: 15,
+    practiceSessionsRequired: 3,
   },
 ];
 

@@ -4,13 +4,14 @@ import { UserProgress, getToday } from "@/lib/progress-store";
 import { UserProfile, GameState, EarnedBadge } from "@/lib/user-store";
 import { STAGES } from "@/lib/stages";
 import { getWorldForStage } from "@/lib/worlds";
+import { PracticeMode } from "@/components/PracticeView";
 
 interface HomeDashboardProps {
   profile: UserProfile;
   progress: UserProgress;
   gameState: GameState;
   badges: EarnedBadge[];
-  onStartPractice: () => void;
+  onStartPractice: (mode: PracticeMode) => void;
   onNavigate: (page: string) => void;
 }
 
@@ -30,6 +31,8 @@ export default function HomeDashboard({
   const goalMinutes = profile.dailyGoalMinutes;
   const goalProgress = Math.min(todayPracticeMinutes / goalMinutes, 1);
   const todayCompleted = gameState.dailyGoalCompleted && isSameDay;
+  const practiceCount = progress.stagePracticeCounts?.[progress.currentStageId] || 0;
+  const canAttemptLevelClear = practiceCount >= (currentStage?.practiceSessionsRequired || 3);
   const world = getWorldForStage(progress.currentStageId);
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
@@ -41,112 +44,125 @@ export default function HomeDashboard({
     return "Good evening";
   };
 
-
   return (
     <div className="dashboard">
+      <div className="dashboard__overlay" />
 
- {/* Coins + XP (compact row) */}
-      <section className="dashboard__progress-row">
-        <div className="dashboard__coins-pill">
-          <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__coins-icon" />
-          <span className="dashboard__coins-value">{gameState.coins}</span>
-        </div>
-        <div className="dashboard__xp-inline">
-          <span className="dashboard__xp-level">Lv {level}</span>
-          <div className="dashboard__xp-bar">
-            <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
+      <div className="dashboard__content">
+        {/* Header: Greeting + Stats Strip */}
+        <header className="dashboard__header">
+          <div className="dashboard__greeting">
+            <p className="dashboard__greeting-hello">{getGreeting()},</p>
+            <h2 className="dashboard__greeting-name">{profile.name}!</h2>
           </div>
-          <span className="dashboard__xp-count">{xpInLevel}/{500}</span>
-        </div>
-      </section>
-
-      {/* Greeting + Streak */}
-      <section className="dashboard__greeting">
-        <div className="dashboard__greeting-text">
-          <p className="dashboard__greeting-hello">{getGreeting()},</p>
-          <h2 className="dashboard__greeting-name">{profile.name}!</h2>
-        </div>
-        <div className="dashboard__streak-pill">
-          <img src="/assets/icons/icon-fire.png" alt="Streak" className="dashboard__streak-icon" />
-          <span className="dashboard__streak-value">{progress.streak}</span>
-        </div>
-      </section>
-
-     
-
-      {/* Daily Goal Card */}
-      <section className="dashboard__daily-card">
-        <div className={`dashboard__daily-bg bg-gradient-to-br ${world?.gradient || "from-purple-300 to-indigo-400"}`} />
-        <div className="dashboard__daily-content">
-          <div className="dashboard__daily-info">
-            <span className="dashboard__daily-label">
-              {todayCompleted ? "Today's Goal Complete! 🎉" : "Daily Goal"}
-            </span>
-            <h3 className="dashboard__daily-title">
-              {todayCompleted
-                ? "Amazing work! Come back tomorrow."
-                : `${currentStage?.name || "Practice"}`}
-            </h3>
-            {!todayCompleted && (
-              <p className="dashboard__daily-meta">
-                {todayPracticeMinutes}/{goalMinutes} min · {currentStage?.questionsPerDay} questions per session
-              </p>
-            )}
-            {!todayCompleted && todayPracticeMinutes > 0 && (
-              <div className="dashboard__goal-bar">
-                <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
+          <div className="dashboard__stats-strip">
+            <div className="dashboard__stat-chip">
+              <img src="/assets/icons/icon-fire.png" alt="Streak" className="dashboard__stat-icon" />
+              <span className="dashboard__stat-value">{progress.streak}</span>
+            </div>
+            <div className="dashboard__stat-chip">
+              <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__stat-icon" />
+              <span className="dashboard__stat-value">{gameState.coins}</span>
+            </div>
+            <div className="dashboard__stat-chip dashboard__stat-chip--xp">
+              <span className="dashboard__xp-label">Lv {level}</span>
+              <div className="dashboard__xp-bar">
+                <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
               </div>
-            )}
+            </div>
           </div>
-          {!todayCompleted && (
-            <button onClick={onStartPractice} className="dashboard__start-btn">
-              <img src="/assets/icons/icon-play.png" alt="Start" className="dashboard__start-icon" />
-              <span>Start</span>
+        </header>
+
+        {/* Primary Action: Practice CTA */}
+        <section className="dashboard__primary-action">
+          {todayCompleted ? (
+            <div className="dashboard__goal-complete">
+              <div className="dashboard__goal-complete-icon">
+                <img src="/assets/icons/icon-checkmark.png" alt="Done" className="dashboard__complete-img" />
+              </div>
+              <div className="dashboard__goal-complete-text">
+                <h3 className="dashboard__goal-complete-title">Today&apos;s Goal Complete!</h3>
+                <p className="dashboard__goal-complete-sub">Amazing work! Come back tomorrow.</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="dashboard__goal-info">
+                <span className="dashboard__goal-label">Daily Goal</span>
+                <div className="dashboard__goal-progress-row">
+                  <div className="dashboard__goal-bar">
+                    <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
+                  </div>
+                  <span className="dashboard__goal-text">{todayPracticeMinutes}/{goalMinutes} min</span>
+                </div>
+              </div>
+              <button onClick={() => onStartPractice("practice")} className="dashboard__practice-btn">
+                <img src="/assets/icons/icon-play.png" alt="Start" className="dashboard__practice-icon" />
+                <span>Practice</span>
+              </button>
+            </>
+          )}
+        </section>
+
+        {/* Secondary: Level Clear Strip */}
+        <section className={`dashboard__level-strip ${canAttemptLevelClear ? "dashboard__level-strip--unlocked" : ""}`}>
+          <div className="dashboard__level-strip-left">
+            <div className="dashboard__level-strip-badge">
+              {canAttemptLevelClear ? "🏆" : "🔒"}
+            </div>
+            <div className="dashboard__level-strip-info">
+              <span className="dashboard__level-strip-title">
+                Level Clear · {currentStage?.name || "Test"}
+              </span>
+              {canAttemptLevelClear ? (
+                <span className="dashboard__level-strip-meta">
+                  100% in {Math.floor((currentStage?.levelClearSeconds || 180) / 60)}:{((currentStage?.levelClearSeconds || 180) % 60).toString().padStart(2, "0")} to advance
+                </span>
+              ) : (
+                <div className="dashboard__level-strip-progress">
+                  <div className="dashboard__level-strip-bar">
+                    <div
+                      className="dashboard__level-strip-fill"
+                      style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
+                    />
+                  </div>
+                  <span className="dashboard__level-strip-count">
+                    {practiceCount}/{currentStage?.practiceSessionsRequired || 3} sessions
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+          {canAttemptLevelClear && (
+            <button onClick={() => onStartPractice("levelClear")} className="dashboard__level-strip-btn">
+              Start
             </button>
           )}
-          {todayCompleted && (
-            <div className="dashboard__complete-badge">
-              <img src="/assets/icons/icon-checkmark.png" alt="Done" className="dashboard__complete-icon" />
+        </section>
+
+        {/* Journey Card */}
+        {world && (
+          <section className="dashboard__journey-card" onClick={() => onNavigate("journey")}>
+            <div className="dashboard__journey-left">
+              <span className="dashboard__journey-icon">{world.icon}</span>
+              <div className="dashboard__journey-info">
+                <h4 className="dashboard__journey-name">{world.name}</h4>
+                <p className="dashboard__journey-progress">Stage {currentStageIndex + 1} of {STAGES.length}</p>
+              </div>
             </div>
-          )}
+            <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__journey-arrow" />
+          </section>
+        )}
+
+        {/* Mascot — bottom corner above nav */}
+        <div className="dashboard__mascot">
+          <img
+            src="/assets/icons/icon-pebble-celebrate-left.png"
+            alt="Pebble"
+            className="dashboard__mascot-img"
+          />
         </div>
-      </section>
-
-      
-
-      {/* Journey Card (Primary Progression) */}
-      {world && (
-        <section className="dashboard__world-card" onClick={() => onNavigate("journey")}>
-          <div className={`dashboard__world-bg bg-gradient-to-r ${world.gradient}`} />
-          <div className="dashboard__world-content">
-            <div className="dashboard__world-icon-wrap">
-              <span className="dashboard__world-icon">{world.icon}</span>
-            </div>
-            <div className="dashboard__world-info">
-              <h4 className="dashboard__world-name">{world.name}</h4>
-              <p className="dashboard__world-desc">Continue your learning path</p>
-              <p className="dashboard__world-progress">Stage {currentStageIndex + 1} of {STAGES.length}</p>
-            </div>
-            <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__world-arrow" />
-          </div>
-        </section>
-      )}
-
-      {/* Mastery Progress */}
-      {!todayCompleted && progress.consecutivePerfectDays > 0 && currentStage && (
-        <section className="dashboard__mastery">
-          <h4 className="dashboard__mastery-title">Stage Mastery</h4>
-          <div className="dashboard__mastery-bar">
-            <div
-              className="dashboard__mastery-fill"
-              style={{ width: `${(progress.consecutivePerfectDays / currentStage.unlockRequirement) * 100}%` }}
-            />
-          </div>
-          <p className="dashboard__mastery-text">
-            {progress.consecutivePerfectDays} / {currentStage.unlockRequirement} perfect days to unlock next stage
-          </p>
-        </section>
-      )}
+      </div>
     </div>
   );
 }

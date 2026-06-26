@@ -14,8 +14,11 @@ import {
 import { getNextStage } from "@/lib/stages";
 import { AgeGroup, GameState, UserProfile, saveGameState } from "@/lib/user-store";
 
+export type PracticeMode = "practice" | "levelClear";
+
 interface PracticeViewProps {
   stage: Stage;
+  mode: PracticeMode;
   progress: UserProgress;
   gameState: GameState;
   profile: UserProfile;
@@ -24,9 +27,13 @@ interface PracticeViewProps {
   onBack: () => void;
 }
 
-export default function PracticeView({ stage, progress, gameState, profile, ageGroup, onComplete, onBack }: PracticeViewProps) {
+export default function PracticeView({ stage, mode, progress, gameState, profile, ageGroup, onComplete, onBack }: PracticeViewProps) {
+  const isLevelClear = mode === "levelClear";
+  const questionCount = isLevelClear ? stage.levelClearQuestions : stage.questionsPerDay;
+  const timeLimit = isLevelClear ? stage.levelClearSeconds : stage.sctSeconds;
+
   const [problems] = useState<MathProblem[]>(() =>
-    generateProblems(stage.id, stage.questionsPerDay)
+    generateProblems(stage.id, questionCount)
   );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -133,23 +140,20 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
     setIsFinished(true);
     const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
     const perfect = finalCorrect === problems.length;
-    const withinSCT = timeSeconds <= stage.sctSeconds;
-    const xpGain = calculateXpGain(finalCorrect, problems.length, withinSCT);
+    const withinTime = timeSeconds <= timeLimit;
+    const xpGain = calculateXpGain(finalCorrect, problems.length, withinTime);
     const coinsGained = Math.floor(xpGain / 5) + (perfect ? 10 : 0);
 
     const today = getToday();
     const streakActive = isStreakActive(progress.lastPracticeDate);
     const newStreak = streakActive ? progress.streak + (progress.lastPracticeDate === today ? 0 : 1) : 1;
 
-    let consecutivePerfect = progress.consecutivePerfectDays;
-    if (perfect && withinSCT) {
-      consecutivePerfect += 1;
-    } else {
-      consecutivePerfect = 0;
-    }
-
     const nextStage = getNextStage(stage.id);
-    const shouldLevelUp = consecutivePerfect >= stage.unlockRequirement && nextStage;
+    const levelCleared = isLevelClear && perfect && withinTime;
+    const shouldLevelUp = levelCleared && nextStage;
+
+    const currentPracticeCount = progress.stagePracticeCounts[stage.id] || 0;
+    const newPracticeCount = isLevelClear ? currentPracticeCount : currentPracticeCount + 1;
 
     const session: SessionRecord = {
       date: today,
@@ -158,17 +162,21 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
       total: problems.length,
       timeSeconds,
       perfect,
-      withinSCT,
+      withinSCT: withinTime,
     };
 
     const updatedProgress: UserProgress = {
       ...progress,
-      xp: progress.xp + xpGain,
+      xp: progress.xp + (isLevelClear && !levelCleared ? 0 : xpGain),
       streak: newStreak,
       lastPracticeDate: today,
-      consecutivePerfectDays: consecutivePerfect,
+      consecutivePerfectDays: perfect && withinTime ? progress.consecutivePerfectDays + 1 : 0,
       currentStageId: shouldLevelUp ? nextStage!.id : progress.currentStageId,
       completedSessions: [...progress.completedSessions, session],
+      stagePracticeCounts: {
+        ...progress.stagePracticeCounts,
+        [stage.id]: newPracticeCount,
+      },
     };
 
     const isSameDay = gameState.practiceDate === today;
@@ -178,7 +186,7 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
 
     const updatedGameState: GameState = {
       ...gameState,
-      coins: gameState.coins + coinsGained,
+      coins: gameState.coins + (isLevelClear && !levelCleared ? 0 : coinsGained),
       hearts,
       dailyGoalCompleted: goalReached,
       todayPracticeSeconds: newPracticeSeconds,
@@ -204,24 +212,36 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
   if (isFinished) {
     const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
     const perfect = correctCount === problems.length;
-    const withinSCT = timeSeconds <= stage.sctSeconds;
-    const xpGain = calculateXpGain(correctCount, problems.length, withinSCT);
-    const coinsGained = Math.floor(xpGain / 5) + (perfect ? 10 : 0);
+    const withinTime = timeSeconds <= timeLimit;
+    const levelCleared = isLevelClear && perfect && withinTime;
+    const xpGain = isLevelClear && !levelCleared ? 0 : calculateXpGain(correctCount, problems.length, withinTime);
+    const coinsGained = isLevelClear && !levelCleared ? 0 : Math.floor(xpGain / 5) + (perfect ? 10 : 0);
+
+    const getTitle = () => {
+      if (isLevelClear && levelCleared) return "Level Cleared! 🏆";
+      if (isLevelClear && !levelCleared) return "Not Yet... 💪";
+      if (perfect) return "Perfect! 🎉";
+      return "Well Done! 👏";
+    };
+
+    const getSubtitle = () => {
+      if (isLevelClear && levelCleared) return "You've mastered this stage!";
+      if (isLevelClear && !perfect) return "You need a perfect score to clear this level. Keep practicing!";
+      if (isLevelClear && !withinTime) return `Too slow! You need to finish within ${formatTime(timeLimit)}.`;
+      if (perfect) return "You nailed every question!";
+      return "Keep practicing to get even better!";
+    };
 
     return (
       <div className="practice-complete">
         <div className="practice-complete__header">
           <img
-            src={`/assets/icons/${perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
+            src={`/assets/icons/${levelCleared || perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
             alt="Pebble"
             className="practice-complete__mascot"
           />
-          <h2 className="practice-complete__title">
-            {perfect ? "Perfect! 🎉" : "Well Done! 👏"}
-          </h2>
-          <p className="practice-complete__subtitle">
-            {perfect ? "You nailed every question!" : "Keep practicing to get even better!"}
-          </p>
+          <h2 className="practice-complete__title">{getTitle()}</h2>
+          <p className="practice-complete__subtitle">{getSubtitle()}</p>
         </div>
 
         <div className="practice-complete__stats">
@@ -235,26 +255,28 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
           </div>
           <div className="practice-complete__stat">
             <span className="practice-complete__stat-label">Target</span>
-            <span className={`practice-complete__stat-value ${withinSCT ? "practice-complete__stat-value--success" : "practice-complete__stat-value--warning"}`}>
-              {formatTime(stage.sctSeconds)}
+            <span className={`practice-complete__stat-value ${withinTime ? "practice-complete__stat-value--success" : "practice-complete__stat-value--warning"}`}>
+              {formatTime(timeLimit)}
             </span>
           </div>
         </div>
 
-        <div className="practice-complete__rewards">
-          <div className="practice-complete__reward">
-            <img src="/assets/icons/icon-xp.png" alt="XP" className="practice-complete__reward-icon" />
-            <span>+{xpGain} XP</span>
+        {(xpGain > 0 || coinsGained > 0) && (
+          <div className="practice-complete__rewards">
+            <div className="practice-complete__reward">
+              <img src="/assets/icons/icon-xp.png" alt="XP" className="practice-complete__reward-icon" />
+              <span>+{xpGain} XP</span>
+            </div>
+            <div className="practice-complete__reward">
+              <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="practice-complete__reward-icon" />
+              <span>+{coinsGained} Coins</span>
+            </div>
           </div>
-          <div className="practice-complete__reward">
-            <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="practice-complete__reward-icon" />
-            <span>+{coinsGained} Coins</span>
-          </div>
-        </div>
+        )}
 
-        {perfect && withinSCT && (
+        {isLevelClear && !levelCleared && (
           <p className="practice-complete__mastery-msg">
-            🌟 {progress.consecutivePerfectDays + 1}/{stage.unlockRequirement} perfect days to next stage!
+            You need 100% correct within {formatTime(timeLimit)} to advance.
           </p>
         )}
 
@@ -285,7 +307,7 @@ export default function PracticeView({ stage, progress, gameState, profile, ageG
           <span className="practice__question-count">{currentIndex + 1}/{problems.length}</span>
         </div>
         <div className="practice__timer-hearts">
-          <span className={`practice__timer ${elapsed > stage.sctSeconds ? "practice__timer--over" : ""}`}>
+          <span className={`practice__timer ${elapsed > timeLimit ? "practice__timer--over" : ""}`}>
             <img src="/assets/icons/icon-timer.png" alt="Time" className="practice__timer-icon" />
             {formatTime(elapsed)}
           </span>

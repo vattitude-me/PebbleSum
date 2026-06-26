@@ -5,6 +5,7 @@ export interface UserProgress {
   lastPracticeDate: string | null;
   consecutivePerfectDays: number;
   completedSessions: SessionRecord[];
+  stagePracticeCounts: Record<string, number>;
 }
 
 export interface SessionRecord {
@@ -26,6 +27,7 @@ const DEFAULT_PROGRESS: UserProgress = {
   lastPracticeDate: null,
   consecutivePerfectDays: 0,
   completedSessions: [],
+  stagePracticeCounts: {},
 };
 
 export function loadProgress(): UserProgress {

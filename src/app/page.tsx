@@ -26,7 +26,7 @@ import AuthScreen from "@/components/AuthScreen";
 import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import HomeDashboard from "@/components/HomeDashboard";
-import PracticeView from "@/components/PracticeView";
+import PracticeView, { PracticeMode } from "@/components/PracticeView";
 import JourneyMap from "@/components/JourneyMap";
 import RewardsPage from "@/components/RewardsPage";
 import ProfilePage from "@/components/ProfilePage";
@@ -44,6 +44,7 @@ export default function Home() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [badges, setBadges] = useState<EarnedBadge[]>([]);
+  const [practiceMode, setPracticeMode] = useState<PracticeMode>("practice");
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -140,7 +141,8 @@ export default function Home() {
     setScreen(page as AppScreen);
   }, []);
 
-  const handleStartPractice = useCallback(() => {
+  const handleStartPractice = useCallback((mode: PracticeMode = "practice") => {
+    setPracticeMode(mode);
     setScreen("practice");
   }, []);
 
@@ -216,6 +218,7 @@ export default function Home() {
       <div className={shellClasses}>
         <PracticeView
           stage={currentStage}
+          mode={practiceMode}
           progress={progress}
           gameState={gameState}
           profile={profile!}
