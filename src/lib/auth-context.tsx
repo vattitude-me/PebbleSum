@@ -14,11 +14,14 @@ import {
 import { doc, deleteDoc } from "firebase/firestore";
 import { getFirebaseAuth, getFirebaseDb } from "./firebase";
 
+const toEmail = (username: string) => `${username.toLowerCase().trim()}@pebblesum.app`;
+
 interface AuthContextType {
   user: User | null;
+  username: string | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (username: string, password: string) => Promise<void>;
+  signUp: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
 }
@@ -42,12 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+  const signIn = useCallback(async (username: string, password: string) => {
+    await signInWithEmailAndPassword(getFirebaseAuth(), toEmail(username), password);
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
+  const signUp = useCallback(async (username: string, password: string) => {
+    await createUserWithEmailAndPassword(getFirebaseAuth(), toEmail(username), password);
   }, []);
 
   const signOutUser = useCallback(async () => {
@@ -65,8 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await deleteUser(currentUser);
   }, []);
 
+  const username = user?.email?.replace("@pebblesum.app", "") || null;
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut: signOutUser, deleteAccount }}>
+    <AuthContext.Provider value={{ user, username, loading, signIn, signUp, signOut: signOutUser, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );

@@ -206,10 +206,14 @@ export default function Home() {
   const ageGroup: AgeGroup = profile?.ageGroup || "middle";
   const level = Math.floor(progress.xp / 500) + 1;
 
+  const themeClass = settings.theme !== "default" ? `theme-${settings.theme}` : "";
+  const textSizeClass = settings.textSize === "large" ? "text-size-large" : settings.textSize === "extra-large" ? "text-size-extra-large" : "";
+  const shellClasses = `app-shell app-shell--${ageGroup} ${themeClass} ${textSizeClass}`.trim();
+
   if (screen === "practice") {
     const currentStage = STAGES.find((s) => s.id === progress.currentStageId)!;
     return (
-      <div className={`app-shell app-shell--${ageGroup}`}>
+      <div className={shellClasses}>
         <PracticeView
           stage={currentStage}
           progress={progress}
@@ -224,7 +228,7 @@ export default function Home() {
 
   if (screen === "settings") {
     return (
-      <div className={`app-shell app-shell--${ageGroup}`}>
+      <div className={shellClasses}>
         <SettingsPage
           settings={settings}
           onSettingsChange={handleSettingsChange}
@@ -237,7 +241,7 @@ export default function Home() {
 
   if (screen === "terms") {
     return (
-      <div className={`app-shell app-shell--${ageGroup}`}>
+      <div className={shellClasses}>
         <TermsPage onBack={() => setScreen("settings")} />
       </div>
     );
@@ -245,7 +249,7 @@ export default function Home() {
 
   if (screen === "privacy") {
     return (
-      <div className={`app-shell app-shell--${ageGroup}`}>
+      <div className={shellClasses}>
         <PrivacyPage onBack={() => setScreen("settings")} />
       </div>
     );
@@ -254,7 +258,7 @@ export default function Home() {
   const showNav = ["home", "journey", "rewards", "profile"].includes(screen);
 
   return (
-    <div className={`app-shell app-shell--${ageGroup}`}>
+    <div className={shellClasses}>
       <TopBar onSettingsClick={() => setScreen("settings")} />
 
       <main className="app-shell__content">

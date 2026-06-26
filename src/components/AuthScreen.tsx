@@ -10,7 +10,7 @@ interface AuthScreenProps {
 export default function AuthScreen({ onSuccess }: AuthScreenProps) {
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -54,8 +54,13 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
       return;
     }
 
-    if (!email || !password) {
+    if (!username || !password) {
       setError("Please fill in all fields.");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+      setError("Username must be 3-20 characters (letters, numbers, underscore).");
       return;
     }
 
@@ -72,19 +77,19 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
     setLoading(true);
     try {
       if (mode === "login") {
-        await signIn(email, password);
+        await signIn(username, password);
       } else {
-        await signUp(email, password);
+        await signUp(username, password);
       }
       onSuccess();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong.";
       if (message.includes("user-not-found") || message.includes("invalid-credential")) {
-        setError("Invalid email or password.");
+        setError("Invalid username or password.");
       } else if (message.includes("email-already-in-use")) {
-        setError("An account with this email already exists.");
+        setError("This username is already taken.");
       } else if (message.includes("invalid-email")) {
-        setError("Please enter a valid email address.");
+        setError("Invalid username format.");
       } else if (message.includes("weak-password")) {
         setError("Password must be at least 6 characters.");
       } else {
@@ -106,22 +111,23 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
         <h2 className="auth-screen__title">
           {mode === "login" ? "Welcome Back!" : "Join the Adventure!"}
         </h2>
-        <p className="auth-screen__subtitle">
-          {mode === "login"
-            ? "Sign in to continue your math journey"
-            : "Create an account to save progress and learn across devices"}
-        </p>
+        {mode === "login" && (
+          <p className="auth-screen__subtitle">
+            Sign in to continue your math journey
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="auth-screen__form">
           <div className="auth-screen__field">
-            <label className="auth-screen__label">Email</label>
+            <label className="auth-screen__label">Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="auth-screen__input"
-              placeholder="your@email.com"
-              autoComplete="email"
+              placeholder="your_username"
+              autoComplete="username"
+              maxLength={20}
             />
           </div>
 

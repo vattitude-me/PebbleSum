@@ -12,7 +12,8 @@ interface SettingsPageProps {
 }
 
 export default function SettingsPage({ settings, onSettingsChange, onBack, onNavigate }: SettingsPageProps) {
-  const { user, signOut, deleteAccount } = useAuth();
+  const { user, username, signOut, deleteAccount } = useAuth();
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
@@ -63,35 +64,6 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         <h2 className="settings-page__title">Settings</h2>
       </div>
 
-      {/* Sound */}
-      <section className="settings-page__section">
-        <h3 className="settings-page__section-title">Audio</h3>
-        <div className="settings-page__row">
-          <div className="settings-page__row-info">
-            <img src="/assets/icons/icon-sound-on.png" alt="Sound" className="settings-page__row-icon" />
-            <span>Sound Effects</span>
-          </div>
-          <button
-            onClick={() => update({ soundEnabled: !settings.soundEnabled })}
-            className={`settings-page__toggle ${settings.soundEnabled ? "settings-page__toggle--on" : ""}`}
-          >
-            <div className="settings-page__toggle-knob" />
-          </button>
-        </div>
-        <div className="settings-page__row">
-          <div className="settings-page__row-info">
-            <img src="/assets/icons/icon-music.png" alt="Music" className="settings-page__row-icon" />
-            <span>Background Music</span>
-          </div>
-          <button
-            onClick={() => update({ musicEnabled: !settings.musicEnabled })}
-            className={`settings-page__toggle ${settings.musicEnabled ? "settings-page__toggle--on" : ""}`}
-          >
-            <div className="settings-page__toggle-knob" />
-          </button>
-        </div>
-      </section>
-
       {/* Display */}
       <section className="settings-page__section">
         <h3 className="settings-page__section-title">Display</h3>
@@ -130,37 +102,36 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         </div>
       </section>
 
-      {/* Input */}
+      {/* Coming Soon */}
       <section className="settings-page__section">
-        <h3 className="settings-page__section-title">Input Mode</h3>
-        <div className="settings-page__input-options">
-          {(["numpad", "keyboard", "buttons"] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => update({ inputMode: mode })}
-              className={`settings-page__input-btn ${settings.inputMode === mode ? "settings-page__input-btn--active" : ""}`}
-            >
-              {mode === "numpad" ? "Number Pad" : mode === "keyboard" ? "Keyboard" : "Tap Buttons"}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Notifications */}
-      <section className="settings-page__section">
-        <h3 className="settings-page__section-title">Reminders</h3>
-        <div className="settings-page__row">
-          <div className="settings-page__row-info">
-            <img src="/assets/icons/icon-calendar.png" alt="Remind" className="settings-page__row-icon" />
-            <span>Daily Reminder</span>
+        <button
+          onClick={() => setComingSoonOpen(!comingSoonOpen)}
+          className="settings-page__accordion-header"
+        >
+          <h3 className="settings-page__section-title settings-page__section-title--inline">Coming Soon</h3>
+          <span className={`settings-page__accordion-arrow ${comingSoonOpen ? "settings-page__accordion-arrow--open" : ""}`}>
+            &#9662;
+          </span>
+        </button>
+        {comingSoonOpen && (
+          <div className="settings-page__coming-soon">
+            <div className="settings-page__coming-soon-item">
+              <span>🔔</span><span>Push Notifications & Reminders</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>🎵</span><span>Sound Effects & Music</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>⌨️</span><span>Multiple Input Modes</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>🔐</span><span>SMS Multi-Factor Authentication</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>👨‍👩‍👧</span><span>Parent / Guardian Dashboard</span>
+            </div>
           </div>
-          <button
-            onClick={() => update({ notificationsEnabled: !settings.notificationsEnabled })}
-            className={`settings-page__toggle ${settings.notificationsEnabled ? "settings-page__toggle--on" : ""}`}
-          >
-            <div className="settings-page__toggle-knob" />
-          </button>
-        </div>
+        )}
       </section>
 
       {/* Legal */}
@@ -180,7 +151,7 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
       {user && (
         <section className="settings-page__section">
           <h3 className="settings-page__section-title">Account</h3>
-          <p className="settings-page__account-email">{user.email}</p>
+          <p className="settings-page__account-email">@{username}</p>
           <button onClick={handleSignOut} className="settings-page__btn settings-page__btn--secondary">
             Sign Out
           </button>
