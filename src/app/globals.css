@@ -2896,6 +2896,31 @@ body {
   padding: 0;
 }
 
+.auth-screen__remember-me {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.auth-screen__remember-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+}
+
+.auth-screen__remember-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #4a3ab5;
+  cursor: pointer;
+}
+
+.auth-screen__remember-text {
+  font-size: 0.9rem;
+  color: #555;
+}
+
 .auth-screen__bot-check {
   margin: 16px 0;
   padding: 14px 16px;

@@ -10,6 +10,9 @@ import {
   deleteUser,
   EmailAuthProvider,
   reauthenticateWithCredential,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  setPersistence,
 } from "firebase/auth";
 import { doc, deleteDoc } from "firebase/firestore";
 import { getFirebaseAuth, getFirebaseDb } from "./firebase";
@@ -20,7 +23,7 @@ interface AuthContextType {
   user: User | null;
   username: string | null;
   loading: boolean;
-  signIn: (username: string, password: string) => Promise<void>;
+  signIn: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
@@ -45,8 +48,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const signIn = useCallback(async (username: string, password: string) => {
-    await signInWithEmailAndPassword(getFirebaseAuth(), toEmail(username), password);
+  const signIn = useCallback(async (username: string, password: string, rememberMe = true) => {
+    const auth = getFirebaseAuth();
+    await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, toEmail(username), password);
   }, []);
 
   const signUp = useCallback(async (username: string, password: string) => {

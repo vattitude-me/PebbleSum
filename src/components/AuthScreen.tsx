@@ -15,6 +15,7 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [botChecked, setBotChecked] = useState(false);
   const [botVerifying, setBotVerifying] = useState(false);
   const [botVerified, setBotVerified] = useState(false);
@@ -49,7 +50,7 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
     e.preventDefault();
     setError("");
 
-    if (!botVerified) {
+    if (mode === "signup" && !botVerified) {
       setError("Please complete the verification check.");
       return;
     }
@@ -77,7 +78,7 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
     setLoading(true);
     try {
       if (mode === "login") {
-        await signIn(username, password);
+        await signIn(username, password, rememberMe);
       } else {
         await signUp(username, password);
       }
@@ -157,40 +158,54 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
             </div>
           )}
 
-          <div className="auth-screen__bot-check" onMouseMove={handleMouseMove}>
-            <div className="auth-screen__bot-left">
-              <label className={`auth-screen__bot-label ${botVerified ? "auth-screen__bot-label--verified" : ""}`}>
+          {mode === "login" ? (
+            <div className="auth-screen__remember-me">
+              <label className="auth-screen__remember-label">
                 <input
                   type="checkbox"
-                  checked={botChecked}
-                  onChange={handleBotCheck}
-                  disabled={botVerified || botVerifying}
-                  className="auth-screen__bot-checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="auth-screen__remember-checkbox"
                 />
-                <span className="auth-screen__bot-box">
-                  {botVerifying && <span className="auth-screen__bot-spinner" />}
-                  {botVerified && <span className="auth-screen__bot-tick">✓</span>}
-                </span>
-                <span className="auth-screen__bot-text">
-                  {botVerifying ? "Verifying..." : botVerified ? "Verified" : "I'm not a robot"}
-                </span>
+                <span className="auth-screen__remember-text">Remember me</span>
               </label>
             </div>
-            <div className="auth-screen__bot-brand">
-              <svg className="auth-screen__bot-icon" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#4a3ab5" opacity="0.15"/>
-                <path d="M12 6v6l4 2" stroke="#4a3ab5" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M17.65 6.35a8 8 0 1 0 .52 10.95" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M22 12h-4" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
-                <path d="M12 2v4" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-              <span className="auth-screen__bot-brand-text">PebbleGuard</span>
+          ) : (
+            <div className="auth-screen__bot-check" onMouseMove={handleMouseMove}>
+              <div className="auth-screen__bot-left">
+                <label className={`auth-screen__bot-label ${botVerified ? "auth-screen__bot-label--verified" : ""}`}>
+                  <input
+                    type="checkbox"
+                    checked={botChecked}
+                    onChange={handleBotCheck}
+                    disabled={botVerified || botVerifying}
+                    className="auth-screen__bot-checkbox"
+                  />
+                  <span className="auth-screen__bot-box">
+                    {botVerifying && <span className="auth-screen__bot-spinner" />}
+                    {botVerified && <span className="auth-screen__bot-tick">✓</span>}
+                  </span>
+                  <span className="auth-screen__bot-text">
+                    {botVerifying ? "Verifying..." : botVerified ? "Verified" : "I'm not a robot"}
+                  </span>
+                </label>
+              </div>
+              <div className="auth-screen__bot-brand">
+                <svg className="auth-screen__bot-icon" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#4a3ab5" opacity="0.15"/>
+                  <path d="M12 6v6l4 2" stroke="#4a3ab5" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M17.65 6.35a8 8 0 1 0 .52 10.95" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M22 12h-4" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M12 2v4" stroke="#6c5ce7" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <span className="auth-screen__bot-brand-text">PebbleGuard</span>
+              </div>
             </div>
-          </div>
+          )}
 
           {error && <p className="auth-screen__error">{error}</p>}
 
-          <button type="submit" className="auth-screen__submit" disabled={loading || !botVerified}>
+          <button type="submit" className="auth-screen__submit" disabled={loading || (mode === "signup" && !botVerified)}>
             {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Create Account"}
           </button>
         </form>
