@@ -104,20 +104,23 @@ export default function HomeDashboard({
           )}
         </section>
 
-        {/* Secondary: Level Clear Strip */}
-        <section className={`dashboard__level-strip ${canAttemptLevelClear ? "dashboard__level-strip--unlocked" : ""}`}>
-          <div className="dashboard__level-strip-left">
+        {/* Level Clear + Journey — 2-column grid */}
+        <div className="dashboard__duo-grid">
+          <section className={`dashboard__level-strip ${canAttemptLevelClear ? "dashboard__level-strip--unlocked" : ""}`}>
             <div className="dashboard__level-strip-badge">
               {canAttemptLevelClear ? "🏆" : "🔒"}
             </div>
             <div className="dashboard__level-strip-info">
               <span className="dashboard__level-strip-title">
-                Level Clear · {currentStage?.name || "Test"}
+                Level Clear
+              </span>
+              <span className="dashboard__level-strip-subtitle">
+                {currentStage?.name || "Test"}
               </span>
               {canAttemptLevelClear ? (
-                <span className="dashboard__level-strip-meta">
-                  100% in {Math.floor((currentStage?.levelClearSeconds || 180) / 60)}:{((currentStage?.levelClearSeconds || 180) % 60).toString().padStart(2, "0")} to advance
-                </span>
+                <button onClick={() => onStartPractice("levelClear")} className="dashboard__level-strip-btn">
+                  Start
+                </button>
               ) : (
                 <div className="dashboard__level-strip-progress">
                   <div className="dashboard__level-strip-bar">
@@ -132,36 +135,20 @@ export default function HomeDashboard({
                 </div>
               )}
             </div>
-          </div>
-          {canAttemptLevelClear && (
-            <button onClick={() => onStartPractice("levelClear")} className="dashboard__level-strip-btn">
-              Start
-            </button>
-          )}
-        </section>
+          </section>
 
-        {/* Journey Card */}
-        {world && (
-          <section className="dashboard__journey-card" onClick={() => onNavigate("journey")}>
-            <div className="dashboard__journey-left">
+          {world && (
+            <section className="dashboard__journey-card" onClick={() => onNavigate("journey")}>
               <span className="dashboard__journey-icon">{world.icon}</span>
               <div className="dashboard__journey-info">
                 <h4 className="dashboard__journey-name">{world.name}</h4>
                 <p className="dashboard__journey-progress">Stage {currentStageIndex + 1} of {STAGES.length}</p>
               </div>
-            </div>
-            <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__journey-arrow" />
-          </section>
-        )}
-
-        {/* Mascot — bottom corner above nav */}
-        <div className="dashboard__mascot">
-          <img
-            src="/assets/icons/icon-pebble-celebrate-left.png"
-            alt="Pebble"
-            className="dashboard__mascot-img"
-          />
+              <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__journey-arrow" />
+            </section>
+          )}
         </div>
+
       </div>
     </div>
   );
