@@ -12,18 +12,19 @@ import {
   SessionRecord,
 } from "@/lib/progress-store";
 import { getNextStage } from "@/lib/stages";
-import { AgeGroup, GameState, saveGameState } from "@/lib/user-store";
+import { AgeGroup, GameState, UserProfile, saveGameState } from "@/lib/user-store";
 
 interface PracticeViewProps {
   stage: Stage;
   progress: UserProgress;
   gameState: GameState;
+  profile: UserProfile;
   ageGroup: AgeGroup;
   onComplete: (updatedProgress: UserProgress, updatedGameState: GameState) => void;
   onBack: () => void;
 }
 
-export default function PracticeView({ stage, progress, gameState, ageGroup, onComplete, onBack }: PracticeViewProps) {
+export default function PracticeView({ stage, progress, gameState, profile, ageGroup, onComplete, onBack }: PracticeViewProps) {
   const [problems] = useState<MathProblem[]>(() =>
     generateProblems(stage.id, stage.questionsPerDay)
   );
@@ -170,12 +171,19 @@ export default function PracticeView({ stage, progress, gameState, ageGroup, onC
       completedSessions: [...progress.completedSessions, session],
     };
 
+    const isSameDay = gameState.practiceDate === today;
+    const newPracticeSeconds = (isSameDay ? gameState.todayPracticeSeconds : 0) + timeSeconds;
+    const goalSeconds = profile.dailyGoalMinutes * 60;
+    const goalReached = newPracticeSeconds >= goalSeconds;
+
     const updatedGameState: GameState = {
       ...gameState,
       coins: gameState.coins + coinsGained,
       hearts,
-      dailyGoalCompleted: true,
-      todaySessionCount: gameState.todaySessionCount + 1,
+      dailyGoalCompleted: goalReached,
+      todayPracticeSeconds: newPracticeSeconds,
+      practiceDate: today,
+      todaySessionCount: (isSameDay ? gameState.todaySessionCount : 0) + 1,
       longestStreak: Math.max(gameState.longestStreak, newStreak),
       totalSessionsCompleted: gameState.totalSessionsCompleted + 1,
       totalCorrectAnswers: gameState.totalCorrectAnswers + finalCorrect,

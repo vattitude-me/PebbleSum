@@ -40,6 +40,8 @@ export interface GameState {
   hearts: number;
   maxHearts: number;
   dailyGoalCompleted: boolean;
+  todayPracticeSeconds: number;
+  practiceDate: string;
   todaySessionCount: number;
   longestStreak: number;
   totalSessionsCompleted: number;
@@ -78,6 +80,8 @@ const DEFAULT_GAME_STATE: GameState = {
   hearts: 5,
   maxHearts: 5,
   dailyGoalCompleted: false,
+  todayPracticeSeconds: 0,
+  practiceDate: "",
   todaySessionCount: 0,
   longestStreak: 0,
   totalSessionsCompleted: 0,

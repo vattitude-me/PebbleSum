@@ -218,6 +218,7 @@ export default function Home() {
           stage={currentStage}
           progress={progress}
           gameState={gameState}
+          profile={profile!}
           ageGroup={ageGroup}
           onComplete={handlePracticeComplete}
           onBack={handlePracticeBack}

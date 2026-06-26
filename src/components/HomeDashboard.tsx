@@ -24,9 +24,12 @@ export default function HomeDashboard({
 }: HomeDashboardProps) {
   const currentStageIndex = STAGES.findIndex((s) => s.id === progress.currentStageId);
   const currentStage = STAGES[currentStageIndex];
-  const todayCompleted = progress.completedSessions.some(
-    (s) => s.date === getToday() && s.stageId === progress.currentStageId
-  );
+  const today = getToday();
+  const isSameDay = gameState.practiceDate === today;
+  const todayPracticeMinutes = isSameDay ? Math.floor(gameState.todayPracticeSeconds / 60) : 0;
+  const goalMinutes = profile.dailyGoalMinutes;
+  const goalProgress = Math.min(todayPracticeMinutes / goalMinutes, 1);
+  const todayCompleted = gameState.dailyGoalCompleted && isSameDay;
   const world = getWorldForStage(progress.currentStageId);
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
@@ -77,7 +80,7 @@ export default function HomeDashboard({
         <div className="dashboard__daily-content">
           <div className="dashboard__daily-info">
             <span className="dashboard__daily-label">
-              {todayCompleted ? "Today's Practice Complete! 🎉" : "Daily Goal"}
+              {todayCompleted ? "Today's Goal Complete! 🎉" : "Daily Goal"}
             </span>
             <h3 className="dashboard__daily-title">
               {todayCompleted
@@ -86,8 +89,13 @@ export default function HomeDashboard({
             </h3>
             {!todayCompleted && (
               <p className="dashboard__daily-meta">
-                {currentStage?.questionsPerDay} questions · {Math.floor((currentStage?.sctSeconds || 300) / 60)} min target
+                {todayPracticeMinutes}/{goalMinutes} min · {currentStage?.questionsPerDay} questions per session
               </p>
+            )}
+            {!todayCompleted && todayPracticeMinutes > 0 && (
+              <div className="dashboard__goal-bar">
+                <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
+              </div>
             )}
           </div>
           {!todayCompleted && (
