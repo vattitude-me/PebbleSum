@@ -41,6 +41,22 @@ export default function HomeDashboard({
 
   return (
     <div className="dashboard">
+
+ {/* Coins + XP (compact row) */}
+      <section className="dashboard__progress-row">
+        <div className="dashboard__coins-pill">
+          <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__coins-icon" />
+          <span className="dashboard__coins-value">{gameState.coins}</span>
+        </div>
+        <div className="dashboard__xp-inline">
+          <span className="dashboard__xp-level">Lv {level}</span>
+          <div className="dashboard__xp-bar">
+            <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
+          </div>
+          <span className="dashboard__xp-count">{xpInLevel}/{500}</span>
+        </div>
+      </section>
+
       {/* Greeting + Streak */}
       <section className="dashboard__greeting">
         <div className="dashboard__greeting-text">
@@ -52,6 +68,8 @@ export default function HomeDashboard({
           <span className="dashboard__streak-value">{progress.streak}</span>
         </div>
       </section>
+
+     
 
       {/* Daily Goal Card */}
       <section className="dashboard__daily-card">
@@ -86,20 +104,7 @@ export default function HomeDashboard({
         </div>
       </section>
 
-      {/* Coins + XP (compact row) */}
-      <section className="dashboard__progress-row">
-        <div className="dashboard__coins-pill">
-          <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__coins-icon" />
-          <span className="dashboard__coins-value">{gameState.coins}</span>
-        </div>
-        <div className="dashboard__xp-inline">
-          <span className="dashboard__xp-level">Lv {level}</span>
-          <div className="dashboard__xp-bar">
-            <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
-          </div>
-          <span className="dashboard__xp-count">{xpInLevel}/{500}</span>
-        </div>
-      </section>
+      
 
       {/* Journey Card (Primary Progression) */}
       {world && (

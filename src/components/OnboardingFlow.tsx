@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { UserProfile, getAgeGroup, saveProfile, setOnboardingComplete } from "@/lib/user-store";
 
 interface OnboardingFlowProps {
@@ -9,7 +9,7 @@ interface OnboardingFlowProps {
 
 const AVATARS = [
   { id: "pebble-wave", icon: "icon-pebble-wave.png", label: "Pebble" },
-  { id: "pebble-celebrate", icon: "icon-pebble-celebrate-left.png", label: "Happy Pebble" },
+  { id: "pebble-celebrate-left", icon: "icon-pebble-celebrate-left.png", label: "Happy Pebble" },
   { id: "pebble-thinking", icon: "icon-pebble-thinking.png", label: "Smart Pebble" },
 ];
 
@@ -19,6 +19,70 @@ const DAILY_GOALS = [
   { minutes: 15, label: "15 min", description: "Math champion" },
   { minutes: 20, label: "20 min", description: "Super scholar" },
 ];
+
+const AGES = Array.from({ length: 14 }, (_, i) => i + 2);
+const ITEM_HEIGHT = 48;
+
+function AgePicker({ age, onChange }: { age: number | null; onChange: (a: number) => void }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const selectedIndex = age !== null ? AGES.indexOf(age) : -1;
+
+  const scrollToIndex = useCallback((index: number, smooth = true) => {
+    if (!scrollRef.current) return;
+    const offset = index * ITEM_HEIGHT;
+    scrollRef.current.scrollTo({ top: offset, behavior: smooth ? "smooth" : "auto" });
+  }, []);
+
+  useEffect(() => {
+    const initial = age !== null ? AGES.indexOf(age) : 5;
+    scrollToIndex(initial, false);
+    if (age === null) onChange(AGES[5]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const scrollTop = scrollRef.current.scrollTop;
+    const index = Math.round(scrollTop / ITEM_HEIGHT);
+    const clamped = Math.max(0, Math.min(AGES.length - 1, index));
+    if (AGES[clamped] !== age) {
+      onChange(AGES[clamped]);
+    }
+  };
+
+  const handleClick = (index: number) => {
+    onChange(AGES[index]);
+    scrollToIndex(index);
+  };
+
+  return (
+    <div className="onboarding__step">
+      <img src="/assets/icons/icon-pebble-thinking.png" alt="Thinking" className="onboarding__mascot" />
+      <h2 className="onboarding__title">How old are you?</h2>
+      <p className="onboarding__subtitle">This helps us pick the right level</p>
+      <div className="onboarding__age-picker">
+        <div className="onboarding__age-picker-highlight" />
+        <div
+          ref={scrollRef}
+          className="onboarding__age-picker-scroll"
+          onScroll={handleScroll}
+        >
+          <div className="onboarding__age-picker-pad" />
+          {AGES.map((a, i) => (
+            <button
+              key={a}
+              onClick={() => handleClick(i)}
+              className={`onboarding__age-picker-item ${i === selectedIndex ? "onboarding__age-picker-item--selected" : ""}`}
+            >
+              {a} years old
+            </button>
+          ))}
+          <div className="onboarding__age-picker-pad" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0);
@@ -78,22 +142,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         )}
 
         {step === 1 && (
-          <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-thinking.png" alt="Thinking" className="onboarding__mascot" />
-            <h2 className="onboarding__title">How old are you?</h2>
-            <p className="onboarding__subtitle">This helps us pick the right level</p>
-            <div className="onboarding__age-grid">
-              {Array.from({ length: 14 }, (_, i) => i + 2).map((a) => (
-                <button
-                  key={a}
-                  onClick={() => setAge(a)}
-                  className={`onboarding__age-btn ${age === a ? "onboarding__age-btn--selected" : ""}`}
-                >
-                  {a}
-                </button>
-              ))}
-            </div>
-          </div>
+          <AgePicker age={age} onChange={setAge} />
         )}
 
         {step === 2 && (

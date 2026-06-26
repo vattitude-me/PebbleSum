@@ -12,6 +12,14 @@ interface ProfilePageProps {
   onNavigate: (page: string) => void;
 }
 
+const AVATAR_ICON_MAP: Record<string, string> = {
+  "pebble-celebrate": "icon-pebble-celebrate-left.png",
+};
+
+function getAvatarSrc(avatarId: string) {
+  return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.png`}`;
+}
+
 export default function ProfilePage({ profile, progress, gameState, badges, onNavigate }: ProfilePageProps) {
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
@@ -28,7 +36,7 @@ export default function ProfilePage({ profile, progress, gameState, badges, onNa
       {/* Profile Header */}
       <section className="profile-page__header">
         <div className="profile-page__avatar">
-          <img src={`/assets/icons/icon-${profile.avatarId}.png`} alt="Avatar" className="profile-page__avatar-img" />
+          <img src={getAvatarSrc(profile.avatarId)} alt="Avatar" className="profile-page__avatar-img" />
         </div>
         <h2 className="profile-page__name">{profile.name}</h2>
         <p className="profile-page__title">Level {level} Learner</p>
@@ -113,14 +121,14 @@ export default function ProfilePage({ profile, progress, gameState, badges, onNa
         </div>
       </section>
 
-      {/* Parent View Link */}
-      <section className="profile-page__parent">
-        <button onClick={() => onNavigate("parent")} className="profile-page__parent-btn">
-          <img src="/assets/icons/icon-gear.png" alt="Parent" className="profile-page__parent-icon" />
-          <span>Parent / Guardian View</span>
-          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="profile-page__parent-arrow" />
-        </button>
-      </section>
+      {/* Parent View Link — hidden until content is ready */}
+
+      {/* Footer */}
+      <footer className="profile-page__footer">
+        <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="profile-page__footer-link">
+          vattitude.ca
+        </a>
+      </footer>
     </div>
   );
 }
