@@ -38,22 +38,18 @@ export default function HomeDashboard({
     return "Good evening";
   };
 
-  const getMascotState = () => {
-    if (todayCompleted) return "icon-pebble-celebrate-left.png";
-    if (progress.streak >= 7) return "icon-pebble-celebrate-left.png";
-    return "icon-pebble-wave.png";
-  };
 
   return (
     <div className="dashboard">
-      {/* Greeting Section */}
+      {/* Greeting + Streak */}
       <section className="dashboard__greeting">
         <div className="dashboard__greeting-text">
           <p className="dashboard__greeting-hello">{getGreeting()},</p>
           <h2 className="dashboard__greeting-name">{profile.name}!</h2>
         </div>
-        <div className="dashboard__greeting-mascot">
-          <img src={`/assets/icons/${getMascotState()}`} alt="Pebble" className="dashboard__mascot-img" />
+        <div className="dashboard__streak-pill">
+          <img src="/assets/icons/icon-fire.png" alt="Streak" className="dashboard__streak-icon" />
+          <span className="dashboard__streak-value">{progress.streak}</span>
         </div>
       </section>
 
@@ -90,50 +86,33 @@ export default function HomeDashboard({
         </div>
       </section>
 
-      {/* Stats Row */}
-      <section className="dashboard__stats">
-        <div className="dashboard__stat-card">
-          <img src="/assets/icons/icon-fire.png" alt="Streak" className="dashboard__stat-icon" />
-          <span className="dashboard__stat-value">{progress.streak}</span>
-          <span className="dashboard__stat-label">Day Streak</span>
+      {/* Coins + XP (compact row) */}
+      <section className="dashboard__progress-row">
+        <div className="dashboard__coins-pill">
+          <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__coins-icon" />
+          <span className="dashboard__coins-value">{gameState.coins}</span>
         </div>
-        <div className="dashboard__stat-card">
-          <img src="/assets/icons/icon-xp.png" alt="Level" className="dashboard__stat-icon" />
-          <span className="dashboard__stat-value">{level}</span>
-          <span className="dashboard__stat-label">Level</span>
-        </div>
-        <div className="dashboard__stat-card">
-          <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__stat-icon" />
-          <span className="dashboard__stat-value">{gameState.coins}</span>
-          <span className="dashboard__stat-label">Coins</span>
-        </div>
-        <div className="dashboard__stat-card" onClick={() => onNavigate("rewards")}>
-          <img src="/assets/icons/icon-star.png" alt="Badges" className="dashboard__stat-icon" />
-          <span className="dashboard__stat-value">{badges.length}</span>
-          <span className="dashboard__stat-label">Badges</span>
+        <div className="dashboard__xp-inline">
+          <span className="dashboard__xp-level">Lv {level}</span>
+          <div className="dashboard__xp-bar">
+            <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
+          </div>
+          <span className="dashboard__xp-count">{xpInLevel}/{500}</span>
         </div>
       </section>
 
-      {/* XP Progress */}
-      <section className="dashboard__xp-section">
-        <div className="dashboard__xp-header">
-          <span className="dashboard__xp-level">Level {level}</span>
-          <span className="dashboard__xp-count">{xpInLevel} / 500 XP</span>
-        </div>
-        <div className="dashboard__xp-bar">
-          <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
-        </div>
-      </section>
-
-      {/* Current World */}
+      {/* Journey Card (Primary Progression) */}
       {world && (
         <section className="dashboard__world-card" onClick={() => onNavigate("journey")}>
           <div className={`dashboard__world-bg bg-gradient-to-r ${world.gradient}`} />
           <div className="dashboard__world-content">
-            <span className="dashboard__world-icon">{world.icon}</span>
+            <div className="dashboard__world-icon-wrap">
+              <span className="dashboard__world-icon">{world.icon}</span>
+            </div>
             <div className="dashboard__world-info">
               <h4 className="dashboard__world-name">{world.name}</h4>
-              <p className="dashboard__world-desc">{world.description}</p>
+              <p className="dashboard__world-desc">Continue your learning path</p>
+              <p className="dashboard__world-progress">Stage {currentStageIndex + 1} of {STAGES.length}</p>
             </div>
             <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__world-arrow" />
           </div>
@@ -155,22 +134,6 @@ export default function HomeDashboard({
           </p>
         </section>
       )}
-
-      {/* Quick Actions */}
-      <section className="dashboard__actions">
-        <button className="dashboard__action-btn" onClick={() => onNavigate("journey")}>
-          <img src="/assets/icons/icon-level.png" alt="Journey" className="dashboard__action-icon" />
-          <span>Journey Map</span>
-        </button>
-        <button className="dashboard__action-btn" onClick={() => onNavigate("rewards")}>
-          <img src="/assets/icons/icon-gift.png" alt="Rewards" className="dashboard__action-icon" />
-          <span>Rewards</span>
-        </button>
-        <button className="dashboard__action-btn" onClick={() => onNavigate("profile")}>
-          <img src="/assets/icons/icon-bar-chart.png" alt="Stats" className="dashboard__action-icon" />
-          <span>My Stats</span>
-        </button>
-      </section>
     </div>
   );
 }
