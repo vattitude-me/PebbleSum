@@ -12,15 +12,18 @@ import {
   SessionRecord,
 } from "@/lib/progress-store";
 import { getNextStage } from "@/lib/stages";
+import { AgeGroup, GameState, saveGameState, addCoins } from "@/lib/user-store";
 
 interface PracticeViewProps {
   stage: Stage;
   progress: UserProgress;
-  onComplete: (updatedProgress: UserProgress) => void;
+  gameState: GameState;
+  ageGroup: AgeGroup;
+  onComplete: (updatedProgress: UserProgress, updatedGameState: GameState) => void;
   onBack: () => void;
 }
 
-export default function PracticeView({ stage, progress, onComplete, onBack }: PracticeViewProps) {
+export default function PracticeView({ stage, progress, gameState, ageGroup, onComplete, onBack }: PracticeViewProps) {
   const [problems] = useState<MathProblem[]>(() =>
     generateProblems(stage.id, stage.questionsPerDay)
   );
@@ -31,6 +34,9 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
   const [elapsed, setElapsed] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [hearts, setHearts] = useState(gameState.hearts);
+  const [comboCount, setComboCount] = useState(0);
+  const [showEncouragement, setShowEncouragement] = useState("");
 
   useEffect(() => {
     if (isFinished) return;
@@ -40,6 +46,15 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
     return () => clearInterval(interval);
   }, [startTime, isFinished]);
 
+  const encouragements = [
+    "Great job! 🌟",
+    "You're amazing! ⭐",
+    "Keep going! 💪",
+    "Fantastic! 🎯",
+    "Brilliant! ✨",
+    "Superstar! 🌈",
+  ];
+
   const handleSubmit = useCallback(() => {
     if (!userAnswer.trim()) return;
 
@@ -48,21 +63,40 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
 
     if (isCorrect) {
       setCorrectCount((c) => c + 1);
+      setComboCount((c) => c + 1);
       setFeedback("correct");
+      if (comboCount > 0 && comboCount % 3 === 2) {
+        setShowEncouragement(encouragements[Math.floor(Math.random() * encouragements.length)]);
+      }
     } else {
       setFeedback("wrong");
+      setComboCount(0);
+      setHearts((h) => Math.max(0, h - 1));
+      setShowEncouragement("");
     }
 
     setTimeout(() => {
       setFeedback(null);
       setUserAnswer("");
-      if (currentIndex + 1 >= problems.length) {
+      setShowEncouragement("");
+      if (currentIndex + 1 >= problems.length || (!isCorrect && hearts <= 1)) {
         finishSession(isCorrect ? correctCount + 1 : correctCount);
       } else {
         setCurrentIndex((i) => i + 1);
       }
-    }, 800);
-  }, [userAnswer, currentIndex, problems, correctCount]);
+    }, 1000);
+  }, [userAnswer, currentIndex, problems, correctCount, hearts, comboCount]);
+
+  const handleNumpad = (digit: string) => {
+    if (feedback !== null) return;
+    if (digit === "del") {
+      setUserAnswer((a) => a.slice(0, -1));
+    } else if (digit === "go") {
+      handleSubmit();
+    } else {
+      setUserAnswer((a) => a + digit);
+    }
+  };
 
   const finishSession = (finalCorrect: number) => {
     setIsFinished(true);
@@ -70,6 +104,7 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
     const perfect = finalCorrect === problems.length;
     const withinSCT = timeSeconds <= stage.sctSeconds;
     const xpGain = calculateXpGain(finalCorrect, problems.length, withinSCT);
+    const coinsGained = Math.floor(xpGain / 5) + (perfect ? 10 : 0);
 
     const today = getToday();
     const streakActive = isStreakActive(progress.lastPracticeDate);
@@ -105,8 +140,21 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
       completedSessions: [...progress.completedSessions, session],
     };
 
+    const updatedGameState: GameState = {
+      ...gameState,
+      coins: gameState.coins + coinsGained,
+      hearts,
+      dailyGoalCompleted: true,
+      todaySessionCount: gameState.todaySessionCount + 1,
+      longestStreak: Math.max(gameState.longestStreak, newStreak),
+      totalSessionsCompleted: gameState.totalSessionsCompleted + 1,
+      totalCorrectAnswers: gameState.totalCorrectAnswers + finalCorrect,
+      totalQuestionsAnswered: gameState.totalQuestionsAnswered + problems.length,
+    };
+
     saveProgress(updatedProgress);
-    onComplete(updatedProgress);
+    saveGameState(updatedGameState);
+    onComplete(updatedProgress, updatedGameState);
   };
 
   const formatTime = (seconds: number) => {
@@ -116,47 +164,63 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
   };
 
   if (isFinished) {
-    const lastSession = progress.completedSessions.length > 0
-      ? progress.completedSessions[progress.completedSessions.length - 1]
-      : null;
     const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
     const perfect = correctCount === problems.length;
     const withinSCT = timeSeconds <= stage.sctSeconds;
+    const xpGain = calculateXpGain(correctCount, problems.length, withinSCT);
+    const coinsGained = Math.floor(xpGain / 5) + (perfect ? 10 : 0);
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 animate-pop-in">
-        <div className="text-6xl mb-4">{perfect ? "🎉" : "👏"}</div>
-        <h2 className="text-3xl font-bold mb-2">
-          {perfect ? "Perfect!" : "Well Done!"}
-        </h2>
-        <div className="card w-full max-w-sm mt-4 space-y-3">
-          <div className="flex justify-between">
-            <span>Score</span>
-            <span className="font-bold">{correctCount}/{problems.length}</span>
+      <div className="practice-complete">
+        <div className="practice-complete__header">
+          <img
+            src={`/assets/icons/${perfect ? "icon-pebble-celebrate.png" : "icon-pebble-wave.png"}`}
+            alt="Pebble"
+            className="practice-complete__mascot"
+          />
+          <h2 className="practice-complete__title">
+            {perfect ? "Perfect! 🎉" : "Well Done! 👏"}
+          </h2>
+          <p className="practice-complete__subtitle">
+            {perfect ? "You nailed every question!" : "Keep practicing to get even better!"}
+          </p>
+        </div>
+
+        <div className="practice-complete__stats">
+          <div className="practice-complete__stat">
+            <span className="practice-complete__stat-label">Score</span>
+            <span className="practice-complete__stat-value">{correctCount}/{problems.length}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Time</span>
-            <span className="font-bold">{formatTime(timeSeconds)}</span>
+          <div className="practice-complete__stat">
+            <span className="practice-complete__stat-label">Time</span>
+            <span className="practice-complete__stat-value">{formatTime(timeSeconds)}</span>
           </div>
-          <div className="flex justify-between">
-            <span>Target Time</span>
-            <span className={`font-bold ${withinSCT ? "text-green-500" : "text-orange-500"}`}>
+          <div className="practice-complete__stat">
+            <span className="practice-complete__stat-label">Target</span>
+            <span className={`practice-complete__stat-value ${withinSCT ? "practice-complete__stat-value--success" : "practice-complete__stat-value--warning"}`}>
               {formatTime(stage.sctSeconds)}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span>XP Earned</span>
-            <span className="font-bold text-primary">
-              +{calculateXpGain(correctCount, problems.length, withinSCT)}
-            </span>
-          </div>
-          {lastSession === null && perfect && withinSCT && (
-            <p className="text-center text-sm text-green-600 font-semibold mt-2">
-              🌟 Keep this up for {stage.unlockRequirement} days to unlock the next stage!
-            </p>
-          )}
         </div>
-        <button onClick={onBack} className="btn-primary mt-6">
+
+        <div className="practice-complete__rewards">
+          <div className="practice-complete__reward">
+            <img src="/assets/icons/icon-xp.png" alt="XP" className="practice-complete__reward-icon" />
+            <span>+{xpGain} XP</span>
+          </div>
+          <div className="practice-complete__reward">
+            <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="practice-complete__reward-icon" />
+            <span>+{coinsGained} Coins</span>
+          </div>
+        </div>
+
+        {perfect && withinSCT && (
+          <p className="practice-complete__mastery-msg">
+            🌟 {progress.consecutivePerfectDays + 1}/{stage.unlockRequirement} perfect days to next stage!
+          </p>
+        )}
+
+        <button onClick={onBack} className="practice-complete__btn">
           Back to Dashboard
         </button>
       </div>
@@ -165,75 +229,88 @@ export default function PracticeView({ stage, progress, onComplete, onBack }: Pr
 
   const problem = problems[currentIndex];
   const progressPercent = (currentIndex / problems.length) * 100;
+  const isYoung = ageGroup === "young";
 
   return (
-    <div className="flex flex-col items-center p-6 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="w-full flex justify-between items-center mb-6">
-        <button onClick={onBack} className="text-gray-400 hover:text-gray-600 text-xl">
-          ✕
+    <div className={`practice ${isYoung ? "practice--young" : ""}`}>
+      {/* Practice Header */}
+      <div className="practice__header">
+        <button onClick={onBack} className="practice__close">
+          <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="practice__close-icon" />
         </button>
-        <div className="text-sm font-semibold text-gray-500">
-          {currentIndex + 1} / {problems.length}
+        <div className="practice__progress-info">
+          <span className="practice__question-count">{currentIndex + 1}/{problems.length}</span>
         </div>
-        <div className={`text-sm font-mono font-bold ${elapsed > stage.sctSeconds ? "text-red-500" : "text-gray-600"}`}>
-          {formatTime(elapsed)}
+        <div className="practice__timer-hearts">
+          <span className={`practice__timer ${elapsed > stage.sctSeconds ? "practice__timer--over" : ""}`}>
+            <img src="/assets/icons/icon-timer.png" alt="Time" className="practice__timer-icon" />
+            {formatTime(elapsed)}
+          </span>
+          <span className="practice__hearts">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className={`practice__heart ${i < hearts ? "" : "practice__heart--empty"}`}>
+                {i < hearts ? "❤️" : "🤍"}
+              </span>
+            ))}
+          </span>
         </div>
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
-        <div
-          className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-300 rounded-full"
-          style={{ width: `${progressPercent}%` }}
-        />
+      <div className="practice__progress-bar">
+        <div className="practice__progress-fill" style={{ width: `${progressPercent}%` }} />
       </div>
 
-      {/* Problem display */}
-      <div
-        className={`card w-full text-center py-12 mb-8 transition-all ${
-          feedback === "correct"
-            ? "ring-4 ring-green-300 bg-green-50"
-            : feedback === "wrong"
-            ? "ring-4 ring-red-300 bg-red-50 animate-shake"
-            : ""
-        }`}
-      >
-        <div className="text-4xl md:text-5xl font-bold tracking-wide">
-          <span>{problem.displayParts.left}</span>
-          <span className="mx-3 text-primary">{problem.displayParts.operator}</span>
-          <span>{problem.displayParts.right}</span>
+      {/* Combo indicator */}
+      {comboCount >= 3 && (
+        <div className="practice__combo animate-pop-in">
+          🔥 {comboCount}x Combo!
         </div>
+      )}
+
+      {/* Problem display */}
+      <div className={`practice__problem ${feedback === "correct" ? "practice__problem--correct" : feedback === "wrong" ? "practice__problem--wrong" : ""}`}>
+        <div className={`practice__problem-text ${isYoung ? "practice__problem-text--large" : ""}`}>
+          <span>{problem.displayParts.left}</span>
+          <span className="practice__operator">{problem.displayParts.operator}</span>
+          <span>{problem.displayParts.right}</span>
+          <span className="practice__equals">=</span>
+          <span className="practice__answer-slot">
+            {userAnswer || "?"}
+          </span>
+        </div>
+
         {feedback === "correct" && (
-          <div className="text-green-500 text-2xl mt-3 animate-pop-in">✓ Correct!</div>
+          <div className="practice__feedback practice__feedback--correct animate-pop-in">
+            <img src="/assets/icons/icon-checkmark.png" alt="Correct" className="practice__feedback-icon" />
+            <span>Correct!</span>
+          </div>
         )}
         {feedback === "wrong" && (
-          <div className="text-red-500 text-lg mt-3 animate-pop-in">
-            The answer is {problem.answer}
+          <div className="practice__feedback practice__feedback--wrong animate-pop-in">
+            <img src="/assets/icons/icon-close-red.png" alt="Wrong" className="practice__feedback-icon" />
+            <span>Answer: {problem.answer}</span>
+          </div>
+        )}
+        {showEncouragement && (
+          <div className="practice__encouragement animate-pop-in">
+            {showEncouragement}
           </div>
         )}
       </div>
 
-      {/* Answer input */}
-      <div className="w-full max-w-xs">
-        <input
-          type="number"
-          inputMode="numeric"
-          value={userAnswer}
-          onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          placeholder="Your answer"
-          autoFocus
-          disabled={feedback !== null}
-          className="w-full text-center text-3xl font-bold py-4 px-6 border-2 border-gray-200 rounded-2xl focus:border-primary focus:outline-none transition-colors"
-        />
-        <button
-          onClick={handleSubmit}
-          disabled={!userAnswer.trim() || feedback !== null}
-          className="btn-primary w-full mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Check
-        </button>
+      {/* Numpad Input */}
+      <div className="practice__numpad">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9", "del", "0", "go"].map((key) => (
+          <button
+            key={key}
+            onClick={() => handleNumpad(key)}
+            disabled={feedback !== null}
+            className={`practice__numpad-btn ${key === "go" ? "practice__numpad-btn--go" : ""} ${key === "del" ? "practice__numpad-btn--del" : ""} ${isYoung ? "practice__numpad-btn--large" : ""}`}
+          >
+            {key === "del" ? "⌫" : key === "go" ? "✓" : key}
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -1,16 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { STAGES } from "@/lib/stages";
 import { UserProgress, loadProgress, saveProgress, isStreakActive, getToday } from "@/lib/progress-store";
-import StreakBadge from "@/components/StreakBadge";
-import XpBar from "@/components/XpBar";
-import StageCard from "@/components/StageCard";
+import {
+  UserProfile,
+  GameState,
+  AppSettings,
+  EarnedBadge,
+  loadProfile,
+  loadGameState,
+  loadSettings,
+  loadBadges,
+  saveBadges,
+  isOnboardingComplete,
+  checkNewBadges,
+  AgeGroup,
+} from "@/lib/user-store";
+import SplashScreen from "@/components/SplashScreen";
+import OnboardingFlow from "@/components/OnboardingFlow";
+import TopBar from "@/components/TopBar";
+import BottomNav from "@/components/BottomNav";
+import HomeDashboard from "@/components/HomeDashboard";
 import PracticeView from "@/components/PracticeView";
+import JourneyMap from "@/components/JourneyMap";
+import RewardsPage from "@/components/RewardsPage";
+import ProfilePage from "@/components/ProfilePage";
+import SettingsPage from "@/components/SettingsPage";
+
+type AppScreen = "splash" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "settings" | "parent";
 
 export default function Home() {
+  const [screen, setScreen] = useState<AppScreen>("splash");
   const [progress, setProgress] = useState<UserProgress | null>(null);
-  const [practicing, setPracticing] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [badges, setBadges] = useState<EarnedBadge[]>([]);
 
   useEffect(() => {
     const p = loadProgress();
@@ -20,93 +46,155 @@ export default function Home() {
       saveProgress(p);
     }
     setProgress(p);
+    setProfile(loadProfile());
+    setGameState(loadGameState());
+    setSettings(loadSettings());
+    setBadges(loadBadges());
   }, []);
 
-  if (!progress) {
+  const handleSplashComplete = useCallback(() => {
+    if (!isOnboardingComplete() || !loadProfile()) {
+      setScreen("onboarding");
+    } else {
+      setScreen("home");
+    }
+  }, []);
+
+  const handleOnboardingComplete = useCallback((newProfile: UserProfile) => {
+    setProfile(newProfile);
+    setScreen("home");
+  }, []);
+
+  const handleNavigate = useCallback((page: string) => {
+    setScreen(page as AppScreen);
+  }, []);
+
+  const handleStartPractice = useCallback(() => {
+    setScreen("practice");
+  }, []);
+
+  const handlePracticeComplete = useCallback((updatedProgress: UserProgress, updatedGameState: GameState) => {
+    setProgress(updatedProgress);
+    setGameState(updatedGameState);
+
+    const existingBadges = loadBadges();
+    const newBadges = checkNewBadges(updatedGameState, updatedProgress.streak, updatedProgress.currentStageId, existingBadges);
+    if (newBadges.length > 0) {
+      const allBadges = [...existingBadges, ...newBadges];
+      saveBadges(allBadges);
+      setBadges(allBadges);
+    }
+
+    setScreen("home");
+  }, []);
+
+  const handlePracticeBack = useCallback(() => {
+    setScreen("home");
+  }, []);
+
+  if (screen === "splash") {
+    return <SplashScreen onComplete={handleSplashComplete} />;
+  }
+
+  if (screen === "onboarding") {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
+
+  if (!progress || !gameState || !settings) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-bounce-soft text-4xl">🪨</div>
+      <div className="app-loading">
+        <div className="app-loading__spinner" />
       </div>
     );
   }
 
-  if (practicing) {
+  const ageGroup: AgeGroup = profile?.ageGroup || "middle";
+  const level = Math.floor(progress.xp / 500) + 1;
+
+  if (screen === "practice") {
     const currentStage = STAGES.find((s) => s.id === progress.currentStageId)!;
     return (
       <PracticeView
         stage={currentStage}
         progress={progress}
-        onComplete={(updated) => {
-          setProgress(updated);
-          setPracticing(false);
-        }}
-        onBack={() => setPracticing(false)}
+        gameState={gameState}
+        ageGroup={ageGroup}
+        onComplete={handlePracticeComplete}
+        onBack={handlePracticeBack}
       />
     );
   }
 
-  const currentStageIndex = STAGES.findIndex((s) => s.id === progress.currentStageId);
-  const todayCompleted = progress.completedSessions.some(
-    (s) => s.date === getToday() && s.stageId === progress.currentStageId
-  );
+  if (screen === "settings") {
+    return (
+      <SettingsPage
+        settings={settings}
+        onSettingsChange={setSettings}
+        onBack={() => setScreen("home")}
+      />
+    );
+  }
+
+  const showNav = ["home", "journey", "rewards", "profile"].includes(screen);
 
   return (
-    <main className="flex flex-col min-h-screen p-4 md:p-8 max-w-2xl mx-auto w-full">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            PebbleSum
-          </h1>
-          <p className="text-sm text-gray-500">Learn math, one pebble at a time</p>
-        </div>
-        <StreakBadge streak={progress.streak} />
-      </header>
+    <div className={`app-shell app-shell--${ageGroup}`}>
+      <TopBar
+        coins={gameState.coins}
+        streak={progress.streak}
+        hearts={gameState.hearts}
+        xp={progress.xp}
+        level={level}
+        onSettingsClick={() => setScreen("settings")}
+      />
 
-      {/* XP Progress */}
-      <div className="card mb-6">
-        <XpBar xp={progress.xp} />
-      </div>
-
-      {/* Daily Challenge CTA */}
-      <div className="card mb-6 bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-bold text-lg">
-              {todayCompleted ? "Today's Practice Complete!" : "Daily Practice"}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {todayCompleted
-                ? "Great job! Come back tomorrow."
-                : `Stage ${progress.currentStageId}: ${STAGES[currentStageIndex].name}`}
-            </p>
-            {!todayCompleted && progress.consecutivePerfectDays > 0 && (
-              <p className="text-xs text-purple-600 mt-1">
-                {progress.consecutivePerfectDays}/{STAGES[currentStageIndex].unlockRequirement} perfect days to next stage
-              </p>
-            )}
-          </div>
-          {!todayCompleted && (
-            <button onClick={() => setPracticing(true)} className="btn-primary">
-              Go!
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Stage Progression */}
-      <h2 className="font-bold text-lg mb-3">Your Journey</h2>
-      <div className="space-y-3 pb-8">
-        {STAGES.map((stage, idx) => (
-          <StageCard
-            key={stage.id}
-            stage={stage}
-            isUnlocked={idx <= currentStageIndex}
-            isCurrent={stage.id === progress.currentStageId}
-            onStart={() => setPracticing(true)}
+      <main className="app-shell__content">
+        {screen === "home" && profile && (
+          <HomeDashboard
+            profile={profile}
+            progress={progress}
+            gameState={gameState}
+            badges={badges}
+            onStartPractice={handleStartPractice}
+            onNavigate={handleNavigate}
           />
-        ))}
-      </div>
-    </main>
+        )}
+
+        {screen === "journey" && (
+          <JourneyMap
+            progress={progress}
+            onSelectStage={(stageId) => {
+              handleStartPractice();
+            }}
+          />
+        )}
+
+        {screen === "rewards" && (
+          <RewardsPage
+            badges={badges}
+            gameState={gameState}
+            progress={progress}
+          />
+        )}
+
+        {screen === "profile" && profile && (
+          <ProfilePage
+            profile={profile}
+            progress={progress}
+            gameState={gameState}
+            badges={badges}
+            onNavigate={handleNavigate}
+          />
+        )}
+      </main>
+
+      {showNav && (
+        <BottomNav
+          active={screen}
+          onNavigate={handleNavigate}
+          ageGroup={ageGroup}
+        />
+      )}
+    </div>
   );
 }
