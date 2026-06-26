@@ -18,6 +18,27 @@ export const metadata: Metadata = {
   description:
     "A gamified math learning app with daily practice, streaks, and progressive difficulty for ages 2-15.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-icon.png",
+  },
+  openGraph: {
+    title: "PebbleSum - Learn Math the Fun Way!",
+    description:
+      "A gamified math learning app with daily practice, streaks, and progressive difficulty for ages 2-15.",
+    images: [{ url: "/og-image.png", width: 512, height: 512 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "PebbleSum - Learn Math the Fun Way!",
+    description:
+      "A gamified math learning app with daily practice, streaks, and progressive difficulty for ages 2-15.",
+    images: ["/og-image.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
