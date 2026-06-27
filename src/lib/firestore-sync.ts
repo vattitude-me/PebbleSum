@@ -13,60 +13,118 @@ export interface FirestoreUserData {
   onboardingComplete: boolean;
 }
 
-interface EncryptedDocument {
+interface PiiFields {
+  name: string;
+  age: number;
+  parentPin?: string;
+}
+
+interface StoredDocument {
+  version: number;
+  pii: string;
+  profile: Omit<UserProfile, "name" | "age" | "parentPin"> | null;
+  gameState: GameState;
+  settings: AppSettings;
+  badges: EarnedBadge[];
+  progress: UserProgress;
+  onboardingComplete: boolean;
+}
+
+interface LegacyEncryptedDocument {
   payload: string;
   version: number;
 }
 
-const ENCRYPTION_VERSION = 1;
+const STORAGE_VERSION = 2;
+
+function splitProfile(profile: UserProfile | null): { pii: PiiFields | null; rest: Omit<UserProfile, "name" | "age" | "parentPin"> | null } {
+  if (!profile) return { pii: null, rest: null };
+  const { name, age, parentPin, ...rest } = profile;
+  return { pii: { name, age, parentPin }, rest };
+}
+
+function mergeProfile(rest: Omit<UserProfile, "name" | "age" | "parentPin"> | null, pii: PiiFields | null): UserProfile | null {
+  if (!rest || !pii) return null;
+  return { ...rest, name: pii.name, age: pii.age, parentPin: pii.parentPin };
+}
 
 export async function loadUserData(uid: string): Promise<FirestoreUserData | null> {
   const snap = await getDoc(doc(getFirebaseDb(), "users", uid));
   if (!snap.exists()) return null;
 
-  const stored = snap.data() as EncryptedDocument | FirestoreUserData;
+  const stored = snap.data() as StoredDocument | LegacyEncryptedDocument;
 
-  if ("payload" in stored && stored.version === ENCRYPTION_VERSION) {
-    return decryptData<FirestoreUserData>(uid, stored.payload);
+  // V1 legacy: entire document encrypted
+  if ("payload" in stored && stored.version === 1) {
+    const legacy = await decryptData<FirestoreUserData>(uid, stored.payload);
+    // Migrate to v2 on next save
+    return legacy;
   }
 
-  return stored as FirestoreUserData;
+  // V2: only PII encrypted
+  if (stored.version === STORAGE_VERSION) {
+    const doc2 = stored as StoredDocument;
+    const pii = doc2.pii ? await decryptData<PiiFields>(uid, doc2.pii) : null;
+    const profile = mergeProfile(doc2.profile, pii);
+    return {
+      profile,
+      gameState: doc2.gameState,
+      settings: doc2.settings,
+      badges: doc2.badges,
+      progress: doc2.progress,
+      onboardingComplete: doc2.onboardingComplete,
+    };
+  }
+
+  return null;
 }
 
-async function writeEncrypted(uid: string, data: Partial<FirestoreUserData>): Promise<void> {
-  const existing = await loadUserData(uid);
-  const merged = { ...existing, ...data } as FirestoreUserData;
-  const payload = await encryptData(uid, merged);
-  const encrypted: EncryptedDocument = { payload, version: ENCRYPTION_VERSION };
-  await setDoc(doc(getFirebaseDb(), "users", uid), encrypted);
+async function buildStoredDocument(uid: string, data: FirestoreUserData): Promise<StoredDocument> {
+  const { pii, rest } = splitProfile(data.profile);
+  const encryptedPii = pii ? await encryptData(uid, pii) : "";
+  return {
+    version: STORAGE_VERSION,
+    pii: encryptedPii,
+    profile: rest,
+    gameState: data.gameState,
+    settings: data.settings,
+    badges: data.badges,
+    progress: data.progress,
+    onboardingComplete: data.onboardingComplete,
+  };
 }
 
 export async function saveUserData(uid: string, data: FirestoreUserData): Promise<void> {
-  const payload = await encryptData(uid, data);
-  const encrypted: EncryptedDocument = { payload, version: ENCRYPTION_VERSION };
-  await setDoc(doc(getFirebaseDb(), "users", uid), encrypted);
+  const stored = await buildStoredDocument(uid, data);
+  await setDoc(doc(getFirebaseDb(), "users", uid), stored);
+}
+
+async function writePartial(uid: string, partial: Partial<FirestoreUserData>): Promise<void> {
+  const existing = await loadUserData(uid);
+  const merged = { ...existing, ...partial } as FirestoreUserData;
+  await saveUserData(uid, merged);
 }
 
 export async function saveProfile(uid: string, profile: UserProfile): Promise<void> {
-  await writeEncrypted(uid, { profile });
+  await writePartial(uid, { profile });
 }
 
 export async function saveGameState(uid: string, gameState: GameState): Promise<void> {
-  await writeEncrypted(uid, { gameState });
+  await writePartial(uid, { gameState });
 }
 
 export async function saveSettings(uid: string, settings: AppSettings): Promise<void> {
-  await writeEncrypted(uid, { settings });
+  await writePartial(uid, { settings });
 }
 
 export async function saveBadges(uid: string, badges: EarnedBadge[]): Promise<void> {
-  await writeEncrypted(uid, { badges });
+  await writePartial(uid, { badges });
 }
 
 export async function saveProgress(uid: string, progress: UserProgress): Promise<void> {
-  await writeEncrypted(uid, { progress });
+  await writePartial(uid, { progress });
 }
 
 export async function saveOnboardingComplete(uid: string): Promise<void> {
-  await writeEncrypted(uid, { onboardingComplete: true });
+  await writePartial(uid, { onboardingComplete: true });
 }
