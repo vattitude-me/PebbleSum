@@ -1,14 +1,17 @@
 "use client";
 
-import { UserProfile, GameState, EarnedBadge } from "@/lib/user-store";
+import { useState } from "react";
+import { UserProfile, GameState, AppSettings, saveSettings } from "@/lib/user-store";
 import { UserProgress } from "@/lib/progress-store";
-import { STAGES } from "@/lib/stages";
+
+import { useAuth } from "@/lib/auth-context";
 
 interface ProfilePageProps {
   profile: UserProfile;
   progress: UserProgress;
   gameState: GameState;
-  badges: EarnedBadge[];
+  settings: AppSettings;
+  onSettingsChange: (settings: AppSettings) => void;
   onNavigate: (page: string) => void;
 }
 
@@ -20,16 +23,55 @@ function getAvatarSrc(avatarId: string) {
   return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.png`}`;
 }
 
-export default function ProfilePage({ profile, progress, gameState, badges, onNavigate }: ProfilePageProps) {
+export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate }: ProfilePageProps) {
+  const { user, username, signOut, deleteAccount } = useAuth();
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
-  const currentStage = STAGES.find((s) => s.id === progress.currentStageId);
-  const totalSessions = progress.completedSessions.length;
-  const perfectSessions = progress.completedSessions.filter((s) => s.perfect).length;
-  const speedSessions = progress.completedSessions.filter((s) => s.withinSCT).length;
   const accuracy = gameState.totalQuestionsAnswered > 0
     ? Math.round((gameState.totalCorrectAnswers / gameState.totalQuestionsAnswered) * 100)
     : 0;
+
+  const update = (partial: Partial<AppSettings>) => {
+    const updated = { ...settings, ...partial };
+    saveSettings(updated);
+    onSettingsChange(updated);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText.toLowerCase() !== "delete") {
+      setDeleteError("Please type \"delete\" to confirm.");
+      return;
+    }
+    if (!deletePassword) {
+      setDeleteError("Please enter your password.");
+      return;
+    }
+    setDeleteLoading(true);
+    setDeleteError("");
+    try {
+      await deleteAccount(deletePassword);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete account.";
+      if (msg.includes("wrong-password") || msg.includes("invalid-credential")) {
+        setDeleteError("Incorrect password.");
+      } else {
+        setDeleteError(msg);
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   return (
     <div className="profile-page">
@@ -39,6 +81,7 @@ export default function ProfilePage({ profile, progress, gameState, badges, onNa
           <img src={getAvatarSrc(profile.avatarId)} alt="Avatar" className="profile-page__avatar-img" />
         </div>
         <h2 className="profile-page__name">{profile.name}</h2>
+        {user && <p className="profile-page__username">@{username}</p>}
         <p className="profile-page__title">Level {level} Learner</p>
         <div className="profile-page__xp-bar">
           <div className="profile-page__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
@@ -46,88 +89,174 @@ export default function ProfilePage({ profile, progress, gameState, badges, onNa
         <span className="profile-page__xp-text">{xpInLevel}/500 XP to Level {level + 1}</span>
       </section>
 
-      {/* Stats Grid */}
+      {/* Quick Stats — only current streak + accuracy */}
       <section className="profile-page__stats">
         <div className="profile-page__stat">
           <img src="/assets/icons/icon-fire.png" alt="Streak" className="profile-page__stat-icon" />
           <span className="profile-page__stat-value">{progress.streak}</span>
-          <span className="profile-page__stat-label">Current Streak</span>
+          <span className="profile-page__stat-label">Streak</span>
         </div>
         <div className="profile-page__stat">
-          <img src="/assets/icons/icon-timer.png" alt="Best" className="profile-page__stat-icon" />
-          <span className="profile-page__stat-value">{gameState.longestStreak}</span>
-          <span className="profile-page__stat-label">Best Streak</span>
-        </div>
-        <div className="profile-page__stat">
-          <img src="/assets/icons/icon-checkmark.png" alt="Sessions" className="profile-page__stat-icon" />
-          <span className="profile-page__stat-value">{totalSessions}</span>
-          <span className="profile-page__stat-label">Sessions</span>
-        </div>
-        <div className="profile-page__stat">
-          <img src="/assets/icons/icon-star.png" alt="Perfect" className="profile-page__stat-icon" />
-          <span className="profile-page__stat-value">{perfectSessions}</span>
-          <span className="profile-page__stat-label">Perfect</span>
+          <img src="/assets/icons/icon-checkmark.png" alt="Accuracy" className="profile-page__stat-icon" />
+          <span className="profile-page__stat-value">{accuracy}%</span>
+          <span className="profile-page__stat-label">Accuracy</span>
         </div>
       </section>
 
-      {/* Performance */}
-      <section className="profile-page__performance">
-        <h3 className="profile-page__section-title">Performance</h3>
-        <div className="profile-page__perf-grid">
-          <div className="profile-page__perf-item">
-            <span className="profile-page__perf-label">Accuracy</span>
-            <div className="profile-page__perf-bar">
-              <div className="profile-page__perf-fill profile-page__perf-fill--accuracy" style={{ width: `${accuracy}%` }} />
-            </div>
-            <span className="profile-page__perf-value">{accuracy}%</span>
+      {/* Display Settings */}
+      <section className="settings-page__section">
+        <h3 className="settings-page__section-title">Display</h3>
+        <div className="settings-page__row">
+          <div className="settings-page__row-info">
+            <img src="/assets/icons/icon-edit.png" alt="Text" className="settings-page__row-icon" />
+            <span>Text Size</span>
           </div>
-          <div className="profile-page__perf-item">
-            <span className="profile-page__perf-label">Speed Mastery</span>
-            <div className="profile-page__perf-bar">
-              <div className="profile-page__perf-fill profile-page__perf-fill--speed" style={{ width: `${totalSessions > 0 ? (speedSessions / totalSessions) * 100 : 0}%` }} />
-            </div>
-            <span className="profile-page__perf-value">{totalSessions > 0 ? Math.round((speedSessions / totalSessions) * 100) : 0}%</span>
+          <div className="settings-page__segmented">
+            {(["normal", "large", "extra-large"] as const).map((size) => (
+              <button
+                key={size}
+                onClick={() => update({ textSize: size })}
+                className={`settings-page__seg-btn ${settings.textSize === size ? "settings-page__seg-btn--active" : ""}`}
+              >
+                {size === "normal" ? "A" : size === "large" ? "A+" : "A++"}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Current Stage */}
-      <section className="profile-page__current">
-        <h3 className="profile-page__section-title">Current Stage</h3>
-        <div className="profile-page__stage-card">
-          <img src="/assets/icons/icon-level.png" alt="Stage" className="profile-page__stage-icon" />
-          <div className="profile-page__stage-info">
-            <span className="profile-page__stage-name">{currentStage?.name}</span>
-            <span className="profile-page__stage-desc">{currentStage?.description}</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Badges preview */}
-      <section className="profile-page__badges">
-        <div className="profile-page__badges-header">
-          <h3 className="profile-page__section-title">Badges ({badges.length})</h3>
-          <button onClick={() => onNavigate("rewards")} className="profile-page__see-all">See All</button>
-        </div>
-        <div className="profile-page__badges-row">
-          {badges.slice(0, 5).map((b) => (
-            <div key={b.badgeId} className="profile-page__badge-mini">
-              <img src={`/assets/icons/icon-badge-trophy.png`} alt="Badge" className="profile-page__badge-img" />
-            </div>
+      {/* Theme */}
+      <section className="settings-page__section">
+        <h3 className="settings-page__section-title">Theme</h3>
+        <div className="settings-page__theme-grid">
+          {(["default", "ocean", "forest", "candy"] as const).map((theme) => (
+            <button
+              key={theme}
+              onClick={() => update({ theme })}
+              className={`settings-page__theme-btn settings-page__theme-btn--${theme} ${settings.theme === theme ? "settings-page__theme-btn--active" : ""}`}
+            >
+              <span className="settings-page__theme-name">{theme}</span>
+            </button>
           ))}
-          {badges.length === 0 && (
-            <p className="profile-page__no-badges">Complete sessions to earn badges!</p>
-          )}
         </div>
       </section>
 
-      {/* Parent View Link — hidden until content is ready */}
+      {/* Coming Soon */}
+      <section className="settings-page__section">
+        <button
+          onClick={() => setComingSoonOpen(!comingSoonOpen)}
+          className="settings-page__accordion-header"
+        >
+          <h3 className="settings-page__section-title settings-page__section-title--inline">Coming Soon</h3>
+          <span className={`settings-page__accordion-arrow ${comingSoonOpen ? "settings-page__accordion-arrow--open" : ""}`}>
+            &#9662;
+          </span>
+        </button>
+        {comingSoonOpen && (
+          <div className="settings-page__coming-soon">
+            <div className="settings-page__coming-soon-item">
+              <span>🔔</span><span>Push Notifications & Reminders</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>🎵</span><span>Sound Effects & Music</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>⌨️</span><span>Multiple Input Modes</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>🔐</span><span>SMS Multi-Factor Authentication</span>
+            </div>
+            <div className="settings-page__coming-soon-item">
+              <span>👨‍👩‍👧</span><span>Parent / Guardian Dashboard</span>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Legal */}
+      <section className="settings-page__section">
+        <h3 className="settings-page__section-title">Legal</h3>
+        <button onClick={() => onNavigate("terms")} className="settings-page__nav-row">
+          <span>Terms of Service</span>
+          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+        </button>
+        <button onClick={() => onNavigate("privacy")} className="settings-page__nav-row">
+          <span>Privacy Policy</span>
+          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+        </button>
+      </section>
+
+      {/* Account */}
+      {user && (
+        <section className="settings-page__section">
+          <h3 className="settings-page__section-title">Account</h3>
+          <button onClick={handleSignOut} className="settings-page__btn settings-page__btn--secondary">
+            Sign Out
+          </button>
+        </section>
+      )}
+
+      {/* Danger Zone */}
+      {user && (
+        <section className="settings-page__section settings-page__section--danger">
+          <h3 className="settings-page__section-title settings-page__section-title--danger">Danger Zone</h3>
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="settings-page__btn settings-page__btn--danger"
+            >
+              Delete Account
+            </button>
+          ) : (
+            <div className="settings-page__delete-confirm">
+              <p className="settings-page__delete-warning">
+                This will permanently delete your account and all your data. This action cannot be undone.
+              </p>
+              <p className="settings-page__delete-instruction">
+                Type <strong>delete</strong> below to confirm:
+              </p>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder='Type "delete" to confirm'
+                className="settings-page__delete-input"
+                autoComplete="off"
+              />
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter your password"
+                className="settings-page__delete-input"
+              />
+              {deleteError && <p className="settings-page__delete-error">{deleteError}</p>}
+              <div className="settings-page__delete-actions">
+                <button
+                  onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(""); setDeletePassword(""); setDeleteError(""); }}
+                  className="settings-page__btn settings-page__btn--secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteLoading || deleteConfirmText.toLowerCase() !== "delete"}
+                  className="settings-page__btn settings-page__btn--danger"
+                >
+                  {deleteLoading ? "Deleting..." : "Confirm Delete"}
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="profile-page__footer">
         <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="profile-page__footer-link">
           vattitude.ca
         </a>
+        <p className="profile-page__copyright">&copy; 2025 Vattitude Inc. All rights reserved.</p>
       </footer>
     </div>
   );

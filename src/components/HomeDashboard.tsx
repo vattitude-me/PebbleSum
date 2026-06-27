@@ -1,30 +1,24 @@
 "use client";
 
 import { UserProgress, getToday } from "@/lib/progress-store";
-import { UserProfile, GameState, EarnedBadge } from "@/lib/user-store";
+import { UserProfile, GameState } from "@/lib/user-store";
 import { STAGES } from "@/lib/stages";
-import { getWorldForStage } from "@/lib/worlds";
 import { PracticeMode } from "@/components/PracticeView";
 
 interface HomeDashboardProps {
   profile: UserProfile;
   progress: UserProgress;
   gameState: GameState;
-  badges: EarnedBadge[];
   onStartPractice: (mode: PracticeMode) => void;
-  onNavigate: (page: string) => void;
 }
 
 export default function HomeDashboard({
   profile,
   progress,
   gameState,
-  badges,
   onStartPractice,
-  onNavigate,
 }: HomeDashboardProps) {
-  const currentStageIndex = STAGES.findIndex((s) => s.id === progress.currentStageId);
-  const currentStage = STAGES[currentStageIndex];
+  const currentStage = STAGES.find((s) => s.id === progress.currentStageId);
   const today = getToday();
   const isSameDay = gameState.practiceDate === today;
   const todayPracticeMinutes = isSameDay ? Math.floor(gameState.todayPracticeSeconds / 60) : 0;
@@ -33,7 +27,6 @@ export default function HomeDashboard({
   const todayCompleted = gameState.dailyGoalCompleted && isSameDay;
   const practiceCount = progress.stagePracticeCounts?.[progress.currentStageId] || 0;
   const canAttemptLevelClear = practiceCount >= (currentStage?.practiceSessionsRequired || 3);
-  const world = getWorldForStage(progress.currentStageId);
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
 
@@ -73,7 +66,7 @@ export default function HomeDashboard({
           </div>
         </header>
 
-        {/* Primary Action: Practice CTA */}
+        {/* Primary Action: Practice CTA + Level Strip */}
         <section className="dashboard__primary-action">
           {todayCompleted ? (
             <div className="dashboard__goal-complete">
@@ -86,68 +79,49 @@ export default function HomeDashboard({
               </div>
             </div>
           ) : (
-            <>
-              <div className="dashboard__goal-info">
-                <span className="dashboard__goal-label">Daily Goal</span>
-                <div className="dashboard__goal-progress-row">
-                  <div className="dashboard__goal-bar">
-                    <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
+            <div className="dashboard__action-row">
+              <div className="dashboard__action-left">
+                <div className="dashboard__goal-info">
+                  <span className="dashboard__goal-label">Daily Goal</span>
+                  <div className="dashboard__goal-progress-row">
+                    <div className="dashboard__goal-bar">
+                      <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
+                    </div>
+                    <span className="dashboard__goal-text">{todayPracticeMinutes}/{goalMinutes} min</span>
                   </div>
-                  <span className="dashboard__goal-text">{todayPracticeMinutes}/{goalMinutes} min</span>
                 </div>
+                <button onClick={() => onStartPractice("practice")} className="dashboard__practice-btn">
+                  <img src="/assets/icons/icon-play.png" alt="Start" className="dashboard__practice-icon" />
+                  <span>Practice</span>
+                </button>
               </div>
-              <button onClick={() => onStartPractice("practice")} className="dashboard__practice-btn">
-                <img src="/assets/icons/icon-play.png" alt="Start" className="dashboard__practice-icon" />
-                <span>Practice</span>
-              </button>
-            </>
+              <div className={`dashboard__action-level ${canAttemptLevelClear ? "dashboard__action-level--unlocked" : ""}`}>
+                <div className="dashboard__action-level-badge">
+                  {canAttemptLevelClear ? "🏆" : "🔒"}
+                </div>
+                <span className="dashboard__action-level-title">Level Clear</span>
+                <span className="dashboard__action-level-stage">{currentStage?.name || "Test"}</span>
+                {canAttemptLevelClear ? (
+                  <button onClick={() => onStartPractice("levelClear")} className="dashboard__action-level-btn">
+                    Start
+                  </button>
+                ) : (
+                  <div className="dashboard__action-level-progress">
+                    <div className="dashboard__action-level-bar">
+                      <div
+                        className="dashboard__action-level-fill"
+                        style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
+                      />
+                    </div>
+                    <span className="dashboard__action-level-count">
+                      {practiceCount}/{currentStage?.practiceSessionsRequired || 3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </section>
-
-        {/* Level Clear + Journey — 2-column grid */}
-        <div className="dashboard__duo-grid">
-          <section className={`dashboard__level-strip ${canAttemptLevelClear ? "dashboard__level-strip--unlocked" : ""}`}>
-            <div className="dashboard__level-strip-badge">
-              {canAttemptLevelClear ? "🏆" : "🔒"}
-            </div>
-            <div className="dashboard__level-strip-info">
-              <span className="dashboard__level-strip-title">
-                Level Clear
-              </span>
-              <span className="dashboard__level-strip-subtitle">
-                {currentStage?.name || "Test"}
-              </span>
-              {canAttemptLevelClear ? (
-                <button onClick={() => onStartPractice("levelClear")} className="dashboard__level-strip-btn">
-                  Start
-                </button>
-              ) : (
-                <div className="dashboard__level-strip-progress">
-                  <div className="dashboard__level-strip-bar">
-                    <div
-                      className="dashboard__level-strip-fill"
-                      style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
-                    />
-                  </div>
-                  <span className="dashboard__level-strip-count">
-                    {practiceCount}/{currentStage?.practiceSessionsRequired || 3} sessions
-                  </span>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {world && (
-            <section className="dashboard__journey-card" onClick={() => onNavigate("journey")}>
-              <span className="dashboard__journey-icon">{world.icon}</span>
-              <div className="dashboard__journey-info">
-                <h4 className="dashboard__journey-name">{world.name}</h4>
-                <p className="dashboard__journey-progress">Stage {currentStageIndex + 1} of {STAGES.length}</p>
-              </div>
-              <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="dashboard__journey-arrow" />
-            </section>
-          )}
-        </div>
 
       </div>
     </div>

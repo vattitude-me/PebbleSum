@@ -45,6 +45,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
   const [hearts, setHearts] = useState(gameState.hearts);
   const [comboCount, setComboCount] = useState(0);
   const [showEncouragement, setShowEncouragement] = useState("");
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -332,7 +333,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
     >
       {/* Practice Header */}
       <div className="practice__header">
-        <button onClick={onBack} className="practice__close">
+        <button onClick={() => setShowExitConfirm(true)} className="practice__close">
           <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="practice__close-icon" />
         </button>
         <div className="practice__progress-info">
@@ -435,6 +436,23 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
               {key === "del" ? "⌫" : key === "go" ? "✓" : key}
             </button>
           ))}
+        </div>
+      )}
+
+      {showExitConfirm && (
+        <div className="practice__exit-overlay">
+          <div className="practice__exit-modal">
+            <p className="practice__exit-title">Are you sure you want to exit?</p>
+            <p className="practice__exit-sub">Your progress for this session won&apos;t be saved.</p>
+            <div className="practice__exit-actions">
+              <button onClick={() => setShowExitConfirm(false)} className="practice__exit-btn practice__exit-btn--stay">
+                Keep Going
+              </button>
+              <button onClick={onBack} className="practice__exit-btn practice__exit-btn--leave">
+                Exit
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

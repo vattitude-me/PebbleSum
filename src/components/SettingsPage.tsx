@@ -90,7 +90,7 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
       <section className="settings-page__section">
         <h3 className="settings-page__section-title">Theme</h3>
         <div className="settings-page__theme-grid">
-          {(["default", "ocean", "forest", "space", "candy"] as const).map((theme) => (
+          {(["default", "ocean", "forest", "candy"] as const).map((theme) => (
             <button
               key={theme}
               onClick={() => update({ theme })}
@@ -218,6 +218,7 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="settings-page__footer-link">
           vattitude.ca
         </a>
+        <p className="settings-page__copyright">&copy; 2025 Vattitude Inc. All rights reserved.</p>
       </footer>
     </div>
   );

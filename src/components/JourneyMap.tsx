@@ -13,10 +13,9 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
   const currentStageIndex = STAGES.findIndex((s) => s.id === progress.currentStageId);
   const completedStageIds = STAGES.slice(0, currentStageIndex).map((s) => s.id);
 
-  const getStageState = (stageId: string, idx: number): "mastered" | "current" | "locked" | "upcoming" => {
+  const getStageState = (stageId: string, idx: number): "mastered" | "current" | "locked" => {
     if (idx < currentStageIndex) return "mastered";
     if (stageId === progress.currentStageId) return "current";
-    if (idx === currentStageIndex + 1) return "upcoming";
     return "locked";
   };
 
@@ -64,13 +63,12 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
                     <button
                       key={stageId}
                       className={`journey__stage journey__stage--${state}`}
-                      onClick={() => state !== "locked" && onSelectStage(stageId)}
+                      onClick={() => state === "current" && onSelectStage(stageId)}
                       disabled={state === "locked"}
                     >
                       <div className="journey__stage-marker">
                         {state === "mastered" && <img src="/assets/icons/icon-checkmark.png" alt="Done" className="journey__stage-icon" />}
                         {state === "current" && <img src="/assets/icons/icon-star-purple.png" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
-                        {state === "upcoming" && <img src="/assets/icons/icon-lightbulb.png" alt="Next" className="journey__stage-icon" />}
                         {state === "locked" && <span className="journey__stage-lock">🔒</span>}
                       </div>
                       <div className="journey__stage-info">

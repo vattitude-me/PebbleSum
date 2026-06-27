@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Logo from "@/components/Logo";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -23,9 +22,6 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
     <div className="splash-screen">
       <div className="splash-screen__bg">
         <div className="splash-screen__content">
-          <div className={`splash-screen__logo ${done ? "splash-screen__logo--up" : ""}`}>
-            <Logo size="lg" showTagline />
-          </div>
           <div className="splash-screen__loader">
             <div className={`splash-screen__loader-bar ${done ? "splash-screen__loader-bar--full" : ""}`} />
           </div>

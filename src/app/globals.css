@@ -89,8 +89,7 @@
   z-index: 0;
 }
 
-.theme-space .dashboard__primary-action,
-.theme-space .dashboard__journey-card {
+.theme-space .dashboard__primary-action {
   background: var(--card-bg);
 }
 
@@ -98,12 +97,12 @@
   background: var(--card-bg);
 }
 
-.theme-space .dashboard__level-strip {
+.theme-space .dashboard__action-level {
   background: rgba(45, 45, 68, 0.85);
   border-color: rgba(162, 155, 254, 0.3);
 }
 
-.theme-space .dashboard__level-strip--unlocked {
+.theme-space .dashboard__action-level--unlocked {
   background: var(--card-bg);
   border-color: var(--primary);
 }
@@ -469,26 +468,29 @@ body {
   align-items: center;
 }
 
-.top-bar__settings {
-  background: none;
-  border: none;
-  width: 40px;
-  height: 40px;
+.top-bar__install {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
+  color: white;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
 }
 
-.top-bar__settings:hover {
-  background: rgba(108, 92, 231, 0.08);
+.top-bar__install:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
 }
 
-.top-bar__settings-icon {
-  width: 24px;
-  height: 24px;
+.top-bar__install:active {
+  transform: translateY(0);
 }
 
 /* ========================================
@@ -1265,183 +1267,106 @@ body {
   margin: 0;
 }
 
-/* Level Clear Strip — compact secondary element */
-.dashboard__duo-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* Action Row — daily goal + level strip side by side */
+.dashboard__action-row {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
 }
 
-.dashboard__level-strip {
+.dashboard__action-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.dashboard__action-level {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 16px 12px;
-  background: rgba(255, 255, 255, 0.85);
+  justify-content: center;
+  padding: 12px 14px;
+  min-width: 100px;
+  background: rgba(237, 232, 255, 0.5);
   border-radius: var(--radius-md);
   border: 1.5px dashed #d4ccf0;
-  opacity: 0.9;
+  gap: 4px;
   transition: all 0.3s ease;
-  gap: 8px;
 }
 
-.dashboard__level-strip--unlocked {
+.dashboard__action-level--unlocked {
   background: white;
   border: 1.5px solid var(--primary);
-  opacity: 1;
   box-shadow: 0 3px 12px rgba(108, 92, 231, 0.12);
 }
 
-.dashboard__level-strip-subtitle {
+.dashboard__action-level-badge {
+  font-size: 20px;
+}
+
+.dashboard__action-level-title {
   font-size: 11px;
-  color: #888;
-  margin-top: -2px;
-}
-
-.dashboard__level-strip-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: #ede8ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.dashboard__level-strip--unlocked .dashboard__level-strip-badge {
-  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
-}
-
-.dashboard__level-strip-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  min-width: 0;
-}
-
-.dashboard__level-strip-title {
-  font-size: 13px;
   font-weight: 700;
   color: #2d2d44;
 }
 
-.dashboard__level-strip-meta {
-  font-size: 11px;
+.dashboard__action-level-stage {
+  font-size: 10px;
   color: #888;
 }
 
-.dashboard__level-strip-progress {
+.dashboard__action-level-progress {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 3px;
+  width: 100%;
 }
 
-.dashboard__level-strip-bar {
+.dashboard__action-level-bar {
   width: 100%;
-  height: 5px;
+  height: 4px;
   background: #e8e0ff;
   border-radius: 3px;
   overflow: hidden;
 }
 
-.dashboard__level-strip-fill {
+.dashboard__action-level-fill {
   height: 100%;
   background: linear-gradient(90deg, #a29bfe, #6c5ce7);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
 
-.dashboard__level-strip-count {
-  font-size: 11px;
+.dashboard__action-level-count {
+  font-size: 10px;
   font-weight: 600;
   color: var(--primary);
-  white-space: nowrap;
 }
 
-.dashboard__level-strip-btn {
-  padding: 8px 16px;
+.dashboard__action-level-btn {
+  padding: 6px 14px;
   border: none;
   border-radius: 99px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
   color: white;
-  white-space: nowrap;
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
-.dashboard__level-strip-btn:hover {
+.dashboard__action-level-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 5px 14px rgba(108, 92, 231, 0.4);
 }
 
-.dashboard__level-strip-btn:active {
+.dashboard__action-level-btn:active {
   transform: translateY(0);
-}
-
-/* Journey Card — compact navigation */
-.dashboard__journey-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 16px 12px;
-  background: white;
-  border-radius: var(--radius-md);
-  box-shadow: var(--card-shadow);
-  cursor: pointer;
-  transition: all 0.2s;
-  gap: 8px;
-}
-
-.dashboard__journey-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--card-shadow-lg);
-}
-
-.dashboard__journey-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.dashboard__journey-icon {
-  font-size: 28px;
-}
-
-.dashboard__journey-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.dashboard__journey-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.dashboard__journey-progress {
-  font-size: 12px;
-  color: var(--primary);
-  font-weight: 600;
-  margin: 0;
-}
-
-.dashboard__journey-arrow {
-  width: 16px;
-  height: 16px;
-  opacity: 0.4;
 }
 
 
@@ -1922,6 +1847,73 @@ body {
   transform: translateY(-2px);
 }
 
+/* Exit Confirmation Modal */
+.practice__exit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.practice__exit-modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: pop-in 0.2s ease-out;
+}
+
+.practice__exit-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2d2d44;
+  margin: 0 0 8px;
+}
+
+.practice__exit-sub {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 20px;
+}
+
+.practice__exit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.practice__exit-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 99px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.practice__exit-btn:active {
+  transform: scale(0.96);
+}
+
+.practice__exit-btn--stay {
+  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
+  color: white;
+  box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+}
+
+.practice__exit-btn--leave {
+  background: #f0f0f0;
+  color: #555;
+}
+
 /* ========================================
    JOURNEY MAP
    ======================================== */
@@ -2324,10 +2316,22 @@ body {
   font-weight: 800;
 }
 
+.profile-page__username {
+  font-size: 13px;
+  color: #999;
+  margin: -2px 0 2px;
+}
+
 .profile-page__title {
   font-size: 14px;
   color: var(--primary);
   font-weight: 600;
+}
+
+.profile-page__copyright {
+  font-size: 0.7rem;
+  color: #bbb;
+  margin: 8px 0 0;
 }
 
 .profile-page__xp-bar {
@@ -3033,6 +3037,35 @@ body {
   outline: none;
 }
 
+.auth-screen__input--has-toggle {
+  padding-right: 44px;
+}
+
+.auth-screen__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-screen__eye-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.auth-screen__eye-btn:hover {
+  color: var(--primary);
+}
+
 .auth-screen__input:focus {
   border-color: var(--primary);
 }
@@ -3416,6 +3449,12 @@ body {
 
 .settings-page__footer-link:hover {
   color: var(--primary);
+}
+
+.settings-page__copyright {
+  font-size: 0.7rem;
+  color: #bbb;
+  margin: 8px 0 0;
 }
 
 /* ========================================

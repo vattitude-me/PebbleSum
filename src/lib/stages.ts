@@ -171,3 +171,11 @@ export function getNextStage(currentId: string): Stage | undefined {
   const idx = STAGES.findIndex((s) => s.id === currentId);
   return idx >= 0 && idx < STAGES.length - 1 ? STAGES[idx + 1] : undefined;
 }
+
+export function getStartingStageForAge(age: number): string {
+  if (age <= 4) return "6A";
+  if (age <= 6) return "5A";
+  if (age <= 8) return "3A";
+  if (age <= 10) return "2A";
+  return "A";
+}

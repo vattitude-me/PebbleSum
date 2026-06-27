@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { STAGES } from "@/lib/stages";
+import { STAGES, getStartingStageForAge } from "@/lib/stages";
 import { UserProgress, loadProgress, saveProgress, isStreakActive, getToday } from "@/lib/progress-store";
 import {
   UserProfile,
@@ -30,11 +30,10 @@ import PracticeView, { PracticeMode } from "@/components/PracticeView";
 import JourneyMap from "@/components/JourneyMap";
 import RewardsPage from "@/components/RewardsPage";
 import ProfilePage from "@/components/ProfilePage";
-import SettingsPage from "@/components/SettingsPage";
 import TermsPage from "@/components/TermsPage";
 import PrivacyPage from "@/components/PrivacyPage";
 
-type AppScreen = "splash" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "settings" | "parent" | "terms" | "privacy";
+type AppScreen = "splash" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "parent" | "terms" | "privacy";
 
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
@@ -123,13 +122,19 @@ export default function Home() {
 
   const handleOnboardingComplete = useCallback((newProfile: UserProfile) => {
     setProfile(newProfile);
+    const startingStage = getStartingStageForAge(newProfile.age);
+    const currentProgress = loadProgress();
+    const updatedProgress = { ...currentProgress, currentStageId: startingStage };
+    saveProgress(updatedProgress);
+    setProgress(updatedProgress);
+
     if (user) {
       const data: FirestoreUserData = {
         profile: newProfile,
         gameState: loadGameState(),
         settings: loadSettings(),
         badges: loadBadges(),
-        progress: loadProgress(),
+        progress: updatedProgress,
         onboardingComplete: true,
       };
       saveUserData(user.uid, data);
@@ -230,23 +235,10 @@ export default function Home() {
     );
   }
 
-  if (screen === "settings") {
-    return (
-      <div className={shellClasses}>
-        <SettingsPage
-          settings={settings}
-          onSettingsChange={handleSettingsChange}
-          onBack={() => setScreen("home")}
-          onNavigate={handleNavigate}
-        />
-      </div>
-    );
-  }
-
   if (screen === "terms") {
     return (
       <div className={shellClasses}>
-        <TermsPage onBack={() => setScreen("settings")} />
+        <TermsPage onBack={() => setScreen("profile")} />
       </div>
     );
   }
@@ -254,7 +246,7 @@ export default function Home() {
   if (screen === "privacy") {
     return (
       <div className={shellClasses}>
-        <PrivacyPage onBack={() => setScreen("settings")} />
+        <PrivacyPage onBack={() => setScreen("profile")} />
       </div>
     );
   }
@@ -263,7 +255,7 @@ export default function Home() {
 
   return (
     <div className={shellClasses}>
-      <TopBar onSettingsClick={() => setScreen("settings")} />
+      <TopBar />
 
       <main className="app-shell__content">
         {screen === "home" && profile && (
@@ -271,9 +263,7 @@ export default function Home() {
             profile={profile}
             progress={progress}
             gameState={gameState}
-            badges={badges}
             onStartPractice={handleStartPractice}
-            onNavigate={handleNavigate}
           />
         )}
 
@@ -299,7 +289,8 @@ export default function Home() {
             profile={profile}
             progress={progress}
             gameState={gameState}
-            badges={badges}
+            settings={settings}
+            onSettingsChange={handleSettingsChange}
             onNavigate={handleNavigate}
           />
         )}
