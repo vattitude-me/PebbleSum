@@ -60,6 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOutUser = useCallback(async () => {
     await firebaseSignOut(getFirebaseAuth());
+    const localKeys = [
+      "pebblesum_profile",
+      "pebblesum_game",
+      "pebblesum_settings",
+      "pebblesum_badges",
+      "pebblesum_onboarding",
+      "pebblesum_progress",
+    ];
+    localKeys.forEach((k) => localStorage.removeItem(k));
   }, []);
 
   const deleteAccount = useCallback(async (password: string) => {
@@ -71,6 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     await deleteDoc(doc(getFirebaseDb(), "users", currentUser.uid));
     await deleteUser(currentUser);
+
+    const localKeys = [
+      "pebblesum_profile",
+      "pebblesum_game",
+      "pebblesum_settings",
+      "pebblesum_badges",
+      "pebblesum_onboarding",
+      "pebblesum_progress",
+    ];
+    localKeys.forEach((k) => localStorage.removeItem(k));
   }, []);
 
   const username = user?.email?.replace("@pebblesum.app", "") || null;

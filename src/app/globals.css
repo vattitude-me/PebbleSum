@@ -417,6 +417,12 @@ body {
   }
 }
 
+@media (min-width: 2560px) {
+  .app-shell {
+    zoom: 1.75;
+  }
+}
+
 .app-shell__content {
   flex: 1;
   overflow-y: auto;
@@ -622,6 +628,12 @@ body {
     height: min(80dvh, 820px);
     zoom: 1.25;
     box-shadow: 0 0 100px rgba(108, 92, 231, 0.2), 0 0 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@media (min-width: 2560px) {
+  .splash-screen__bg {
+    zoom: 1.75;
   }
 }
 
@@ -1067,7 +1079,7 @@ body {
 
 .dashboard__greeting-hello {
   font-size: 13px;
-  color: #666;
+  color: #ffffff;
   font-weight: 500;
   margin: 0;
 }
