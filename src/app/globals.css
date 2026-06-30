@@ -1670,6 +1670,7 @@ body {
   font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 12px;
 }
 
 .practice__visual-objects {
@@ -2059,8 +2060,12 @@ body {
   cursor: not-allowed;
 }
 
+.journey__stage.journey__stage--mastered {
+  background: #5ce7b254;
+}
+
 .journey__stage--current {
-  background: rgba(108, 92, 231, 0.06);
+  background: rgba(108, 92, 231, 0.08);
   border-left: 3px solid var(--primary);
   padding-left: 13px;
 }

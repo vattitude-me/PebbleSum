@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { UserProgress } from "@/lib/progress-store";
 import { STAGES } from "@/lib/stages";
 import { WORLDS, getWorldProgress } from "@/lib/worlds";
@@ -10,6 +11,13 @@ interface JourneyMapProps {
 }
 
 export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps) {
+  const currentStageRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (currentStageRef.current) {
+      currentStageRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [progress.currentStageId]);
   const currentStageIndex = STAGES.findIndex((s) => s.id === progress.currentStageId);
   const completedStageIds = STAGES.slice(0, currentStageIndex).map((s) => s.id);
 
@@ -62,6 +70,7 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
                   return (
                     <button
                       key={stageId}
+                      ref={state === "current" ? currentStageRef : undefined}
                       className={`journey__stage journey__stage--${state}`}
                       onClick={() => state === "current" && onSelectStage(stageId)}
                       disabled={state === "locked"}
