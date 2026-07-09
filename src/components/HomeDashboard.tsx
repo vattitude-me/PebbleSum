@@ -1,9 +1,15 @@
 "use client";
 
+import { useEffect, useState, useRef } from "react";
 import { UserProgress, getToday } from "@/lib/progress-store";
 import { UserProfile, GameState } from "@/lib/user-store";
 import { STAGES } from "@/lib/stages";
 import { PracticeMode } from "@/components/PracticeView";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
 
 interface HomeDashboardProps {
   profile: UserProfile;
@@ -29,6 +35,44 @@ export default function HomeDashboard({
   const canAttemptLevelClear = practiceCount >= (currentStage?.practiceSessionsRequired || 3);
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
+
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches
+      || (navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (isStandalone) return;
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      deferredPromptRef.current = e as BeforeInstallPromptEvent;
+      setShowInstallBanner(true);
+    };
+
+    const installedHandler = () => {
+      setShowInstallBanner(false);
+      deferredPromptRef.current = null;
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", installedHandler);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", installedHandler);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    const prompt = deferredPromptRef.current;
+    if (!prompt) return;
+    await prompt.prompt();
+    const { outcome } = await prompt.userChoice;
+    if (outcome === "accepted") {
+      setShowInstallBanner(false);
+    }
+    deferredPromptRef.current = null;
+  };
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -122,6 +166,26 @@ export default function HomeDashboard({
             </div>
           )}
         </section>
+
+        {showInstallBanner && (
+          <section className="dashboard__install-banner">
+            <div className="dashboard__install-info">
+              <span className="dashboard__install-icon">📲</span>
+              <div>
+                <p className="dashboard__install-title">Install PebbleSum</p>
+                <p className="dashboard__install-desc">Add to home screen for quick access</p>
+              </div>
+            </div>
+            <div className="dashboard__install-actions">
+              <button onClick={handleInstallClick} className="dashboard__install-btn">
+                Install
+              </button>
+              <button onClick={() => setShowInstallBanner(false)} className="dashboard__install-dismiss">
+                ✕
+              </button>
+            </div>
+          </section>
+        )}
 
       </div>
     </div>
