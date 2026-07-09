@@ -46,6 +46,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
   const [comboCount, setComboCount] = useState(0);
   const [showEncouragement, setShowEncouragement] = useState("");
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const finishedDataRef = useRef<{ updatedProgress: UserProgress; updatedGameState: GameState } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -233,7 +234,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
     saveProgress(updatedProgress);
     saveGameState(updatedGameState);
-    onComplete(updatedProgress, updatedGameState);
+    finishedDataRef.current = { updatedProgress, updatedGameState };
   };
 
   const formatTime = (seconds: number) => {
@@ -241,6 +242,13 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
+
+  const handleContinue = useCallback(() => {
+    if (finishedDataRef.current) {
+      onComplete(finishedDataRef.current.updatedProgress, finishedDataRef.current.updatedGameState);
+    }
+  }, [onComplete]);
+
 
   if (isFinished) {
     const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
@@ -307,14 +315,20 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
           </div>
         )}
 
+        {isLevelClear && levelCleared && (
+          <p className="practice-complete__mastery-msg practice-complete__mastery-msg--success">
+            🎉 This counts toward your level clear!
+          </p>
+        )}
+
         {isLevelClear && !levelCleared && (
           <p className="practice-complete__mastery-msg">
             You need 100% correct within {formatTime(timeLimit)} to advance.
           </p>
         )}
 
-        <button onClick={onBack} className="practice-complete__btn">
-          Back to Dashboard
+        <button onClick={handleContinue} className="practice-complete__btn">
+          Continue
         </button>
       </div>
     );
