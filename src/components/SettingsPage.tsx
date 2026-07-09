@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AppSettings, saveSettings } from "@/lib/user-store";
 import { useAuth } from "@/lib/auth-context";
+import { STAGES } from "@/lib/stages";
+import { UserProgress, loadProgress, saveProgress } from "@/lib/progress-store";
 
 interface SettingsPageProps {
   settings: AppSettings;
   onSettingsChange: (settings: AppSettings) => void;
   onBack: () => void;
   onNavigate: (page: string) => void;
+  onDevJumpToStage?: (stageId: string) => void;
 }
 
-export default function SettingsPage({ settings, onSettingsChange, onBack, onNavigate }: SettingsPageProps) {
+export default function SettingsPage({ settings, onSettingsChange, onBack, onNavigate, onDevJumpToStage }: SettingsPageProps) {
   const { user, username, signOut, deleteAccount } = useAuth();
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -19,6 +22,31 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [devMode, setDevMode] = useState(false);
+  const devTapCount = useRef(0);
+  const devTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleDevTap = () => {
+    devTapCount.current += 1;
+    if (devTapTimer.current) clearTimeout(devTapTimer.current);
+    if (devTapCount.current >= 5) {
+      setDevMode(true);
+      devTapCount.current = 0;
+      return;
+    }
+    devTapTimer.current = setTimeout(() => {
+      devTapCount.current = 0;
+    }, 2000);
+  };
+
+  const handleJumpToStage = (stageId: string) => {
+    const progress = loadProgress();
+    const updated: UserProgress = { ...progress, currentStageId: stageId };
+    saveProgress(updated);
+    if (onDevJumpToStage) {
+      onDevJumpToStage(stageId);
+    }
+  };
 
   const update = (partial: Partial<AppSettings>) => {
     const updated = { ...settings, ...partial };
@@ -213,12 +241,31 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         </section>
       )}
 
+      {/* Developer Mode */}
+      {devMode && (
+        <section className="settings-page__section settings-page__section--dev">
+          <h3 className="settings-page__section-title settings-page__section-title--dev">Developer Mode</h3>
+          <p className="settings-page__dev-hint">Jump to any stage:</p>
+          <div className="settings-page__dev-stages">
+            {STAGES.map((stage) => (
+              <button
+                key={stage.id}
+                onClick={() => handleJumpToStage(stage.id)}
+                className="settings-page__dev-stage-btn"
+              >
+                {stage.id} — {stage.name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="settings-page__footer">
         <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="settings-page__footer-link">
           vattitude.ca
         </a>
-        <p className="settings-page__copyright">&copy; 2025 Vattitude Inc. All rights reserved.</p>
+        <p className="settings-page__copyright" onClick={handleDevTap}>&copy; 2025 Vattitude Inc. All rights reserved.</p>
       </footer>
     </div>
   );

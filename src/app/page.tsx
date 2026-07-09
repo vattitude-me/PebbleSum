@@ -349,6 +349,10 @@ export default function Home() {
             settings={settings}
             onSettingsChange={handleSettingsChange}
             onNavigate={handleNavigate}
+            onDevJumpToStage={(stageId) => {
+              const updated = { ...progress, currentStageId: stageId };
+              setProgress(updated);
+            }}
           />
         )}
       </main>

@@ -2415,6 +2415,9 @@ body {
   font-size: 0.7rem;
   color: #bbb;
   margin: 8px 0 0;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
 }
 
 .profile-page__xp-bar {
@@ -3620,6 +3623,58 @@ body {
   font-size: 0.7rem;
   color: #bbb;
   margin: 8px 0 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Developer Mode */
+.settings-page__section--dev {
+  border: 2px dashed var(--warning);
+  background: rgba(253, 203, 110, 0.08);
+}
+
+.settings-page__section-title--dev {
+  color: var(--warning);
+}
+
+.settings-page__dev-hint {
+  font-size: 0.85rem;
+  color: var(--foreground);
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+
+.settings-page__dev-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-page__dev-stage-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--card-bg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.settings-page__dev-stage-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.settings-page__dev-stage-btn--active {
+  border-color: var(--primary);
+  background: rgba(108, 92, 231, 0.1);
+  font-weight: 700;
 }
 
 /* ========================================

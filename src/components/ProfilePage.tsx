@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { UserProfile, GameState, AppSettings, saveSettings } from "@/lib/user-store";
-import { UserProgress } from "@/lib/progress-store";
+import { UserProgress, loadProgress, saveProgress } from "@/lib/progress-store";
+import { STAGES } from "@/lib/stages";
 
 import { useAuth } from "@/lib/auth-context";
 
@@ -13,6 +14,7 @@ interface ProfilePageProps {
   settings: AppSettings;
   onSettingsChange: (settings: AppSettings) => void;
   onNavigate: (page: string) => void;
+  onDevJumpToStage?: (stageId: string) => void;
 }
 
 const AVATAR_ICON_MAP: Record<string, string> = {
@@ -23,7 +25,7 @@ function getAvatarSrc(avatarId: string) {
   return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.png`}`;
 }
 
-export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate }: ProfilePageProps) {
+export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate, onDevJumpToStage }: ProfilePageProps) {
   const { user, username, isGuest, signOut, deleteAccount, linkAccount } = useAuth();
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -37,6 +39,31 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
   const [linkConfirmPassword, setLinkConfirmPassword] = useState("");
   const [linkError, setLinkError] = useState("");
   const [linkLoading, setLinkLoading] = useState(false);
+  const [devMode, setDevMode] = useState(false);
+  const devTapCount = useRef(0);
+  const devTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleDevTap = () => {
+    devTapCount.current += 1;
+    if (devTapTimer.current) clearTimeout(devTapTimer.current);
+    if (devTapCount.current >= 5) {
+      setDevMode(true);
+      devTapCount.current = 0;
+      return;
+    }
+    devTapTimer.current = setTimeout(() => {
+      devTapCount.current = 0;
+    }, 2000);
+  };
+
+  const handleJumpToStage = (stageId: string) => {
+    const currentProgress = loadProgress();
+    const updated: UserProgress = { ...currentProgress, currentStageId: stageId };
+    saveProgress(updated);
+    if (onDevJumpToStage) {
+      onDevJumpToStage(stageId);
+    }
+  };
 
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
@@ -349,12 +376,31 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         </section>
       )}
 
+      {/* Developer Mode */}
+      {devMode && (
+        <section className="settings-page__section settings-page__section--dev">
+          <h3 className="settings-page__section-title settings-page__section-title--dev">Developer Mode</h3>
+          <p className="settings-page__dev-hint">Jump to any stage:</p>
+          <div className="settings-page__dev-stages">
+            {STAGES.map((stage) => (
+              <button
+                key={stage.id}
+                onClick={() => handleJumpToStage(stage.id)}
+                className={`settings-page__dev-stage-btn ${stage.id === progress.currentStageId ? "settings-page__dev-stage-btn--active" : ""}`}
+              >
+                {stage.id} — {stage.name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="profile-page__footer">
         <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="profile-page__footer-link">
           vattitude.ca
         </a>
-        <p className="profile-page__copyright">&copy; 2025 Vattitude Inc. All rights reserved.</p>
+        <p className="profile-page__copyright" onClick={handleDevTap}>&copy; 2025 Vattitude Inc. All rights reserved.</p>
       </footer>
     </div>
   );
