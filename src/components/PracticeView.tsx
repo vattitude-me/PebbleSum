@@ -274,16 +274,31 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
     };
 
     return (
-      <div className="practice-complete">
+      <div className={`practice-complete ${isLevelClear && levelCleared ? "practice-complete--level-cleared" : ""}`}>
+        {isLevelClear && levelCleared && (
+          <div className="practice-complete__confetti" aria-hidden="true">
+            {Array.from({ length: 24 }).map((_, i) => (
+              <span key={i} className="practice-complete__confetti-piece" style={{ animationDelay: `${i * 0.08}s`, left: `${4 + (i * 4)}%` }} />
+            ))}
+          </div>
+        )}
+
         <div className="practice-complete__header">
           <img
             src={`/assets/icons/${levelCleared || perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
             alt="Pebble"
-            className="practice-complete__mascot"
+            className={`practice-complete__mascot ${isLevelClear && levelCleared ? "practice-complete__mascot--celebrate" : ""}`}
           />
-          <h2 className="practice-complete__title">{getTitle()}</h2>
+          <h2 className={`practice-complete__title ${isLevelClear && levelCleared ? "practice-complete__title--cleared" : ""}`}>{getTitle()}</h2>
           <p className="practice-complete__subtitle">{getSubtitle()}</p>
         </div>
+
+        {isLevelClear && levelCleared && (
+          <div className="practice-complete__badge">
+            <span className="practice-complete__badge-icon">⭐</span>
+            <span className="practice-complete__badge-text">Stage {stage.id} Complete!</span>
+          </div>
+        )}
 
         <div className="practice-complete__stats">
           <div className="practice-complete__stat">
@@ -317,7 +332,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
         {isLevelClear && levelCleared && (
           <p className="practice-complete__mastery-msg practice-complete__mastery-msg--success">
-            🎉 This counts toward your level clear!
+            Amazing work! You&apos;re moving on to the next stage!
           </p>
         )}
 
@@ -328,7 +343,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         )}
 
         <button onClick={handleContinue} className="practice-complete__btn">
-          Continue
+          {isLevelClear && levelCleared ? "Onward!" : "Continue"}
         </button>
       </div>
     );

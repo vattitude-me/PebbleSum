@@ -1920,6 +1920,121 @@ body {
   transform: translateY(-2px);
 }
 
+/* Level Cleared Fanfare */
+.practice-complete--level-cleared {
+  background: linear-gradient(180deg, #fff8e1 0%, #ffffff 40%);
+}
+
+.practice-complete__confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.practice-complete__confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confetti-fall 2.5s ease-out forwards;
+  opacity: 0;
+}
+
+.practice-complete__confetti-piece:nth-child(3n) {
+  background: #ffd700;
+  width: 8px;
+  height: 12px;
+}
+
+.practice-complete__confetti-piece:nth-child(3n+1) {
+  background: #6c5ce7;
+  width: 12px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.practice-complete__confetti-piece:nth-child(3n+2) {
+  background: #00cec9;
+  width: 6px;
+  height: 14px;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.practice-complete__mascot--celebrate {
+  width: 100px;
+  height: 100px;
+  animation: bounce-celebrate 0.6s ease-out, float 3s ease-in-out 0.6s infinite;
+}
+
+@keyframes bounce-celebrate {
+  0% { transform: scale(0.5) translateY(20px); opacity: 0; }
+  50% { transform: scale(1.2) translateY(-10px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.practice-complete__title--cleared {
+  font-size: 32px;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: title-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.2); }
+}
+
+.practice-complete__badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ffd700, #ffaa00);
+  border-radius: 99px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(255, 170, 0, 0.3);
+  animation: badge-pop 0.5s ease-out 0.3s both;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.practice-complete__badge-icon {
+  font-size: 20px;
+  animation: star-spin 1s ease-out 0.5s both;
+}
+
+@keyframes star-spin {
+  from { transform: rotate(0deg) scale(0); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+.practice-complete__badge-text {
+  font-size: 14px;
+  font-weight: 800;
+  color: #5a3e00;
+}
+
 /* Exit Confirmation Modal */
 .practice__exit-overlay {
   position: fixed;

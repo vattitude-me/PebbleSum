@@ -18,16 +18,16 @@ These stages build number recognition and counting fluency. They require more pr
 
 | Stage | Name | Practice Sessions Required | Level Clear Questions | Time Limit | Problem Style |
 |-------|------|---------------------------|----------------------|------------|---------------|
-| 6A | Know Your Numbers | 5 | 10 | 60s | Multiple Choice |
-| 5A | Count to 10 | 5 | 10 | 60s | Multiple Choice |
-| 4A | Count to 30 | 5 | 10 | 90s | Multiple Choice |
-| 3A | Number Sequence | 5 | 10 | 90s | Multiple Choice |
+| 6A | Know Your Numbers | 5 | 10 | 30s | Multiple Choice |
+| 5A | Count to 10 | 5 | 10 | 30s | Multiple Choice |
+| 4A | Count to 30 | 5 | 10 | 30s | Multiple Choice |
+| 3A | Number Sequence | 5 | 10 | 30s | Multiple Choice |
 
 ### Criteria for Foundation Stages
 
 - Complete **5 practice sessions** on the stage
-- In Level Clear: answer all **10 questions correctly**
-- Finish within **60–90 seconds** (depending on stage)
+- In Level Clear: answer all **10 questions correctly** (zero errors allowed)
+- Finish within **30 seconds** (3 seconds per question)
 
 ---
 
@@ -37,19 +37,19 @@ These stages test arithmetic fluency. They require fewer practice sessions but d
 
 | Stage | Name | Practice Sessions Required | Level Clear Questions | Time Limit | Problem Style |
 |-------|------|---------------------------|----------------------|------------|---------------|
-| 2A | Add Small (+1 to +3) | 3 | 15 | 60s | Numpad |
-| A | Add to 10 | 3 | 15 | 60s | Numpad |
-| B | Add to 20 | 3 | 15 | 75s | Numpad |
-| C | Subtract Small (within 10) | 3 | 15 | 60s | Numpad |
-| D | Subtract to 20 | 3 | 15 | 75s | Numpad |
-| E | Multiply (2, 5, 10) | 3 | 15 | 90s | Numpad |
-| F | Divide (2, 5, 10) | 3 | 15 | 90s | Numpad |
+| 2A | Add Small (+1 to +3) | 3 | 15 | 45s | Numpad |
+| A | Add to 10 | 3 | 15 | 45s | Numpad |
+| B | Add to 20 | 3 | 15 | 45s | Numpad |
+| C | Subtract Small (within 10) | 3 | 15 | 45s | Numpad |
+| D | Subtract to 20 | 3 | 15 | 45s | Numpad |
+| E | Multiply (2, 5, 10) | 3 | 15 | 45s | Numpad |
+| F | Divide (2, 5, 10) | 3 | 15 | 45s | Numpad |
 
 ### Criteria for Computation Stages
 
 - Complete **3 practice sessions** on the stage
-- In Level Clear: answer all **15 questions correctly**
-- Finish within **60–90 seconds** (depending on stage)
+- In Level Clear: answer all **15 questions correctly** (zero errors allowed)
+- Finish within **45 seconds** (3 seconds per question)
 
 ---
 
