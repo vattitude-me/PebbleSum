@@ -143,8 +143,8 @@ export default function HomeDashboard({
                 <div className="dashboard__action-level-badge">
                   {canAttemptLevelClear ? "🏆" : "🔒"}
                 </div>
-                <span className="dashboard__action-level-title">Level Clear</span>
-                <span className="dashboard__action-level-stage">{currentStage?.name || "Test"}</span>
+                <span className="dashboard__action-level-title">{currentStage?.name || "Test"}</span>
+                <span className="dashboard__action-level-stage">To clear the level</span>
                 {canAttemptLevelClear ? (
                   <button onClick={() => onStartPractice("levelClear")} className="dashboard__action-level-btn">
                     Start
