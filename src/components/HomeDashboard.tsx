@@ -158,7 +158,7 @@ export default function HomeDashboard({
                       />
                     </div>
                     <span className="dashboard__action-level-count">
-                      {practiceCount}/{currentStage?.practiceSessionsRequired || 3}
+                      {practiceCount}/{currentStage?.practiceSessionsRequired || 3} practices
                     </span>
                   </div>
                 )}
