@@ -24,13 +24,19 @@ function getAvatarSrc(avatarId: string) {
 }
 
 export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate }: ProfilePageProps) {
-  const { user, username, signOut, deleteAccount } = useAuth();
+  const { user, username, isGuest, signOut, deleteAccount, linkAccount } = useAuth();
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showLinkAccount, setShowLinkAccount] = useState(false);
+  const [linkUsername, setLinkUsername] = useState("");
+  const [linkPassword, setLinkPassword] = useState("");
+  const [linkConfirmPassword, setLinkConfirmPassword] = useState("");
+  const [linkError, setLinkError] = useState("");
+  const [linkLoading, setLinkLoading] = useState(false);
 
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
@@ -73,6 +79,35 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
     }
   };
 
+  const handleLinkAccount = async () => {
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(linkUsername)) {
+      setLinkError("Username must be 3-20 characters (letters, numbers, underscore).");
+      return;
+    }
+    if (linkPassword.length < 6) {
+      setLinkError("Password must be at least 6 characters.");
+      return;
+    }
+    if (linkPassword !== linkConfirmPassword) {
+      setLinkError("Passwords don't match.");
+      return;
+    }
+    setLinkLoading(true);
+    setLinkError("");
+    try {
+      await linkAccount(linkUsername, linkPassword);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      if (msg.includes("email-already-in-use")) {
+        setLinkError("This username is already taken.");
+      } else {
+        setLinkError(msg);
+      }
+    } finally {
+      setLinkLoading(false);
+    }
+  };
+
   return (
     <div className="profile-page">
       {/* Profile Header */}
@@ -82,6 +117,7 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         </div>
         <h2 className="profile-page__name">{profile.name}</h2>
         {user && <p className="profile-page__username">@{username}</p>}
+        {isGuest && <p className="profile-page__username">Guest</p>}
         <p className="profile-page__title">Level {level} Learner</p>
         <div className="profile-page__xp-bar">
           <div className="profile-page__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
@@ -186,12 +222,74 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         </button>
       </section>
 
+      {/* Save Progress (guest users) */}
+      {isGuest && (
+        <section className="settings-page__section settings-page__section--highlight">
+          <h3 className="settings-page__section-title">Save Your Progress</h3>
+          <p className="settings-page__section-desc">
+            Create an account to save your progress to the cloud and access it from any device.
+          </p>
+          {!showLinkAccount ? (
+            <button
+              onClick={() => setShowLinkAccount(true)}
+              className="settings-page__btn settings-page__btn--primary"
+            >
+              Create Account
+            </button>
+          ) : (
+            <div className="settings-page__link-form">
+              <input
+                type="text"
+                value={linkUsername}
+                onChange={(e) => setLinkUsername(e.target.value)}
+                placeholder="Choose a username"
+                className="settings-page__link-input"
+                maxLength={20}
+                autoComplete="username"
+              />
+              <input
+                type="password"
+                value={linkPassword}
+                onChange={(e) => setLinkPassword(e.target.value)}
+                placeholder="Choose a password"
+                className="settings-page__link-input"
+                autoComplete="new-password"
+              />
+              <input
+                type="password"
+                value={linkConfirmPassword}
+                onChange={(e) => setLinkConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                className="settings-page__link-input"
+                autoComplete="new-password"
+              />
+              {linkError && <p className="settings-page__delete-error">{linkError}</p>}
+              <div className="settings-page__delete-actions">
+                <button
+                  onClick={() => { setShowLinkAccount(false); setLinkError(""); }}
+                  className="settings-page__btn settings-page__btn--secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLinkAccount}
+                  disabled={linkLoading}
+                  className="settings-page__btn settings-page__btn--primary"
+                >
+                  {linkLoading ? "Creating..." : "Save Progress"}
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Account */}
-      {user && (
+      {(user || isGuest) && (
         <section className="settings-page__section">
           <h3 className="settings-page__section-title">Account</h3>
           <button onClick={handleSignOut} className="settings-page__btn settings-page__btn--secondary">
-            Sign Out
+            {isGuest ? "Exit Guest Mode" : "Sign Out"}
           </button>
         </section>
       )}

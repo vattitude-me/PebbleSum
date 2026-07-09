@@ -38,7 +38,7 @@ import PrivacyPage from "@/components/PrivacyPage";
 type AppScreen = "splash" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "parent" | "terms" | "privacy";
 
 export default function Home() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isGuest } = useAuth();
   const [screen, setScreen] = useState<AppScreen>("splash");
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -49,7 +49,7 @@ export default function Home() {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user && dataLoaded) {
+    if (!authLoading && !user && !isGuest && dataLoaded) {
       setScreen("auth");
       setProfile(null);
       setProgress(null);
@@ -58,14 +58,28 @@ export default function Home() {
       setBadges([]);
       setDataLoaded(false);
     }
-  }, [user, authLoading, dataLoaded]);
+  }, [user, authLoading, isGuest, dataLoaded]);
 
   useEffect(() => {
     if (authLoading) return;
+    if (!user && !isGuest) return;
 
     const loadData = async () => {
       if (user) {
         const cloudData = await loadUserData(user.uid);
+        if (!cloudData && dataLoaded && profile) {
+          const localData: FirestoreUserData = {
+            profile: profile,
+            gameState: gameState || loadGameState(),
+            settings: settings || loadSettings(),
+            badges: badges.length > 0 ? badges : loadBadges(),
+            progress: progress || loadProgress(),
+            onboardingComplete: true,
+          };
+          await saveUserData(user.uid, localData);
+          setDataLoaded(true);
+          return;
+        }
         if (cloudData) {
           setProfile(cloudData.profile);
           setGameState(cloudData.gameState);
@@ -104,11 +118,11 @@ export default function Home() {
     };
 
     loadData();
-  }, [user, authLoading]);
+  }, [user, authLoading, isGuest]);
 
   const handleSplashComplete = useCallback(() => {
     if (authLoading) return;
-    if (!user) {
+    if (!user && !isGuest) {
       setScreen("auth");
     } else if (!dataLoaded) {
       return;
@@ -117,9 +131,17 @@ export default function Home() {
     } else {
       setScreen("home");
     }
-  }, [authLoading, user, dataLoaded, profile]);
+  }, [authLoading, user, isGuest, dataLoaded, profile]);
 
   const handleAuthSuccess = useCallback(() => {
+    if (!isOnboardingComplete() && !profile) {
+      setScreen("onboarding");
+    } else {
+      setScreen("home");
+    }
+  }, [profile]);
+
+  const handleGuestStart = useCallback(() => {
     if (!isOnboardingComplete() && !profile) {
       setScreen("onboarding");
     } else {
@@ -204,7 +226,7 @@ export default function Home() {
   if (screen === "auth") {
     return (
       <div className={`app-shell app-shell--${profile?.ageGroup || "middle"}`}>
-        <AuthScreen onSuccess={handleAuthSuccess} />
+        <AuthScreen onSuccess={handleAuthSuccess} onSkip={handleGuestStart} />
       </div>
     );
   }

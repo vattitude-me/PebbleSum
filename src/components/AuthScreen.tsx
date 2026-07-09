@@ -24,10 +24,11 @@ function EyeIcon({ visible }: { visible: boolean }) {
 
 interface AuthScreenProps {
   onSuccess: () => void;
+  onSkip: () => void;
 }
 
-export default function AuthScreen({ onSuccess }: AuthScreenProps) {
-  const { signIn, signUp } = useAuth();
+export default function AuthScreen({ onSuccess, onSkip }: AuthScreenProps) {
+  const { signIn, signUp, skipLogin } = useAuth();
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -267,6 +268,18 @@ export default function AuthScreen({ onSuccess }: AuthScreenProps) {
               </button>
             </p>
           )}
+        </div>
+
+        <div className="auth-screen__guest">
+          <button
+            onClick={() => { skipLogin(); onSkip(); }}
+            className="auth-screen__guest-btn"
+          >
+            Try without an account
+          </button>
+          <p className="auth-screen__guest-note">
+            Your progress stays on this device. Create an account later to save it.
+          </p>
         </div>
 
       </div>

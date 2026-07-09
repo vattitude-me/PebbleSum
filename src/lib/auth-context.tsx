@@ -23,10 +23,13 @@ interface AuthContextType {
   user: User | null;
   username: string | null;
   loading: boolean;
+  isGuest: boolean;
   signIn: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (username: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
+  skipLogin: () => void;
+  linkAccount: (username: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -34,6 +37,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -43,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (u) => {
       setUser(u);
+      if (u) setIsGuest(false);
       setLoading(false);
     });
     return unsubscribe;
@@ -58,7 +63,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await createUserWithEmailAndPassword(getFirebaseAuth(), toEmail(username), password);
   }, []);
 
+  const skipLogin = useCallback(() => {
+    setIsGuest(true);
+  }, []);
+
+  const linkAccount = useCallback(async (username: string, password: string) => {
+    await createUserWithEmailAndPassword(getFirebaseAuth(), toEmail(username), password);
+    setIsGuest(false);
+  }, []);
+
   const signOutUser = useCallback(async () => {
+    if (isGuest) {
+      setIsGuest(false);
+      const localKeys = [
+        "pebblesum_profile",
+        "pebblesum_game",
+        "pebblesum_settings",
+        "pebblesum_badges",
+        "pebblesum_onboarding",
+        "pebblesum_progress",
+      ];
+      localKeys.forEach((k) => localStorage.removeItem(k));
+      return;
+    }
     await firebaseSignOut(getFirebaseAuth());
     const localKeys = [
       "pebblesum_profile",
@@ -69,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       "pebblesum_progress",
     ];
     localKeys.forEach((k) => localStorage.removeItem(k));
-  }, []);
+  }, [isGuest]);
 
   const deleteAccount = useCallback(async (password: string) => {
     const currentUser = getFirebaseAuth().currentUser;
@@ -95,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const username = user?.email?.replace("@pebblesum.app", "") || null;
 
   return (
-    <AuthContext.Provider value={{ user, username, loading, signIn, signUp, signOut: signOutUser, deleteAccount }}>
+    <AuthContext.Provider value={{ user, username, loading, isGuest, signIn, signUp, signOut: signOutUser, deleteAccount, skipLogin, linkAccount }}>
       {children}
     </AuthContext.Provider>
   );
