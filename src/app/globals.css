@@ -1869,7 +1869,7 @@ body {
 }
 
 .practice-complete__stat-value--warning {
-  color: var(--warning);
+  color: #e17055;
 }
 
 .practice-complete__rewards {
@@ -1897,7 +1897,7 @@ body {
 
 .practice-complete__mastery-msg {
   font-size: 13px;
-  color: var(--success);
+  color: var(--primary);
   font-weight: 600;
   text-align: center;
   margin-bottom: 16px;
@@ -1985,6 +1985,10 @@ body {
   0% { transform: scale(0.5) translateY(20px); opacity: 0; }
   50% { transform: scale(1.2) translateY(-10px); opacity: 1; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.practice-complete__title--not-cleared {
+  color: #e17055;
 }
 
 .practice-complete__title--cleared {

@@ -260,7 +260,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
     const getTitle = () => {
       if (isLevelClear && levelCleared) return "Level Cleared! 🏆";
-      if (isLevelClear && !levelCleared) return "Not Yet... 💪";
+      if (isLevelClear && !levelCleared) return "Not Quite! ⏱️";
       if (perfect) return "Perfect! 🎉";
       return "Well Done! 👏";
     };
@@ -285,11 +285,11 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
         <div className="practice-complete__header">
           <img
-            src={`/assets/icons/${levelCleared || perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
+            src={`/assets/icons/${levelCleared || (!isLevelClear && perfect) ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
             alt="Pebble"
             className={`practice-complete__mascot ${isLevelClear && levelCleared ? "practice-complete__mascot--celebrate" : ""}`}
           />
-          <h2 className={`practice-complete__title ${isLevelClear && levelCleared ? "practice-complete__title--cleared" : ""}`}>{getTitle()}</h2>
+          <h2 className={`practice-complete__title ${isLevelClear && levelCleared ? "practice-complete__title--cleared" : ""} ${isLevelClear && !levelCleared ? "practice-complete__title--not-cleared" : ""}`}>{getTitle()}</h2>
           <p className="practice-complete__subtitle">{getSubtitle()}</p>
         </div>
 
