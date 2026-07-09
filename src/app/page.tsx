@@ -10,7 +10,9 @@ import {
   EarnedBadge,
   loadProfile,
   loadGameState,
+  saveGameState as saveGameStateLocal,
   loadSettings,
+  saveSettings as saveSettingsLocal,
   loadBadges,
   saveBadges,
   isOnboardingComplete,
@@ -76,6 +78,12 @@ export default function Home() {
             firestoreSync.saveProgress(user.uid, p);
           }
           setProgress(p);
+
+          saveProgress(p);
+          saveGameStateLocal(cloudData.gameState);
+          saveSettingsLocal(cloudData.settings);
+          saveBadges(cloudData.badges);
+
           setDataLoaded(true);
           return;
         }
@@ -120,27 +128,31 @@ export default function Home() {
   }, [profile]);
 
 
-  const handleOnboardingComplete = useCallback((newProfile: UserProfile) => {
+  const handleOnboardingComplete = useCallback(async (newProfile: UserProfile) => {
     setProfile(newProfile);
     const startingStage = getStartingStageForAge(newProfile.age);
-    const currentProgress = loadProgress();
-    const updatedProgress = { ...currentProgress, currentStageId: startingStage };
+    const baseProgress = progress || loadProgress();
+    const updatedProgress = { ...baseProgress, currentStageId: startingStage };
     saveProgress(updatedProgress);
     setProgress(updatedProgress);
+
+    const currentGameState = gameState || loadGameState();
+    const currentSettings = settings || loadSettings();
+    const currentBadges = badges.length > 0 ? badges : loadBadges();
 
     if (user) {
       const data: FirestoreUserData = {
         profile: newProfile,
-        gameState: loadGameState(),
-        settings: loadSettings(),
-        badges: loadBadges(),
+        gameState: currentGameState,
+        settings: currentSettings,
+        badges: currentBadges,
         progress: updatedProgress,
         onboardingComplete: true,
       };
-      saveUserData(user.uid, data);
+      await saveUserData(user.uid, data);
     }
     setScreen("home");
-  }, [user]);
+  }, [user, progress, gameState, settings, badges]);
 
   const handleNavigate = useCallback((page: string) => {
     setScreen(page as AppScreen);
@@ -151,7 +163,7 @@ export default function Home() {
     setScreen("practice");
   }, []);
 
-  const handlePracticeComplete = useCallback((updatedProgress: UserProgress, updatedGameState: GameState) => {
+  const handlePracticeComplete = useCallback(async (updatedProgress: UserProgress, updatedGameState: GameState) => {
     setProgress(updatedProgress);
     setGameState(updatedGameState);
 
@@ -163,13 +175,12 @@ export default function Home() {
       setBadges(allBadges);
 
       if (user) {
-        firestoreSync.saveBadges(user.uid, allBadges);
+        await firestoreSync.saveBadges(user.uid, allBadges);
       }
     }
 
     if (user) {
-      firestoreSync.saveProgress(user.uid, updatedProgress);
-      firestoreSync.saveGameState(user.uid, updatedGameState);
+      await firestoreSync.saveProgressAndGameState(user.uid, updatedProgress, updatedGameState);
     }
 
     setScreen("home");

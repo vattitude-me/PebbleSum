@@ -105,6 +105,14 @@ async function writePartial(uid: string, partial: Partial<FirestoreUserData>): P
   await saveUserData(uid, merged);
 }
 
+export async function saveProgressAndGameState(
+  uid: string,
+  progress: UserProgress,
+  gameState: GameState
+): Promise<void> {
+  await writePartial(uid, { progress, gameState });
+}
+
 export async function saveProfile(uid: string, profile: UserProfile): Promise<void> {
   await writePartial(uid, { profile });
 }
