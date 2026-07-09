@@ -72,7 +72,7 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
                       key={stageId}
                       ref={state === "current" ? currentStageRef : undefined}
                       className={`journey__stage journey__stage--${state}`}
-                      onClick={() => state === "current" && onSelectStage(stageId)}
+                      onClick={() => state !== "locked" && onSelectStage(stageId)}
                       disabled={state === "locked"}
                     >
                       <div className="journey__stage-marker">
@@ -86,6 +86,9 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
                       </div>
                       {state === "current" && (
                         <span className="journey__stage-badge">NOW</span>
+                      )}
+                      {state === "mastered" && (
+                        <span className="journey__stage-badge journey__stage-badge--replay">REPLAY</span>
                       )}
                     </button>
                   );

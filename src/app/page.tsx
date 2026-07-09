@@ -48,6 +48,7 @@ export default function Home() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [badges, setBadges] = useState<EarnedBadge[]>([]);
   const [practiceMode, setPracticeMode] = useState<PracticeMode>("practice");
+  const [practiceStageId, setPracticeStageId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -200,8 +201,9 @@ export default function Home() {
     setScreen(page as AppScreen);
   }, []);
 
-  const handleStartPractice = useCallback((mode: PracticeMode = "practice") => {
+  const handleStartPractice = useCallback((mode: PracticeMode = "practice", stageId?: string) => {
     setPracticeMode(mode);
+    setPracticeStageId(stageId || null);
     setScreen("practice");
   }, []);
 
@@ -271,12 +273,14 @@ export default function Home() {
   const shellClasses = `app-shell app-shell--${ageGroup} ${themeClass} ${textSizeClass}`.trim();
 
   if (screen === "practice") {
-    const currentStage = STAGES.find((s) => s.id === progress.currentStageId)!;
+    const selectedStageId = practiceStageId || progress.currentStageId;
+    const practiceStage = STAGES.find((s) => s.id === selectedStageId)!;
+    const isReplay = selectedStageId !== progress.currentStageId;
     return (
       <div className={shellClasses}>
         <PracticeView
-          stage={currentStage}
-          mode={practiceMode}
+          stage={practiceStage}
+          mode={isReplay ? "practice" : practiceMode}
           progress={progress}
           gameState={gameState}
           profile={profile!}
@@ -324,7 +328,7 @@ export default function Home() {
           <JourneyMap
             progress={progress}
             onSelectStage={(stageId) => {
-              handleStartPractice();
+              handleStartPractice("practice", stageId);
             }}
           />
         )}

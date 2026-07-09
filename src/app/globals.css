@@ -2062,6 +2062,7 @@ body {
 
 .journey__stage.journey__stage--mastered {
   background: #5ce7b254;
+  cursor: pointer;
 }
 
 .journey__stage--current {
@@ -2130,6 +2131,11 @@ body {
   background: var(--primary);
   padding: 3px 8px;
   border-radius: 99px;
+}
+
+.journey__stage-badge--replay {
+  background: #6b7280;
+  font-size: 9px;
 }
 
 /* Path Connector */
