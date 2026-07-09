@@ -613,7 +613,7 @@ body {
   width: 100%;
   max-width: var(--app-max-width);
   height: 100dvh;
-  background: url('/assets/backgrounds/onboarding_background.png') center/cover no-repeat;
+  background: url('/assets/backgrounds/onboarding_background.webp') center/cover no-repeat;
   border-radius: 0;
   overflow: hidden;
   display: flex;
@@ -1048,7 +1048,7 @@ body {
   padding: 0;
   border-radius: 16px 16px 0 0;
   overflow: hidden;
-  background: url('/assets/backgrounds/dashboard_background.png') center/cover no-repeat;
+  background: url('/assets/backgrounds/dashboard_background.webp') center/cover no-repeat;
 }
 
 .dashboard__overlay {
@@ -1935,7 +1935,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  background: url('/assets/backgrounds/Progress_background.png') center/cover no-repeat;
+  background: url('/assets/backgrounds/Progress_background.webp') center/cover no-repeat;
   min-height: 100%;
   margin: calc(-1 * var(--spacing-md));
   padding: var(--spacing-md);
@@ -2947,7 +2947,7 @@ body {
   padding: var(--spacing-md);
   padding-top: var(--spacing-lg);
   overflow-y: auto;
-  background: url('/assets/backgrounds/plain-background.png') center/cover no-repeat;
+  background: url('/assets/backgrounds/plain-background.webp') center/cover no-repeat;
 }
 
 .auth-screen__container {
