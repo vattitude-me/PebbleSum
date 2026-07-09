@@ -16,6 +16,8 @@ import {
   loadBadges,
   saveBadges,
   isOnboardingComplete,
+  setOnboardingComplete,
+  saveProfile,
   checkNewBadges,
   AgeGroup,
 } from "@/lib/user-store";
@@ -97,6 +99,12 @@ export default function Home() {
           saveGameStateLocal(cloudData.gameState);
           saveSettingsLocal(cloudData.settings);
           saveBadges(cloudData.badges);
+          if (cloudData.profile) {
+            saveProfile(cloudData.profile);
+          }
+          if (cloudData.onboardingComplete) {
+            setOnboardingComplete();
+          }
 
           setDataLoaded(true);
           return;
@@ -120,6 +128,16 @@ export default function Home() {
     loadData();
   }, [user, authLoading, isGuest]);
 
+  useEffect(() => {
+    if (dataLoaded && (user || isGuest) && screen === "auth") {
+      if (!isOnboardingComplete() && !profile) {
+        setScreen("onboarding");
+      } else {
+        setScreen("home");
+      }
+    }
+  }, [dataLoaded, user, isGuest, screen, profile]);
+
   const handleSplashComplete = useCallback(() => {
     if (authLoading) return;
     if (!user && !isGuest) {
@@ -134,12 +152,14 @@ export default function Home() {
   }, [authLoading, user, isGuest, dataLoaded, profile]);
 
   const handleAuthSuccess = useCallback(() => {
-    if (!isOnboardingComplete() && !profile) {
-      setScreen("onboarding");
-    } else {
-      setScreen("home");
+    if (dataLoaded) {
+      if (!isOnboardingComplete() && !profile) {
+        setScreen("onboarding");
+      } else {
+        setScreen("home");
+      }
     }
-  }, [profile]);
+  }, [profile, dataLoaded]);
 
   const handleGuestStart = useCallback(() => {
     if (!isOnboardingComplete() && !profile) {
