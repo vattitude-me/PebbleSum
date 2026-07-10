@@ -5,6 +5,7 @@ import { UserProgress, getToday } from "@/lib/progress-store";
 import { UserProfile, GameState } from "@/lib/user-store";
 import { STAGES } from "@/lib/stages";
 import { PracticeMode } from "@/components/PracticeView";
+import IOSInstallModal from "@/components/IOSInstallModal";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -27,6 +28,7 @@ export default function HomeDashboard({
   const currentStage = STAGES.find((s) => s.id === progress.currentStageId);
   const today = getToday();
   const isSameDay = gameState.practiceDate === today;
+
   const todayPracticeMinutes = isSameDay ? Math.floor(gameState.todayPracticeSeconds / 60) : 0;
   const goalMinutes = profile.dailyGoalMinutes;
   const goalProgress = Math.min(todayPracticeMinutes / goalMinutes, 1);
@@ -37,12 +39,26 @@ export default function HomeDashboard({
   const xpInLevel = progress.xp % 500;
 
   const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isIOSModalOpen, setIsIOSModalOpen] = useState(false);
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches
       || (navigator as unknown as { standalone?: boolean }).standalone === true;
     if (isStandalone) return;
+
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+      (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+    setIsIOS(isIOSDevice);
+
+    if (isIOSDevice) {
+      const dismissed = localStorage.getItem("pebblesum_ios_install_dismissed");
+      if (!dismissed) {
+        setShowInstallBanner(true);
+      }
+      return;
+    }
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -64,6 +80,10 @@ export default function HomeDashboard({
   }, []);
 
   const handleInstallClick = async () => {
+    if (isIOS) {
+      setIsIOSModalOpen(true);
+      return;
+    }
     const prompt = deferredPromptRef.current;
     if (!prompt) return;
     await prompt.prompt();
@@ -72,6 +92,13 @@ export default function HomeDashboard({
       setShowInstallBanner(false);
     }
     deferredPromptRef.current = null;
+  };
+
+  const handleDismissBanner = () => {
+    setShowInstallBanner(false);
+    if (isIOS) {
+      localStorage.setItem("pebblesum_ios_install_dismissed", "true");
+    }
   };
 
   const getGreeting = () => {
@@ -180,7 +207,7 @@ export default function HomeDashboard({
               <button onClick={handleInstallClick} className="dashboard__install-btn">
                 Install
               </button>
-              <button onClick={() => setShowInstallBanner(false)} className="dashboard__install-dismiss">
+              <button onClick={handleDismissBanner} className="dashboard__install-dismiss">
                 ✕
               </button>
             </div>
@@ -188,6 +215,7 @@ export default function HomeDashboard({
         )}
 
       </div>
+      <IOSInstallModal isOpen={isIOSModalOpen} onClose={() => setIsIOSModalOpen(false)} />
     </div>
   );
 }
