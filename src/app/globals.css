@@ -174,18 +174,6 @@ body {
    ANIMATIONS
    ======================================== */
 
-@keyframes bounce-soft {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
 @keyframes pop-in {
   0% {
     transform: scale(0.8);
@@ -250,18 +238,6 @@ body {
   }
 }
 
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
 @keyframes spin-slow {
   0% {
     transform: rotate(0deg);
@@ -273,7 +249,7 @@ body {
 }
 
 .animate-bounce-soft {
-  animation: bounce-soft 2s ease-in-out infinite;
+  animation: none;
 }
 
 .animate-pop-in {
@@ -293,7 +269,7 @@ body {
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: none;
 }
 
 /* ========================================
@@ -677,7 +653,6 @@ body {
 .splash-screen__mascot-img {
   width: 80px;
   height: 80px;
-  animation: float 3s ease-in-out infinite;
 }
 
 .splash-screen__loader {
@@ -797,7 +772,6 @@ body {
 .onboarding__mascot {
   width: 80px;
   height: 80px;
-  animation: float 3s ease-in-out infinite;
 }
 
 .onboarding__title {
@@ -1821,7 +1795,6 @@ body {
 .practice-complete__mascot {
   width: 80px;
   height: 80px;
-  animation: float 3s ease-in-out infinite;
   margin-bottom: 12px;
 }
 
@@ -1978,13 +1951,6 @@ body {
 .practice-complete__mascot--celebrate {
   width: 100px;
   height: 100px;
-  animation: bounce-celebrate 0.6s ease-out, float 3s ease-in-out 0.6s infinite;
-}
-
-@keyframes bounce-celebrate {
-  0% { transform: scale(0.5) translateY(20px); opacity: 0; }
-  50% { transform: scale(1.2) translateY(-10px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .practice-complete__title--not-cleared {
@@ -2278,7 +2244,7 @@ body {
 }
 
 .journey__stage-icon--pulse {
-  animation: bounce-soft 2s ease-in-out infinite;
+  animation: none;
 }
 
 .journey__stage-lock {
