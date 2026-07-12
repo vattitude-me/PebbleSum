@@ -42,6 +42,15 @@ function generateChoices(answer: number, min: number, max: number, count: number
 
 const ICONS = ["🍎", "⭐", "🌸", "🐟", "🦋", "🎈", "🌙", "🍀", "🐚"];
 
+function arrangeInRows(icon: string, count: number, perRow: number): string {
+  const rows: string[] = [];
+  for (let i = 0; i < count; i += perRow) {
+    const rowCount = Math.min(perRow, count - i);
+    rows.push(Array(rowCount).fill(icon).join(" "));
+  }
+  return rows.join("\n");
+}
+
 function pickIcon(): string {
   return ICONS[rand(0, ICONS.length - 1)];
 }
@@ -70,7 +79,7 @@ function generateIdentify6A(): MathProblem {
 function generateCount5A(): MathProblem {
   const answer = rand(1, 10);
   const icon = pickIcon();
-  const visual = Array(answer).fill(icon).join(" ");
+  const visual = arrangeInRows(icon, answer, 5);
   const choices = generateChoices(answer, 1, 10, 4);
   return {
     id: generateId(),
@@ -87,7 +96,7 @@ function generateCount5A(): MathProblem {
 function generateCount4A(): MathProblem {
   const answer = rand(5, 30);
   const icon = pickIcon();
-  const visual = Array(answer).fill(icon).join(" ");
+  const visual = arrangeInRows(icon, answer, 5);
   const choices = generateChoices(answer, 1, 30, 4);
   return {
     id: generateId(),
