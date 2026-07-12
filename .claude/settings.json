@@ -19,10 +19,14 @@
       "Bash(curl *)",
       "Bash(head *)",
       "Bash(cd *)",
+      "Bash(cp *)",
+      "Bash(find *)",
       "Read",
       "Glob",
       "Grep",
       "Write",
+      "Node",
+      "tasklist",
       "Edit"
     ]
   }
