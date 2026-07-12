@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { UserProfile, getAgeGroup, saveProfile, setOnboardingComplete } from "@/lib/user-store";
+import { useState } from "react";
+import { UserProfile, AgeGroup, saveProfile, setOnboardingComplete } from "@/lib/user-store";
 
 interface OnboardingFlowProps {
   onComplete: (profile: UserProfile) => void;
@@ -20,84 +20,27 @@ const DAILY_GOALS = [
   { minutes: 20, label: "20 min", description: "Super scholar" },
 ];
 
-const AGES = Array.from({ length: 14 }, (_, i) => i + 2);
-const ITEM_HEIGHT = 48;
-
-function AgePicker({ age, onChange }: { age: number | null; onChange: (a: number) => void }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const selectedIndex = age !== null ? AGES.indexOf(age) : -1;
-
-  const scrollToIndex = useCallback((index: number, smooth = true) => {
-    if (!scrollRef.current) return;
-    const offset = index * ITEM_HEIGHT;
-    scrollRef.current.scrollTo({ top: offset, behavior: smooth ? "smooth" : "auto" });
-  }, []);
-
-  useEffect(() => {
-    const initial = age !== null ? AGES.indexOf(age) : 5;
-    scrollToIndex(initial, false);
-    if (age === null) onChange(AGES[5]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    const scrollTop = scrollRef.current.scrollTop;
-    const index = Math.round(scrollTop / ITEM_HEIGHT);
-    const clamped = Math.max(0, Math.min(AGES.length - 1, index));
-    if (AGES[clamped] !== age) {
-      onChange(AGES[clamped]);
-    }
-  };
-
-  const handleClick = (index: number) => {
-    onChange(AGES[index]);
-    scrollToIndex(index);
-  };
-
-  return (
-    <div className="onboarding__step">
-      <img src="/assets/icons/icon-pebble-thinking.png" alt="Thinking" className="onboarding__mascot" />
-      <h2 className="onboarding__title">How old are you?</h2>
-      <p className="onboarding__subtitle">This helps us pick the right level</p>
-      <div className="onboarding__age-picker">
-        <div className="onboarding__age-picker-highlight" />
-        <div
-          ref={scrollRef}
-          className="onboarding__age-picker-scroll"
-          onScroll={handleScroll}
-        >
-          <div className="onboarding__age-picker-pad" />
-          {AGES.map((a, i) => (
-            <button
-              key={a}
-              onClick={() => handleClick(i)}
-              className={`onboarding__age-picker-item ${i === selectedIndex ? "onboarding__age-picker-item--selected" : ""}`}
-            >
-              {a} years old
-            </button>
-          ))}
-          <div className="onboarding__age-picker-pad" />
-        </div>
-      </div>
-    </div>
-  );
-}
+const SKILL_LEVELS: { id: AgeGroup; icon: string; title: string; description: string }[] = [
+  { id: "young", icon: "🔢", title: "I'm learning numbers", description: "Counting and recognizing numbers" },
+  { id: "middle", icon: "➕", title: "I can add and subtract", description: "Simple addition and subtraction" },
+  { id: "older", icon: "✖️", title: "I know multiplication", description: "Multiplication and beyond" },
+];
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
-  const [age, setAge] = useState<number | null>(null);
+  const [skillLevel, setSkillLevel] = useState<AgeGroup>("middle");
   const [avatarId, setAvatarId] = useState("pebble-wave");
   const [dailyGoal, setDailyGoal] = useState(10);
 
   const totalSteps = 4;
 
   const handleFinish = () => {
+    const ageFromSkill = skillLevel === "young" ? 5 : skillLevel === "middle" ? 8 : 12;
     const profile: UserProfile = {
       name: name || "Learner",
-      age: age || 7,
-      ageGroup: getAgeGroup(age || 7),
+      age: ageFromSkill,
+      ageGroup: skillLevel,
       avatarId,
       themeId: "default",
       dailyGoalMinutes: dailyGoal,
@@ -110,7 +53,6 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const canNext = () => {
     if (step === 0) return name.trim().length > 0;
-    if (step === 1) return age !== null;
     return true;
   };
 
@@ -142,7 +84,24 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         )}
 
         {step === 1 && (
-          <AgePicker age={age} onChange={setAge} />
+          <div className="onboarding__step">
+            <img src="/assets/icons/icon-pebble-thinking.png" alt="Thinking" className="onboarding__mascot" />
+            <h2 className="onboarding__title">What do you know?</h2>
+            <p className="onboarding__subtitle">Pick what fits you best!</p>
+            <div className="onboarding__skill-grid">
+              {SKILL_LEVELS.map((level) => (
+                <button
+                  key={level.id}
+                  onClick={() => setSkillLevel(level.id)}
+                  className={`onboarding__skill-btn ${skillLevel === level.id ? "onboarding__skill-btn--selected" : ""}`}
+                >
+                  <span className="onboarding__skill-icon">{level.icon}</span>
+                  <span className="onboarding__skill-title">{level.title}</span>
+                  <span className="onboarding__skill-desc">{level.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
         {step === 2 && (
