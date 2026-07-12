@@ -36,7 +36,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const totalSteps = 4;
 
   const handleFinish = () => {
-    const ageFromSkill = skillLevel === "young" ? 5 : skillLevel === "middle" ? 8 : 12;
+    const ageFromSkill = skillLevel === "young" ? 4 : skillLevel === "middle" ? 8 : 12;
     const profile: UserProfile = {
       name: name || "Learner",
       age: ageFromSkill,
