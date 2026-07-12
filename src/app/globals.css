@@ -1529,7 +1529,8 @@ body {
   transition: all 0.3s;
   position: relative;
   min-height: 0;
-  max-height: 280px;
+  max-height: 360px;
+  overflow-y: auto;
 }
 
 .practice__problem--correct {
@@ -1679,8 +1680,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  gap: 8px;
+  padding: 12px;
 }
 
 .practice__visual-question {
@@ -1691,12 +1692,12 @@ body {
 }
 
 .practice__visual-objects {
-  font-size: 28px;
-  line-height: 1.6;
+  font-size: 24px;
+  line-height: 1.4;
   text-align: center;
-  max-width: 280px;
+  max-width: 320px;
   word-wrap: break-word;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
 }
 
 .practice__numeral-display {
