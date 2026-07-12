@@ -66,7 +66,7 @@ function generateIdentify6A(): MathProblem {
   }));
   return {
     id: generateId(),
-    question: `Pick ${answer}`,
+    question: [`Find ${answer}!`, `Which one is ${answer}?`, `Where is ${answer}?`, `Tap ${answer}!`, `Show me ${answer}!`][rand(0, 4)],
     answer,
     displayParts: { left: String(answer), operator: "", right: "" },
     problemType: "identify",
