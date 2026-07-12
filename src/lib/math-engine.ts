@@ -5,6 +5,7 @@ export interface MathProblem {
   displayParts: { left: string; operator: string; right: string };
   problemType: "equation" | "identify" | "count" | "sequence";
   choices?: number[];
+  visualChoices?: { value: number; display: string }[];
   visual?: string;
 }
 
@@ -45,19 +46,23 @@ function pickIcon(): string {
   return ICONS[rand(0, ICONS.length - 1)];
 }
 
-// 6A: Number recognition — show a numeral, child identifies it
+// 6A: Number recognition — show a numeral, pick the matching group of objects
 function generateIdentify6A(): MathProblem {
   const answer = rand(1, 10);
-  const visual = String(answer);
-  const choices = generateChoices(answer, 1, 10, 4);
+  const icon = pickIcon();
+  const choiceValues = generateChoices(answer, 1, 10, 4);
+  const visualChoices = choiceValues.map((v) => ({
+    value: v,
+    display: Array(v).fill(icon).join(" "),
+  }));
   return {
     id: generateId(),
-    question: "What number is this?",
+    question: `Pick ${answer}`,
     answer,
-    displayParts: { left: visual, operator: "", right: "" },
+    displayParts: { left: String(answer), operator: "", right: "" },
     problemType: "identify",
-    choices,
-    visual,
+    visualChoices,
+    visual: String(answer),
   };
 }
 

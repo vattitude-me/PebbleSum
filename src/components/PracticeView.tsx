@@ -443,8 +443,21 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         )}
       </div>
 
-      {/* Multiple choice input for visual/sequence problems */}
-      {problem.choices ? (
+      {/* Visual choices for number recognition (6A) */}
+      {problem.visualChoices ? (
+        <div className="practice__choices practice__choices--visual">
+          {problem.visualChoices.map((vc) => (
+            <button
+              key={vc.value}
+              onClick={() => handleChoiceSelect(vc.value)}
+              disabled={feedback !== null}
+              className={`practice__choice-btn practice__choice-btn--visual ${isYoung ? "practice__choice-btn--large" : ""}`}
+            >
+              {vc.display}
+            </button>
+          ))}
+        </div>
+      ) : problem.choices ? (
         <div className="practice__choices">
           {problem.choices.map((choice) => (
             <button
