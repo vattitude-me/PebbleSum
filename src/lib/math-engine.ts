@@ -45,15 +45,14 @@ function pickIcon(): string {
   return ICONS[rand(0, ICONS.length - 1)];
 }
 
-// 6A: Identify numbers 1-10 — show a number visually, pick from pool of 9
+// 6A: Number recognition — show a numeral, child identifies it
 function generateIdentify6A(): MathProblem {
   const answer = rand(1, 10);
-  const icon = pickIcon();
-  const visual = Array(answer).fill(icon).join(" ");
+  const visual = String(answer);
   const choices = generateChoices(answer, 1, 10, 4);
   return {
     id: generateId(),
-    question: `How many ${icon} are there?`,
+    question: "What number is this?",
     answer,
     displayParts: { left: visual, operator: "", right: "" },
     problemType: "identify",

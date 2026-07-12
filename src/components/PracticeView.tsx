@@ -407,7 +407,12 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
               {userAnswer || "?"}
             </span>
           </div>
-        ) : problem.problemType === "identify" || problem.problemType === "count" ? (
+        ) : problem.problemType === "identify" ? (
+          <div className="practice__visual-problem">
+            <p className="practice__visual-question">{problem.question}</p>
+            <div className="practice__numeral-display">{problem.visual}</div>
+          </div>
+        ) : problem.problemType === "count" ? (
           <div className="practice__visual-problem">
             <p className="practice__visual-question">{problem.question}</p>
             <div className="practice__visual-objects">{problem.visual}</div>

@@ -1698,6 +1698,14 @@ body {
   letter-spacing: 4px;
 }
 
+.practice__numeral-display {
+  font-size: 96px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-primary, #4f46e5);
+  line-height: 1.2;
+}
+
 .practice__sequence {
   font-size: 24px;
   font-weight: 700;
