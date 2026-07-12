@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pebblesum.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pebblesum.vattitude.ca";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
