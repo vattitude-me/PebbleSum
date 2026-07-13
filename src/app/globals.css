@@ -3893,10 +3893,14 @@ body {
    ========================================== */
 
 .number-learn {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-  background: var(--bg-primary, #f8fafc);
+  padding: var(--spacing-md);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+  background: var(--background);
+  width: 100%;
+  overflow: hidden;
   position: relative;
 }
 
@@ -4010,7 +4014,7 @@ body {
 
 /* Level cleared popup */
 .number-learn__popup-overlay {
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
