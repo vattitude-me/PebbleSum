@@ -36,6 +36,7 @@ import RewardsPage from "@/components/RewardsPage";
 import ProfilePage from "@/components/ProfilePage";
 import TermsPage from "@/components/TermsPage";
 import PrivacyPage from "@/components/PrivacyPage";
+import ExitConfirmModal from "@/components/ExitConfirmModal";
 
 type AppScreen = "splash" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "parent" | "terms" | "privacy";
 
@@ -309,9 +310,11 @@ export default function Home() {
   }
 
   const showNav = ["home", "journey", "rewards", "profile"].includes(screen);
+  const exitGuardActive = ["home", "journey", "rewards", "profile"].includes(screen);
 
   return (
     <div className={shellClasses}>
+      <ExitConfirmModal enabled={exitGuardActive} />
       <TopBar />
 
       <main className="app-shell__content">

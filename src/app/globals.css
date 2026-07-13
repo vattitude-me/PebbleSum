@@ -1706,7 +1706,7 @@ body {
   width: 100%;
   border: none;
   border-top: 1.5px solid var(--color-primary-light, #e0e7ff);
-  margin: 0 0 12px 0;
+  margin: 0 0 20px 0;
 }
 
 .practice__visual-objects {
@@ -3809,4 +3809,81 @@ body {
 
 .profile-page__footer-link:hover {
   color: var(--primary);
+}
+
+/* ========================================
+   EXIT CONFIRMATION MODAL
+   ======================================== */
+
+.exit-confirm__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+  animation: pop-in 0.15s ease-out;
+}
+
+.exit-confirm__modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: pop-in 0.2s ease-out;
+}
+
+.exit-confirm__icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.exit-confirm__title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2d2d44;
+  margin: 0 0 8px;
+}
+
+.exit-confirm__subtitle {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 24px;
+  line-height: 1.5;
+}
+
+.exit-confirm__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.exit-confirm__btn {
+  flex: 1;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 99px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.exit-confirm__btn:active {
+  transform: scale(0.96);
+}
+
+.exit-confirm__btn--stay {
+  background: linear-gradient(135deg, #6c5ce7, #4a3ab5);
+  color: white;
+  box-shadow: 0 3px 12px rgba(108, 92, 231, 0.3);
+}
+
+.exit-confirm__btn--leave {
+  background: #f0f0f0;
+  color: #555;
 }
