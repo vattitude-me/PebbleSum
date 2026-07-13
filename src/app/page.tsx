@@ -31,6 +31,7 @@ import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import HomeDashboard from "@/components/HomeDashboard";
 import PracticeView, { PracticeMode } from "@/components/PracticeView";
+import NumberLearningView from "@/components/NumberLearningView";
 import JourneyMap from "@/components/JourneyMap";
 import RewardsPage from "@/components/RewardsPage";
 import ProfilePage from "@/components/ProfilePage";
@@ -277,6 +278,23 @@ export default function Home() {
     const selectedStageId = practiceStageId || progress.currentStageId;
     const practiceStage = STAGES.find((s) => s.id === selectedStageId)!;
     const isReplay = selectedStageId !== progress.currentStageId;
+
+    if (selectedStageId === "6A") {
+      return (
+        <div className={shellClasses}>
+          <NumberLearningView
+            stage={practiceStage}
+            progress={progress}
+            gameState={gameState}
+            profile={profile!}
+            ageGroup={ageGroup}
+            onComplete={handlePracticeComplete}
+            onBack={handlePracticeBack}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className={shellClasses}>
         <PracticeView

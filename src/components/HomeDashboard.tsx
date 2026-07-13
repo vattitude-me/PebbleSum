@@ -166,30 +166,49 @@ export default function HomeDashboard({
                   <span>Practice</span>
                 </button>
               </div>
-              <div className={`dashboard__action-level ${canAttemptLevelClear ? "dashboard__action-level--unlocked" : ""}`}>
-                <div className="dashboard__action-level-badge">
-                  {canAttemptLevelClear ? "🏆" : "🔒"}
-                </div>
-                <span className="dashboard__action-level-title">{currentStage?.name || "Test"}</span>
-                <span className="dashboard__action-level-stage">To clear the level</span>
-                {canAttemptLevelClear ? (
-                  <button onClick={() => onStartPractice("levelClear")} className="dashboard__action-level-btn">
-                    Start
-                  </button>
-                ) : (
+              {progress.currentStageId === "6A" ? (
+                <div className="dashboard__action-level">
+                  <div className="dashboard__action-level-badge">📖</div>
+                  <span className="dashboard__action-level-title">Know Your Numbers</span>
+                  <span className="dashboard__action-level-stage">Auto-clears after 10 practices</span>
                   <div className="dashboard__action-level-progress">
                     <div className="dashboard__action-level-bar">
                       <div
                         className="dashboard__action-level-fill"
-                        style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
+                        style={{ width: `${(practiceCount / 10) * 100}%` }}
                       />
                     </div>
                     <span className="dashboard__action-level-count">
-                      {practiceCount}/{currentStage?.practiceSessionsRequired || 3} practices
+                      {practiceCount}/10 practices
                     </span>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className={`dashboard__action-level ${canAttemptLevelClear ? "dashboard__action-level--unlocked" : ""}`}>
+                  <div className="dashboard__action-level-badge">
+                    {canAttemptLevelClear ? "🏆" : "🔒"}
+                  </div>
+                  <span className="dashboard__action-level-title">{currentStage?.name || "Test"}</span>
+                  <span className="dashboard__action-level-stage">To clear the level</span>
+                  {canAttemptLevelClear ? (
+                    <button onClick={() => onStartPractice("levelClear")} className="dashboard__action-level-btn">
+                      Start
+                    </button>
+                  ) : (
+                    <div className="dashboard__action-level-progress">
+                      <div className="dashboard__action-level-bar">
+                        <div
+                          className="dashboard__action-level-fill"
+                          style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
+                        />
+                      </div>
+                      <span className="dashboard__action-level-count">
+                        {practiceCount}/{currentStage?.practiceSessionsRequired || 3} practices
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </section>

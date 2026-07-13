@@ -3887,3 +3887,248 @@ body {
   background: #f0f0f0;
   color: #555;
 }
+
+/* ==========================================
+   NumberLearningView (6A - Know Your Numbers)
+   ========================================== */
+
+.number-learn {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--bg-primary, #f8fafc);
+  position: relative;
+}
+
+.number-learn--young {
+  font-size: 1.1em;
+}
+
+.number-learn__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  padding: 24px;
+}
+
+.number-learn__numeral {
+  font-size: 120px;
+  font-weight: 800;
+  color: var(--color-primary, #4f46e5);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.number-learn__name {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  text-transform: capitalize;
+  margin-top: -4px;
+}
+
+.number-learn__dots {
+  font-size: 36px;
+  letter-spacing: 6px;
+  text-align: center;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+.number-learn__number-strip {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.number-learn__strip-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary-light, #c7d2fe);
+  background: white;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #1e293b);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.number-learn__strip-btn--active {
+  background: var(--color-primary, #4f46e5);
+  border-color: var(--color-primary, #4f46e5);
+  color: white;
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.number-learn__nav {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px 32px;
+  justify-content: center;
+}
+
+.number-learn__nav-btn {
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.number-learn__nav-btn--prev {
+  background: #f1f5f9;
+  color: var(--text-secondary, #64748b);
+}
+
+.number-learn__nav-btn--prev:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.number-learn__nav-btn--next {
+  background: linear-gradient(135deg, var(--color-primary, #4f46e5), #6366f1);
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.number-learn__nav-btn--next:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 4px rgba(79, 70, 229, 0.3);
+}
+
+/* Level cleared popup */
+.number-learn__popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+
+.number-learn__popup {
+  background: white;
+  border-radius: 24px;
+  padding: 32px 24px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: popup-slide-up 0.4s ease-out;
+}
+
+@keyframes popup-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.number-learn__popup-confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.number-learn__popup-confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confetti-fall 2s ease-in forwards;
+}
+
+.number-learn__popup-confetti-piece:nth-child(odd) {
+  background: #f59e0b;
+}
+.number-learn__popup-confetti-piece:nth-child(even) {
+  background: #6366f1;
+}
+.number-learn__popup-confetti-piece:nth-child(3n) {
+  background: #10b981;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(400px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.number-learn__popup-mascot {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.number-learn__popup-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 8px;
+}
+
+.number-learn__popup-text {
+  font-size: 15px;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.number-learn__popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.number-learn__popup-btn {
+  padding: 14px 24px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.number-learn__popup-btn--primary {
+  background: linear-gradient(135deg, var(--color-primary, #4f46e5), #6366f1);
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.number-learn__popup-btn--primary:active {
+  transform: translateY(2px);
+}
+
+.number-learn__popup-btn--secondary {
+  background: #f1f5f9;
+  color: var(--text-secondary, #64748b);
+}
