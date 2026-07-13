@@ -23,7 +23,6 @@ interface NumberLearningViewProps {
 }
 
 const NUMBER_NAMES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-const NUMBER_EMOJIS = ["🫧", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐", "⭐"];
 
 function getDotsForNumber(n: number): string {
   if (n === 0) return "🫧";
@@ -203,6 +202,18 @@ export default function NumberLearningView({
     }
   }, [onComplete]);
 
+  const handleSkipLevel = useCallback(() => {
+    const nextStage = getNextStage(stage.id);
+    if (!nextStage) return;
+
+    const updatedProgress: UserProgress = {
+      ...progress,
+      currentStageId: nextStage.id,
+    };
+    saveProgress(updatedProgress);
+    onComplete(updatedProgress, gameState);
+  }, [progress, stage, gameState, onComplete]);
+
   const handleKeepPracticing = useCallback(() => {
     setShowLevelClearedPopup(false);
     setPhase("learn");
@@ -349,9 +360,10 @@ export default function NumberLearningView({
               key={choice}
               onClick={() => handleQuizAnswer(choice)}
               disabled={feedback !== null}
-              className={`practice__choice-btn ${isYoung ? "practice__choice-btn--large" : ""}`}
+              className={`practice__choice-btn practice__choice-btn--with-name ${isYoung ? "practice__choice-btn--large" : ""}`}
             >
-              {choice}
+              <span className="practice__choice-number">{choice}</span>
+              <span className="practice__choice-name">{NUMBER_NAMES[choice]}</span>
             </button>
           ))}
         </div>
@@ -426,6 +438,10 @@ export default function NumberLearningView({
           {currentNumber === 9 ? "Start Quiz →" : "Next →"}
         </button>
       </div>
+
+      <button onClick={handleSkipLevel} className="number-learn__skip-btn">
+        I already know my numbers — skip to counting →
+      </button>
 
       {showExitConfirm && (
         <div className="practice__exit-overlay">

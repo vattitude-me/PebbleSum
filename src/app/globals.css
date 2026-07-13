@@ -4136,3 +4136,40 @@ body {
   background: #f1f5f9;
   color: var(--text-secondary, #64748b);
 }
+
+.number-learn__skip-btn {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.number-learn__skip-btn:active {
+  color: var(--color-primary, #4f46e5);
+}
+
+/* Quiz choice with number name */
+.practice__choice-btn--with-name {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.practice__choice-number {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.practice__choice-name {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  opacity: 0.7;
+}
