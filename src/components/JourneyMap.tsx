@@ -8,9 +8,10 @@ import { WORLDS, getWorldProgress } from "@/lib/worlds";
 interface JourneyMapProps {
   progress: UserProgress;
   onSelectStage: (stageId: string) => void;
+  onSkipStage?: (stageId: string) => void;
 }
 
-export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps) {
+export default function JourneyMap({ progress, onSelectStage, onSkipStage }: JourneyMapProps) {
   const currentStageRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -68,29 +69,38 @@ export default function JourneyMap({ progress, onSelectStage }: JourneyMapProps)
                   const state = getStageState(stageId, stageIdx);
 
                   return (
-                    <button
-                      key={stageId}
-                      ref={state === "current" ? currentStageRef : undefined}
-                      className={`journey__stage journey__stage--${state}`}
-                      onClick={() => state !== "locked" && onSelectStage(stageId)}
-                      disabled={state === "locked"}
-                    >
-                      <div className="journey__stage-marker">
-                        {state === "mastered" && <img src="/assets/icons/icon-checkmark.png" alt="Done" className="journey__stage-icon" />}
-                        {state === "current" && <img src="/assets/icons/icon-star-purple.png" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
-                        {state === "locked" && <span className="journey__stage-lock">🔒</span>}
-                      </div>
-                      <div className="journey__stage-info">
-                        <span className="journey__stage-name">{stage.name}</span>
-                        <span className="journey__stage-desc">{stage.description}</span>
-                      </div>
-                      {state === "current" && (
-                        <span className="journey__stage-badge">NOW</span>
+                    <div key={stageId} className="journey__stage-wrapper">
+                      <button
+                        ref={state === "current" ? currentStageRef : undefined}
+                        className={`journey__stage journey__stage--${state}`}
+                        onClick={() => state !== "locked" && onSelectStage(stageId)}
+                        disabled={state === "locked"}
+                      >
+                        <div className="journey__stage-marker">
+                          {state === "mastered" && <img src="/assets/icons/icon-checkmark.png" alt="Done" className="journey__stage-icon" />}
+                          {state === "current" && <img src="/assets/icons/icon-star-purple.png" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
+                          {state === "locked" && <span className="journey__stage-lock">🔒</span>}
+                        </div>
+                        <div className="journey__stage-info">
+                          <span className="journey__stage-name">{stage.name}</span>
+                          <span className="journey__stage-desc">{stage.description}</span>
+                        </div>
+                        {state === "current" && (
+                          <span className="journey__stage-badge">NOW</span>
+                        )}
+                        {state === "mastered" && (
+                          <span className="journey__stage-badge journey__stage-badge--replay">REPLAY</span>
+                        )}
+                      </button>
+                      {stageId === "6A" && state === "current" && onSkipStage && (
+                        <button
+                          className="journey__skip-btn"
+                          onClick={() => onSkipStage(stageId)}
+                        >
+                          I know my numbers — skip to counting →
+                        </button>
                       )}
-                      {state === "mastered" && (
-                        <span className="journey__stage-badge journey__stage-badge--replay">REPLAY</span>
-                      )}
-                    </button>
+                    </div>
                   );
                 })}
               </div>

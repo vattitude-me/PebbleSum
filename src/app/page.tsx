@@ -236,6 +236,18 @@ export default function Home() {
     setScreen("home");
   }, []);
 
+  const handleSkipStage = useCallback(async (stageId: string) => {
+    if (!progress) return;
+    const nextStage = STAGES[STAGES.findIndex((s) => s.id === stageId) + 1];
+    if (!nextStage) return;
+    const updatedProgress = { ...progress, currentStageId: nextStage.id };
+    saveProgress(updatedProgress);
+    setProgress(updatedProgress);
+    if (user) {
+      await firestoreSync.saveProgress(user.uid, updatedProgress);
+    }
+  }, [progress, user]);
+
   const handleSettingsChange = useCallback((updated: AppSettings) => {
     setSettings(updated);
     if (user) {
@@ -351,6 +363,7 @@ export default function Home() {
             onSelectStage={(stageId) => {
               handleStartPractice("practice", stageId);
             }}
+            onSkipStage={handleSkipStage}
           />
         )}
 

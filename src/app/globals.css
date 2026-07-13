@@ -2311,6 +2311,30 @@ body {
   font-size: 9px;
 }
 
+.journey__stage-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.journey__skip-btn {
+  border: none;
+  background: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary, #64748b);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: left;
+  margin-left: 56px;
+  margin-top: -4px;
+}
+
+.journey__skip-btn:active {
+  color: var(--color-primary, #4f46e5);
+}
+
 /* Path Connector */
 .journey__path-connector {
   display: flex;
