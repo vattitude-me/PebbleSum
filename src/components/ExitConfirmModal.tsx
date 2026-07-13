@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 
 interface ExitConfirmModalProps {
   enabled: boolean;
@@ -8,11 +8,13 @@ interface ExitConfirmModalProps {
 
 export default function ExitConfirmModal({ enabled }: ExitConfirmModalProps) {
   const [showModal, setShowModal] = useState(false);
+  const leavingRef = useRef(false);
 
   useEffect(() => {
     if (!enabled) return;
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (leavingRef.current) return;
       e.preventDefault();
       e.returnValue = "";
     };
@@ -27,6 +29,7 @@ export default function ExitConfirmModal({ enabled }: ExitConfirmModalProps) {
     window.history.pushState(null, "", window.location.href);
 
     const handlePopState = () => {
+      if (leavingRef.current) return;
       window.history.pushState(null, "", window.location.href);
       setShowModal(true);
     };
@@ -40,9 +43,8 @@ export default function ExitConfirmModal({ enabled }: ExitConfirmModalProps) {
   }, []);
 
   const handleLeave = useCallback(() => {
+    leavingRef.current = true;
     setShowModal(false);
-    window.removeEventListener("popstate", () => {});
-    window.history.back();
     window.history.back();
   }, []);
 
