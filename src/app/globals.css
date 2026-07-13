@@ -1684,6 +1684,12 @@ body {
   padding: 12px;
 }
 
+.practice__visual-problem--count {
+  justify-content: flex-start;
+  width: 100%;
+  gap: 0;
+}
+
 .practice__visual-question {
   font-size: 20px;
   font-weight: 600;
@@ -1691,12 +1697,28 @@ body {
   margin-bottom: 12px;
 }
 
+.practice__visual-question--count {
+  margin-bottom: 8px;
+  align-self: center;
+}
+
+.practice__count-divider {
+  width: 100%;
+  border: none;
+  border-top: 1.5px solid var(--color-primary-light, #e0e7ff);
+  margin: 0 0 12px 0;
+}
+
 .practice__visual-objects {
-  font-size: 24px;
-  line-height: 1.6;
+  font-size: 32px;
+  line-height: 1.5;
   text-align: center;
   white-space: pre-line;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  padding: 0 8px;
 }
 
 .practice__numeral-display {

@@ -413,8 +413,9 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
             <div className="practice__numeral-display">{problem.visual}</div>
           </div>
         ) : problem.problemType === "count" ? (
-          <div className="practice__visual-problem">
-            <p className="practice__visual-question">{problem.question}</p>
+          <div className="practice__visual-problem practice__visual-problem--count">
+            <p className="practice__visual-question practice__visual-question--count">{problem.question}</p>
+            <hr className="practice__count-divider" />
             <div className="practice__visual-objects">{problem.visual}</div>
           </div>
         ) : problem.problemType === "sequence" ? (
