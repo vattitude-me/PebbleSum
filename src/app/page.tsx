@@ -19,6 +19,7 @@ import {
   setOnboardingComplete,
   saveProfile,
   checkNewBadges,
+  resetDailyGameState,
   AgeGroup,
 } from "@/lib/user-store";
 import { useAuth } from "@/lib/auth-context";
@@ -87,7 +88,8 @@ export default function Home() {
         }
         if (cloudData) {
           setProfile(cloudData.profile);
-          setGameState(cloudData.gameState);
+          const resetGameState = resetDailyGameState(cloudData.gameState);
+          setGameState(resetGameState);
           setSettings(cloudData.settings);
           setBadges(cloudData.badges);
           const p = cloudData.progress;
@@ -99,7 +101,7 @@ export default function Home() {
           setProgress(p);
 
           saveProgress(p);
-          saveGameStateLocal(cloudData.gameState);
+          saveGameStateLocal(resetGameState);
           saveSettingsLocal(cloudData.settings);
           saveBadges(cloudData.badges);
           if (cloudData.profile) {
@@ -122,7 +124,9 @@ export default function Home() {
       }
       setProgress(p);
       setProfile(loadProfile());
-      setGameState(loadGameState());
+      const resetGameState = resetDailyGameState(loadGameState());
+      setGameState(resetGameState);
+      saveGameStateLocal(resetGameState);
       setSettings(loadSettings());
       setBadges(loadBadges());
       setDataLoaded(true);

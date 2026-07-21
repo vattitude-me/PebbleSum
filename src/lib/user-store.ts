@@ -207,3 +207,22 @@ export function checkNewBadges(
 
   return newBadges;
 }
+
+function getTodayDate(): string {
+  return new Date().toISOString().split("T")[0];
+}
+
+export function resetDailyGameState(gameState: GameState): GameState {
+  const today = getTodayDate();
+  if (gameState.practiceDate === today) {
+    return gameState;
+  }
+  return {
+    ...gameState,
+    hearts: gameState.maxHearts,
+    todayPracticeSeconds: 0,
+    dailyGoalCompleted: false,
+    todaySessionCount: 0,
+    practiceDate: today,
+  };
+}
