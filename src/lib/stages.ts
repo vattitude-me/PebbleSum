@@ -179,3 +179,9 @@ export function getStartingStageForAge(age: number): string {
   if (age <= 10) return "2A";
   return "A";
 }
+
+export function getStartingStageForSkill(skillLevel: "young" | "middle" | "older"): string {
+  if (skillLevel === "young") return "6A";
+  if (skillLevel === "middle") return "2A";
+  return "E";
+}

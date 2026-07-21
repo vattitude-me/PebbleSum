@@ -15,39 +15,30 @@ export default function WelcomeScreen({ onGetStarted, onSignIn }: WelcomeScreenP
             alt="PebbleSum mascot"
             className="welcome-screen__mascot"
           />
-          <h1 className="welcome-screen__title">
-            <span className="welcome-screen__title-pebble">Pebble</span>
-            <span className="welcome-screen__title-sum">Sum</span>
-          </h1>
+          <h1 className="welcome-screen__title">PebbleSum</h1>
           <p className="welcome-screen__tagline">Fun math practice for kids</p>
         </div>
 
         <div className="welcome-screen__features">
           <div className="welcome-screen__feature">
             <span className="welcome-screen__feature-icon">🎯</span>
-            <span className="welcome-screen__feature-text">Daily challenges</span>
+            <span>Daily challenges that grow with you</span>
           </div>
           <div className="welcome-screen__feature">
             <span className="welcome-screen__feature-icon">🏆</span>
-            <span className="welcome-screen__feature-text">Earn badges</span>
+            <span>Earn badges and rewards</span>
           </div>
           <div className="welcome-screen__feature">
             <span className="welcome-screen__feature-icon">🔥</span>
-            <span className="welcome-screen__feature-text">Build streaks</span>
+            <span>Build a daily learning streak</span>
           </div>
         </div>
 
         <div className="welcome-screen__actions">
-          <button
-            onClick={onGetStarted}
-            className="welcome-screen__btn-primary"
-          >
+          <button onClick={onGetStarted} className="welcome-screen__btn-primary">
             Get Started
           </button>
-          <button
-            onClick={onSignIn}
-            className="welcome-screen__btn-secondary"
-          >
+          <button onClick={onSignIn} className="welcome-screen__btn-secondary">
             I already have an account
           </button>
         </div>

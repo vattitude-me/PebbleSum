@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { STAGES, getStartingStageForAge } from "@/lib/stages";
+import { STAGES, getStartingStageForAge, getStartingStageForSkill } from "@/lib/stages";
 import { UserProgress, loadProgress, saveProgress, isStreakActive, getToday } from "@/lib/progress-store";
 import {
   UserProfile,
@@ -191,7 +191,7 @@ export default function Home() {
 
   const handleOnboardingComplete = useCallback(async (newProfile: UserProfile) => {
     setProfile(newProfile);
-    const startingStage = getStartingStageForAge(newProfile.age);
+    const startingStage = getStartingStageForSkill(newProfile.ageGroup);
     const baseProgress = progress || loadProgress();
     const updatedProgress = { ...baseProgress, currentStageId: startingStage };
     saveProgress(updatedProgress);
@@ -286,7 +286,11 @@ export default function Home() {
   }
 
   if (screen === "welcome") {
-    return <WelcomeScreen onGetStarted={handleGetStarted} onSignIn={handleGoToSignIn} />;
+    return (
+      <div className="app-shell app-shell--middle">
+        <WelcomeScreen onGetStarted={handleGetStarted} onSignIn={handleGoToSignIn} />
+      </div>
+    );
   }
 
   if (screen === "auth") {
