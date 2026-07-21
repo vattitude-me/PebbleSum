@@ -10,7 +10,7 @@ interface OnboardingFlowProps {
 const AVATARS = [
   { id: "pebble-wave", icon: "icon-pebble-wave.webp", label: "Pebble" },
   { id: "pebble-celebrate-left", icon: "icon-pebble-celebrate-left.webp", label: "Happy Pebble" },
-  { id: "pebble-thinking", icon: "icon-pebble-thinking.png", label: "Smart Pebble" },
+  { id: "pebble-thinking", icon: "icon-pebble-thinking.webp", label: "Smart Pebble" },
 ];
 
 const DAILY_GOALS = [
