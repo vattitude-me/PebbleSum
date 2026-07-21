@@ -3142,6 +3142,211 @@ body {
 }
 
 /* ========================================
+   WELCOME SCREEN
+   ======================================== */
+
+.welcome-screen {
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a2e;
+}
+
+.welcome-screen__container {
+  position: relative;
+  width: 100%;
+  max-width: var(--app-max-width);
+  height: 100dvh;
+  background: url('/assets/backgrounds/onboarding_background.webp') center/cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 64px var(--spacing-lg) 48px;
+  overflow: hidden;
+}
+
+.welcome-screen__container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 0;
+}
+
+.welcome-screen__container > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 480px) {
+  .welcome-screen__container {
+    border-radius: 24px;
+    height: min(100dvh, 900px);
+    box-shadow: 0 0 100px rgba(108, 92, 231, 0.2), 0 0 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.welcome-screen__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.welcome-screen__mascot {
+  width: 120px;
+  height: 120px;
+  animation: pop-in 0.5s ease-out;
+  filter: drop-shadow(0 8px 20px rgba(108, 92, 231, 0.25));
+}
+
+.welcome-screen__title {
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.welcome-screen__title-pebble {
+  color: #2c3e7a;
+}
+
+.welcome-screen__title-sum {
+  color: var(--primary);
+}
+
+.welcome-screen__tagline {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a3ab5;
+  margin-top: 4px;
+}
+
+.welcome-screen__features {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.welcome-screen__feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 99px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d1b69;
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.1);
+}
+
+.welcome-screen__feature-icon {
+  font-size: 18px;
+}
+
+.welcome-screen__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.welcome-screen__btn-primary {
+  width: 100%;
+  max-width: 320px;
+  padding: 18px 36px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  border: none;
+  border-radius: 99px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(108, 92, 231, 0.4), 0 2px 8px rgba(108, 92, 231, 0.2);
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.welcome-screen__btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(108, 92, 231, 0.5);
+}
+
+.welcome-screen__btn-primary:active {
+  transform: scale(0.97);
+}
+
+.welcome-screen__btn-secondary {
+  background: none;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a3ab5;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 99px;
+  transition: background 0.15s;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.welcome-screen__btn-secondary:hover {
+  background: rgba(108, 92, 231, 0.08);
+}
+
+/* ========================================
+   ONBOARDING — Theme Swatches
+   ======================================== */
+
+.onboarding__theme-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.onboarding__theme-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+}
+
+.onboarding__theme-swatches {
+  display: flex;
+  gap: 10px;
+}
+
+.onboarding__theme-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.onboarding__theme-swatch:hover {
+  transform: scale(1.15);
+}
+
+.onboarding__theme-swatch--selected {
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: scale(1.15);
+}
+
+/* ========================================
    AUTH SCREEN
    ======================================== */
 

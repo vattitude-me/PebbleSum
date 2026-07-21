@@ -13,6 +13,14 @@ const AVATARS = [
   { id: "pebble-thinking", icon: "icon-pebble-thinking.webp", label: "Smart Pebble" },
 ];
 
+const THEMES = [
+  { id: "default", label: "Purple", color: "#6c5ce7" },
+  { id: "ocean", label: "Ocean", color: "#0984e3" },
+  { id: "forest", label: "Forest", color: "#00b894" },
+  { id: "space", label: "Space", color: "#a29bfe" },
+  { id: "candy", label: "Candy", color: "#e84393" },
+];
+
 const DAILY_GOALS = [
   { minutes: 5, label: "5 min", description: "Quick daily practice" },
   { minutes: 10, label: "10 min", description: "Steady learner" },
@@ -31,6 +39,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [name, setName] = useState("");
   const [skillLevel, setSkillLevel] = useState<AgeGroup>("middle");
   const [avatarId, setAvatarId] = useState("pebble-wave");
+  const [themeId, setThemeId] = useState("default");
   const [dailyGoal, setDailyGoal] = useState(10);
 
   const totalSteps = 4;
@@ -42,7 +51,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       age: ageFromSkill,
       ageGroup: skillLevel,
       avatarId,
-      themeId: "default",
+      themeId,
       dailyGoalMinutes: dailyGoal,
       createdAt: new Date().toISOString(),
     };
@@ -107,7 +116,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         {step === 2 && (
           <div className="onboarding__step">
             <h2 className="onboarding__title">Choose your buddy</h2>
-            <p className="onboarding__subtitle">Pick a friend to learn with!</p>
+            <p className="onboarding__subtitle">Pick a friend and a color!</p>
             <div className="onboarding__avatar-grid">
               {AVATARS.map((av) => (
                 <button
@@ -119,6 +128,21 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <span className="onboarding__avatar-label">{av.label}</span>
                 </button>
               ))}
+            </div>
+            <div className="onboarding__theme-row">
+              <p className="onboarding__theme-label">Your color</p>
+              <div className="onboarding__theme-swatches">
+                {THEMES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setThemeId(t.id)}
+                    className={`onboarding__theme-swatch ${themeId === t.id ? "onboarding__theme-swatch--selected" : ""}`}
+                    style={{ backgroundColor: t.color }}
+                    title={t.label}
+                    aria-label={t.label}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         )}

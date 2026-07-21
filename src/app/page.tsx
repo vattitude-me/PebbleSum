@@ -26,6 +26,7 @@ import { useAuth } from "@/lib/auth-context";
 import { loadUserData, saveUserData, FirestoreUserData } from "@/lib/firestore-sync";
 import * as firestoreSync from "@/lib/firestore-sync";
 import SplashScreen from "@/components/SplashScreen";
+import WelcomeScreen from "@/components/WelcomeScreen";
 import OnboardingFlow from "@/components/OnboardingFlow";
 import AuthScreen from "@/components/AuthScreen";
 import TopBar from "@/components/TopBar";
@@ -40,10 +41,10 @@ import TermsPage from "@/components/TermsPage";
 import PrivacyPage from "@/components/PrivacyPage";
 import ExitConfirmModal from "@/components/ExitConfirmModal";
 
-type AppScreen = "splash" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "parent" | "terms" | "privacy";
+type AppScreen = "splash" | "welcome" | "auth" | "onboarding" | "home" | "practice" | "journey" | "rewards" | "profile" | "parent" | "terms" | "privacy";
 
 export default function Home() {
-  const { user, loading: authLoading, isGuest } = useAuth();
+  const { user, loading: authLoading, isGuest, skipLogin } = useAuth();
   const [screen, setScreen] = useState<AppScreen>("splash");
   const [progress, setProgress] = useState<UserProgress | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -53,10 +54,11 @@ export default function Home() {
   const [practiceMode, setPracticeMode] = useState<PracticeMode>("practice");
   const [practiceStageId, setPracticeStageId] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [firstTimeFlow, setFirstTimeFlow] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user && !isGuest && dataLoaded) {
-      setScreen("auth");
+      setScreen("welcome");
       setProfile(null);
       setProgress(null);
       setGameState(null);
@@ -136,7 +138,7 @@ export default function Home() {
   }, [user, authLoading, isGuest]);
 
   useEffect(() => {
-    if (dataLoaded && (user || isGuest) && screen === "auth") {
+    if (dataLoaded && (user || isGuest) && (screen === "auth" || screen === "welcome")) {
       if (!isOnboardingComplete() && !profile) {
         setScreen("onboarding");
       } else {
@@ -148,7 +150,7 @@ export default function Home() {
   const handleSplashComplete = useCallback(() => {
     if (authLoading) return;
     if (!user && !isGuest) {
-      setScreen("auth");
+      setScreen("welcome");
     } else if (!dataLoaded) {
       return;
     } else if (!profile) {
@@ -176,6 +178,16 @@ export default function Home() {
     }
   }, [profile]);
 
+  const handleGetStarted = useCallback(() => {
+    skipLogin();
+    setFirstTimeFlow(true);
+    setScreen("onboarding");
+  }, [skipLogin]);
+
+  const handleGoToSignIn = useCallback(() => {
+    setScreen("auth");
+  }, []);
+
 
   const handleOnboardingComplete = useCallback(async (newProfile: UserProfile) => {
     setProfile(newProfile);
@@ -186,22 +198,32 @@ export default function Home() {
     setProgress(updatedProgress);
 
     const currentGameState = gameState || loadGameState();
-    const currentSettings = settings || loadSettings();
+    const updatedSettings = { ...(settings || loadSettings()), theme: newProfile.themeId as "default" | "ocean" | "forest" | "space" | "candy" };
+    saveSettingsLocal(updatedSettings);
+    setSettings(updatedSettings);
     const currentBadges = badges.length > 0 ? badges : loadBadges();
 
     if (user) {
       const data: FirestoreUserData = {
         profile: newProfile,
         gameState: currentGameState,
-        settings: currentSettings,
+        settings: updatedSettings,
         badges: currentBadges,
         progress: updatedProgress,
         onboardingComplete: true,
       };
       await saveUserData(user.uid, data);
     }
-    setScreen("home");
-  }, [user, progress, gameState, settings, badges]);
+
+    if (firstTimeFlow) {
+      setFirstTimeFlow(false);
+      setPracticeMode("practice");
+      setPracticeStageId(startingStage);
+      setScreen("practice");
+    } else {
+      setScreen("home");
+    }
+  }, [user, progress, gameState, settings, badges, firstTimeFlow]);
 
   const handleNavigate = useCallback((page: string) => {
     setScreen(page as AppScreen);
@@ -263,10 +285,14 @@ export default function Home() {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
 
+  if (screen === "welcome") {
+    return <WelcomeScreen onGetStarted={handleGetStarted} onSignIn={handleGoToSignIn} />;
+  }
+
   if (screen === "auth") {
     return (
       <div className={`app-shell app-shell--${profile?.ageGroup || "middle"}`}>
-        <AuthScreen onSuccess={handleAuthSuccess} onSkip={handleGuestStart} />
+        <AuthScreen onSuccess={handleAuthSuccess} onSkip={() => setScreen("welcome")} />
       </div>
     );
   }
