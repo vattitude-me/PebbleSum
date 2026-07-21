@@ -270,7 +270,7 @@ export default function NumberLearningView({
         <div className="practice-complete">
           <div className="practice-complete__header">
             <img
-              src={`/assets/icons/${perfect ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
+              src={`/assets/icons/${perfect ? "icon-pebble-celebrate-left.webp" : "icon-pebble-wave.webp"}`}
               alt="Pebble"
               className="practice-complete__mascot"
             />

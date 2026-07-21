@@ -18,7 +18,7 @@ interface ProfilePageProps {
 }
 
 const AVATAR_ICON_MAP: Record<string, string> = {
-  "pebble-celebrate": "icon-pebble-celebrate-left.png",
+  "pebble-celebrate": "icon-pebble-celebrate-left.webp",
 };
 
 function getAvatarSrc(avatarId: string) {

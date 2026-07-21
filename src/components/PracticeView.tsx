@@ -285,7 +285,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
         <div className="practice-complete__header">
           <img
-            src={`/assets/icons/${levelCleared || (!isLevelClear && perfect) ? "icon-pebble-celebrate-left.png" : "icon-pebble-wave.png"}`}
+            src={`/assets/icons/${levelCleared || (!isLevelClear && perfect) ? "icon-pebble-celebrate-left.webp" : "icon-pebble-wave.webp"}`}
             alt="Pebble"
             className={`practice-complete__mascot ${isLevelClear && levelCleared ? "practice-complete__mascot--celebrate" : ""}`}
           />
