@@ -236,7 +236,7 @@ export default function NumberLearningView({
               ))}
             </div>
             <img
-              src="/assets/icons/icon-pebble-celebrate-left.png"
+              src="/assets/icons/icon-pebble-celebrate-left.webp"
               alt="Pebble celebrating"
               className="number-learn__popup-mascot"
             />
@@ -294,11 +294,11 @@ export default function NumberLearningView({
           {(xpGain > 0 || coinsGained > 0) && (
             <div className="practice-complete__rewards">
               <div className="practice-complete__reward">
-                <img src="/assets/icons/icon-xp.png" alt="XP" className="practice-complete__reward-icon" />
+                <img src="/assets/icons/icon-xp.webp" alt="XP" className="practice-complete__reward-icon" />
                 <span>+{xpGain} XP</span>
               </div>
               <div className="practice-complete__reward">
-                <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="practice-complete__reward-icon" />
+                <img src="/assets/icons/icon-coin-star.webp" alt="Coins" className="practice-complete__reward-icon" />
                 <span>+{coinsGained} Coins</span>
               </div>
             </div>
@@ -322,7 +322,7 @@ export default function NumberLearningView({
       <div className={`number-learn ${isYoung ? "number-learn--young" : ""}`}>
         <div className="practice__header">
           <button onClick={() => setShowExitConfirm(true)} className="practice__close">
-            <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="practice__close-icon" />
+            <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="practice__close-icon" />
           </button>
           <div className="practice__progress-info">
             <span className="practice__question-count">Quiz {quizIndex + 1}/{quiz.length}</span>
@@ -342,13 +342,13 @@ export default function NumberLearningView({
 
           {feedback === "correct" && (
             <div className="practice__feedback practice__feedback--correct animate-pop-in">
-              <img src="/assets/icons/icon-checkmark.png" alt="Correct" className="practice__feedback-icon" />
+              <img src="/assets/icons/icon-checkmark.webp" alt="Correct" className="practice__feedback-icon" />
               <span>Correct!</span>
             </div>
           )}
           {feedback === "wrong" && (
             <div className="practice__feedback practice__feedback--wrong animate-pop-in">
-              <img src="/assets/icons/icon-close-red.png" alt="Wrong" className="practice__feedback-icon" />
+              <img src="/assets/icons/icon-close-red.webp" alt="Wrong" className="practice__feedback-icon" />
               <span>It&apos;s {question.number}!</span>
             </div>
           )}
@@ -393,7 +393,7 @@ export default function NumberLearningView({
     <div className={`number-learn ${isYoung ? "number-learn--young" : ""}`}>
       <div className="practice__header">
         <button onClick={() => setShowExitConfirm(true)} className="practice__close">
-          <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="practice__close-icon" />
+          <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="practice__close-icon" />
         </button>
         <div className="practice__progress-info">
           <span className="practice__question-count">Learn: {currentNumber + 1}/10</span>

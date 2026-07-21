@@ -7,11 +7,11 @@ interface BottomNavProps {
 }
 
 const NAV_ITEMS = [
-  { id: "home", label: "Home", icon: "/assets/icons/icon-home.png" },
-  { id: "journey", label: "Journey", icon: "/assets/icons/icon-level.png" },
-  { id: "practice", label: "Practice", icon: "/assets/icons/icon-play.png" },
-  { id: "rewards", label: "Rewards", icon: "/assets/icons/icon-star.png" },
-  { id: "profile", label: "Profile", icon: "/assets/icons/icon-avatar.png" },
+  { id: "home", label: "Home", icon: "/assets/icons/icon-home.webp" },
+  { id: "journey", label: "Journey", icon: "/assets/icons/icon-level.webp" },
+  { id: "practice", label: "Practice", icon: "/assets/icons/icon-play.webp" },
+  { id: "rewards", label: "Rewards", icon: "/assets/icons/icon-star.webp" },
+  { id: "profile", label: "Profile", icon: "/assets/icons/icon-avatar.webp" },
 ];
 
 export default function BottomNav({ active, onNavigate, ageGroup }: BottomNavProps) {

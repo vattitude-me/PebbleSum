@@ -68,7 +68,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       <div className="onboarding__card animate-pop-in" key={step}>
         {step === 0 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pencil.png" alt="Write your name" className="onboarding__mascot" />
+            <img src="/assets/icons/icon-pencil.webp" alt="Write your name" className="onboarding__mascot" />
             <h2 className="onboarding__title">What&apos;s your name?</h2>
             <p className="onboarding__subtitle">Let&apos;s get to know each other!</p>
             <input
@@ -85,7 +85,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         {step === 1 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-thinking.png" alt="Thinking" className="onboarding__mascot" />
+            <img src="/assets/icons/icon-pebble-thinking.webp" alt="Thinking" className="onboarding__mascot" />
             <h2 className="onboarding__title">What do you know?</h2>
             <p className="onboarding__subtitle">Pick what fits you best!</p>
             <div className="onboarding__skill-grid">
@@ -125,7 +125,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         {step === 3 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-celebrate-left.png" alt="Let's go!" className="onboarding__mascot" />
+            <img src="/assets/icons/icon-pebble-celebrate-left.webp" alt="Let's go!" className="onboarding__mascot" />
             <h2 className="onboarding__title">Daily goal</h2>
             <p className="onboarding__subtitle">How much will you practice each day?</p>
             <div className="onboarding__goal-grid">
@@ -147,7 +147,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       <div className="onboarding__actions">
         {step > 0 && (
           <button onClick={() => setStep((s) => s - 1)} className="onboarding__btn-back">
-            <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="onboarding__btn-icon" />
+            <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="onboarding__btn-icon" />
           </button>
         )}
         <button
@@ -160,7 +160,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         >
           {step === totalSteps - 1 ? "Let's Go!" : "Next"}
           {step < totalSteps - 1 && (
-            <img src="/assets/icons/icon-arrow-right.png" alt="Next" className="onboarding__btn-icon" />
+            <img src="/assets/icons/icon-arrow-right.webp" alt="Next" className="onboarding__btn-icon" />
           )}
         </button>
       </div>

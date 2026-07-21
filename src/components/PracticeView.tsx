@@ -320,11 +320,11 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         {(xpGain > 0 || coinsGained > 0) && (
           <div className="practice-complete__rewards">
             <div className="practice-complete__reward">
-              <img src="/assets/icons/icon-xp.png" alt="XP" className="practice-complete__reward-icon" />
+              <img src="/assets/icons/icon-xp.webp" alt="XP" className="practice-complete__reward-icon" />
               <span>+{xpGain} XP</span>
             </div>
             <div className="practice-complete__reward">
-              <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="practice-complete__reward-icon" />
+              <img src="/assets/icons/icon-coin-star.webp" alt="Coins" className="practice-complete__reward-icon" />
               <span>+{coinsGained} Coins</span>
             </div>
           </div>
@@ -363,14 +363,14 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
       {/* Practice Header */}
       <div className="practice__header">
         <button onClick={() => setShowExitConfirm(true)} className="practice__close">
-          <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="practice__close-icon" />
+          <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="practice__close-icon" />
         </button>
         <div className="practice__progress-info">
           <span className="practice__question-count">{currentIndex + 1}/{problems.length}</span>
         </div>
         <div className="practice__timer-hearts">
           <span className={`practice__timer ${elapsed > timeLimit ? "practice__timer--over" : ""}`}>
-            <img src="/assets/icons/icon-timer.png" alt="Time" className="practice__timer-icon" />
+            <img src="/assets/icons/icon-timer.webp" alt="Time" className="practice__timer-icon" />
             {formatTime(elapsed)}
           </span>
           <span className="practice__hearts">
@@ -427,13 +427,13 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
         {feedback === "correct" && (
           <div className="practice__feedback practice__feedback--correct animate-pop-in">
-            <img src="/assets/icons/icon-checkmark.png" alt="Correct" className="practice__feedback-icon" />
+            <img src="/assets/icons/icon-checkmark.webp" alt="Correct" className="practice__feedback-icon" />
             <span>Correct!</span>
           </div>
         )}
         {feedback === "wrong" && (
           <div className="practice__feedback practice__feedback--wrong animate-pop-in">
-            <img src="/assets/icons/icon-close-red.png" alt="Wrong" className="practice__feedback-icon" />
+            <img src="/assets/icons/icon-close-red.webp" alt="Wrong" className="practice__feedback-icon" />
             <span>Answer: {problem.answer}</span>
           </div>
         )}

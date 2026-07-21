@@ -22,7 +22,7 @@ const AVATAR_ICON_MAP: Record<string, string> = {
 };
 
 function getAvatarSrc(avatarId: string) {
-  return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.png`}`;
+  return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.webp`}`;
 }
 
 export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate, onDevJumpToStage }: ProfilePageProps) {
@@ -155,12 +155,12 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
       {/* Quick Stats — only current streak + accuracy */}
       <section className="profile-page__stats">
         <div className="profile-page__stat">
-          <img src="/assets/icons/icon-fire.png" alt="Streak" className="profile-page__stat-icon" />
+          <img src="/assets/icons/icon-fire.webp" alt="Streak" className="profile-page__stat-icon" />
           <span className="profile-page__stat-value">{progress.streak}</span>
           <span className="profile-page__stat-label">Streak</span>
         </div>
         <div className="profile-page__stat">
-          <img src="/assets/icons/icon-checkmark.png" alt="Accuracy" className="profile-page__stat-icon" />
+          <img src="/assets/icons/icon-checkmark.webp" alt="Accuracy" className="profile-page__stat-icon" />
           <span className="profile-page__stat-value">{accuracy}%</span>
           <span className="profile-page__stat-label">Accuracy</span>
         </div>
@@ -171,7 +171,7 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         <h3 className="settings-page__section-title">Display</h3>
         <div className="settings-page__row">
           <div className="settings-page__row-info">
-            <img src="/assets/icons/icon-edit.png" alt="Text" className="settings-page__row-icon" />
+            <img src="/assets/icons/icon-edit.webp" alt="Text" className="settings-page__row-icon" />
             <span>Text Size</span>
           </div>
           <div className="settings-page__segmented">
@@ -241,11 +241,11 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         <h3 className="settings-page__section-title">Legal</h3>
         <button onClick={() => onNavigate("terms")} className="settings-page__nav-row">
           <span>Terms of Service</span>
-          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+          <img src="/assets/icons/icon-arrow-right.webp" alt="Go" className="settings-page__nav-arrow" />
         </button>
         <button onClick={() => onNavigate("privacy")} className="settings-page__nav-row">
           <span>Privacy Policy</span>
-          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+          <img src="/assets/icons/icon-arrow-right.webp" alt="Go" className="settings-page__nav-arrow" />
         </button>
       </section>
 

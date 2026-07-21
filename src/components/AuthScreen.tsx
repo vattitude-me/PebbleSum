@@ -127,7 +127,7 @@ export default function AuthScreen({ onSuccess, onSkip }: AuthScreenProps) {
     <div className={`auth-screen ${mode === "signup" ? "auth-screen--signup" : ""}`}>
       <div className="auth-screen__container">
         <div className="auth-screen__logo">
-          <img src="/assets/icons/icon-pebble-wave.png" alt="PebbleSum" className="auth-screen__logo-img" />
+          <img src="/assets/icons/icon-pebble-wave.webp" alt="PebbleSum" className="auth-screen__logo-img" />
           <h1 className="auth-screen__app-name">PebbleSum</h1>
         </div>
 

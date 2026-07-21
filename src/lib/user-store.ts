@@ -161,15 +161,15 @@ export function addCoins(amount: number): GameState {
 }
 
 export const BADGE_DEFINITIONS: BadgeDefinition[] = [
-  { id: "first-step", name: "First Step", description: "Complete your first session", icon: "icon-badge-footprint.png", category: "milestone", requirement: 1 },
-  { id: "streak-3", name: "Warming Up", description: "3-day streak", icon: "icon-badge-streak.png", category: "streak", requirement: 3 },
-  { id: "streak-7", name: "On Fire!", description: "7-day streak", icon: "icon-badge-lightning.png", category: "streak", requirement: 7 },
-  { id: "streak-30", name: "Unstoppable", description: "30-day streak", icon: "icon-badge-crown.png", category: "streak", requirement: 30 },
-  { id: "speed-demon", name: "Speed Demon", description: "Complete 5 sessions within target time", icon: "icon-badge-target.png", category: "speed", requirement: 5 },
-  { id: "perfectionist", name: "Perfectionist", description: "Get 10 perfect scores", icon: "icon-badge-trophy.png", category: "mastery", requirement: 10 },
-  { id: "scholar", name: "Scholar", description: "Answer 500 questions correctly", icon: "icon-badge-graduation.png", category: "milestone", requirement: 500 },
-  { id: "champion", name: "Champion", description: "Reach Stage C", icon: "icon-badge-champion.png", category: "milestone", requirement: 1 },
-  { id: "seedling", name: "Seedling", description: "Complete 7 total sessions", icon: "icon-badge-seedling.png", category: "consistency", requirement: 7 },
+  { id: "first-step", name: "First Step", description: "Complete your first session", icon: "icon-badge-footprint.webp", category: "milestone", requirement: 1 },
+  { id: "streak-3", name: "Warming Up", description: "3-day streak", icon: "icon-badge-streak.webp", category: "streak", requirement: 3 },
+  { id: "streak-7", name: "On Fire!", description: "7-day streak", icon: "icon-badge-lightning.webp", category: "streak", requirement: 7 },
+  { id: "streak-30", name: "Unstoppable", description: "30-day streak", icon: "icon-badge-crown.webp", category: "streak", requirement: 30 },
+  { id: "speed-demon", name: "Speed Demon", description: "Complete 5 sessions within target time", icon: "icon-badge-target.webp", category: "speed", requirement: 5 },
+  { id: "perfectionist", name: "Perfectionist", description: "Get 10 perfect scores", icon: "icon-badge-trophy.webp", category: "mastery", requirement: 10 },
+  { id: "scholar", name: "Scholar", description: "Answer 500 questions correctly", icon: "icon-badge-graduation.webp", category: "milestone", requirement: 500 },
+  { id: "champion", name: "Champion", description: "Reach Stage C", icon: "icon-badge-champion.webp", category: "milestone", requirement: 1 },
+  { id: "seedling", name: "Seedling", description: "Complete 7 total sessions", icon: "icon-badge-seedling.webp", category: "consistency", requirement: 7 },
 ];
 
 export function checkNewBadges(

@@ -51,7 +51,7 @@ export default function JourneyMap({ progress, onSelectStage, onSkipStage }: Jou
                 </div>
                 {isPastWorld && (
                   <div className="journey__world-complete">
-                    <img src="/assets/icons/icon-checkmark.png" alt="Complete" className="journey__world-check" />
+                    <img src="/assets/icons/icon-checkmark.webp" alt="Complete" className="journey__world-check" />
                   </div>
                 )}
               </div>
@@ -77,8 +77,8 @@ export default function JourneyMap({ progress, onSelectStage, onSkipStage }: Jou
                         disabled={state === "locked"}
                       >
                         <div className="journey__stage-marker">
-                          {state === "mastered" && <img src="/assets/icons/icon-checkmark.png" alt="Done" className="journey__stage-icon" />}
-                          {state === "current" && <img src="/assets/icons/icon-star-purple.png" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
+                          {state === "mastered" && <img src="/assets/icons/icon-checkmark.webp" alt="Done" className="journey__stage-icon" />}
+                          {state === "current" && <img src="/assets/icons/icon-star-purple.webp" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
                           {state === "locked" && <span className="journey__stage-lock">🔒</span>}
                         </div>
                         <div className="journey__stage-info">

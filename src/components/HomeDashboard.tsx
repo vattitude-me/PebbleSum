@@ -121,11 +121,11 @@ export default function HomeDashboard({
           </div>
           <div className="dashboard__stats-strip">
             <div className="dashboard__stat-chip">
-              <img src="/assets/icons/icon-fire.png" alt="Streak" className="dashboard__stat-icon" />
+              <img src="/assets/icons/icon-fire.webp" alt="Streak" className="dashboard__stat-icon" />
               <span className="dashboard__stat-value">{progress.streak}</span>
             </div>
             <div className="dashboard__stat-chip">
-              <img src="/assets/icons/icon-coin-star.png" alt="Coins" className="dashboard__stat-icon" />
+              <img src="/assets/icons/icon-coin-star.webp" alt="Coins" className="dashboard__stat-icon" />
               <span className="dashboard__stat-value">{gameState.coins}</span>
             </div>
             <div className="dashboard__stat-chip dashboard__stat-chip--xp">
@@ -142,7 +142,7 @@ export default function HomeDashboard({
           {todayCompleted ? (
             <div className="dashboard__goal-complete">
               <div className="dashboard__goal-complete-icon">
-                <img src="/assets/icons/icon-checkmark.png" alt="Done" className="dashboard__complete-img" />
+                <img src="/assets/icons/icon-checkmark.webp" alt="Done" className="dashboard__complete-img" />
               </div>
               <div className="dashboard__goal-complete-text">
                 <h3 className="dashboard__goal-complete-title">Today&apos;s Goal Complete!</h3>
@@ -162,7 +162,7 @@ export default function HomeDashboard({
                   </div>
                 </div>
                 <button onClick={() => onStartPractice("practice")} className="dashboard__practice-btn">
-                  <img src="/assets/icons/icon-play.png" alt="Start" className="dashboard__practice-icon" />
+                  <img src="/assets/icons/icon-play.webp" alt="Start" className="dashboard__practice-icon" />
                   <span>Practice</span>
                 </button>
               </div>

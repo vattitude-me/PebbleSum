@@ -9,7 +9,7 @@ export default function PrivacyPage({ onBack }: PrivacyPageProps) {
     <div className="legal-page">
       <div className="legal-page__header">
         <button onClick={onBack} className="legal-page__back">
-          <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="legal-page__back-icon" />
+          <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="legal-page__back-icon" />
         </button>
         <h2 className="legal-page__title">Privacy Policy</h2>
       </div>

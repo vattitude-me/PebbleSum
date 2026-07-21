@@ -87,7 +87,7 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
     <div className="settings-page">
       <div className="settings-page__header">
         <button onClick={onBack} className="settings-page__back">
-          <img src="/assets/icons/icon-arrow-left.png" alt="Back" className="settings-page__back-icon" />
+          <img src="/assets/icons/icon-arrow-left.webp" alt="Back" className="settings-page__back-icon" />
         </button>
         <h2 className="settings-page__title">Settings</h2>
       </div>
@@ -97,7 +97,7 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         <h3 className="settings-page__section-title">Display</h3>
         <div className="settings-page__row">
           <div className="settings-page__row-info">
-            <img src="/assets/icons/icon-edit.png" alt="Text" className="settings-page__row-icon" />
+            <img src="/assets/icons/icon-edit.webp" alt="Text" className="settings-page__row-icon" />
             <span>Text Size</span>
           </div>
           <div className="settings-page__segmented">
@@ -167,11 +167,11 @@ export default function SettingsPage({ settings, onSettingsChange, onBack, onNav
         <h3 className="settings-page__section-title">Legal</h3>
         <button onClick={() => onNavigate("terms")} className="settings-page__nav-row">
           <span>Terms of Service</span>
-          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+          <img src="/assets/icons/icon-arrow-right.webp" alt="Go" className="settings-page__nav-arrow" />
         </button>
         <button onClick={() => onNavigate("privacy")} className="settings-page__nav-row">
           <span>Privacy Policy</span>
-          <img src="/assets/icons/icon-arrow-right.png" alt="Go" className="settings-page__nav-arrow" />
+          <img src="/assets/icons/icon-arrow-right.webp" alt="Go" className="settings-page__nav-arrow" />
         </button>
       </section>
 
