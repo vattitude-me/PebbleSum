@@ -462,6 +462,22 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         </section>
       )}
 
+      {/* Support */}
+      <section className="settings-page__section">
+        <h3 className="settings-page__section-title">Support This Project</h3>
+        <p className="settings-page__section-desc">
+          Love PebbleSum? Support our work and help us continue building great educational tools.
+        </p>
+        <a
+          href="https://buymeacoffee.com/vattitude"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="settings-page__btn settings-page__btn--primary"
+        >
+          Buy Me A Coffee ☕
+        </a>
+      </section>
+
       {/* Footer */}
       <footer className="profile-page__footer">
         <a href="https://vattitude.ca" target="_blank" rel="noopener noreferrer" className="profile-page__footer-link">

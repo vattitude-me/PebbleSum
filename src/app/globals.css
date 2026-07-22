@@ -3902,6 +3902,9 @@ body {
   transition: all 0.2s;
   margin-top: 8px;
   font-family: inherit;
+  display: block;
+  text-align: center;
+  text-decoration: none;
 }
 
 .settings-page__btn--secondary {
