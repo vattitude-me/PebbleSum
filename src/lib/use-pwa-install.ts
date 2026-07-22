@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export function usePwaInstall() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -19,7 +24,7 @@ export function usePwaInstall() {
       setInstallPrompt(null);
     };
 
-    if (window.navigator.standalone === true) {
+    if ((window.navigator as any).standalone === true) {
       setIsInstalled(true);
     }
 
