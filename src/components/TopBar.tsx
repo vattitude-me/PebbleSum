@@ -33,7 +33,7 @@ export default function TopBar() {
     const handler = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
-      console.log("PWA install prompt ready");
+      console.log("PWA install prompt ready", e);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
