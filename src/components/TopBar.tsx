@@ -16,12 +16,10 @@ export default function TopBar() {
   const [isIOSModalOpen, setIsIOSModalOpen] = useState(false);
 
   useEffect(() => {
-    const checkStandalone = () => {
-      return window.matchMedia("(display-mode: standalone)").matches ||
-             (window.navigator as any).standalone === true;
-    };
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as any).standalone === true;
 
-    if (checkStandalone()) {
+    if (isStandalone) {
       setIsInstalled(true);
       return;
     }
@@ -30,20 +28,28 @@ export default function TopBar() {
       (navigator.userAgent.includes("Mac") && "ontouchend" in document);
     setIsIOS(isIOSDevice);
 
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setInstallPrompt(e as BeforeInstallPromptEvent);
-      console.log("PWA install prompt ready", e);
+    // Pick up prompt captured before React mounted
+    if ((window as any).__pwaInstallPrompt) {
+      setInstallPrompt((window as any).__pwaInstallPrompt);
+    }
+
+    const handleReady = () => {
+      if ((window as any).__pwaInstallPrompt) {
+        setInstallPrompt((window as any).__pwaInstallPrompt);
+      }
     };
 
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", () => {
+    const handleInstalled = () => {
       setIsInstalled(true);
-      console.log("App installed");
-    });
+      setInstallPrompt(null);
+    };
+
+    window.addEventListener("pwainstallready", handleReady);
+    window.addEventListener("appinstalled", handleInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("pwainstallready", handleReady);
+      window.removeEventListener("appinstalled", handleInstalled);
     };
   }, []);
 
@@ -60,6 +66,7 @@ export default function TopBar() {
       setIsInstalled(true);
     }
     setInstallPrompt(null);
+    (window as any).__pwaInstallPrompt = null;
   };
 
   const showInstallButton = !isInstalled && (installPrompt || isIOS);
