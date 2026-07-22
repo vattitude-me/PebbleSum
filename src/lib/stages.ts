@@ -20,7 +20,7 @@ export const STAGES: Stage[] = [
   {
     id: "6A",
     name: "Know Your Numbers",
-    description: "Learn and recognise numerals 0–9",
+    description: "Learn and recognise numerals 1–3",
     category: "Number Recognition",
     clearingType: "practice-then-pass",
     problemStyle: "multiple-choice",

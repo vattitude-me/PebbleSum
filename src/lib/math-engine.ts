@@ -55,11 +55,11 @@ function pickIcon(): string {
   return ICONS[rand(0, ICONS.length - 1)];
 }
 
-// 6A: Number recognition — show a numeral 1-5, pick the matching group of objects
+// 6A: Number recognition — show a numeral 1-3, pick the matching group of objects
 function generateIdentify6A(): MathProblem {
-  const answer = rand(1, 5);
+  const answer = rand(1, 3);
   const icon = pickIcon();
-  const choiceValues = generateChoices(answer, 1, 5, 4);
+  const choiceValues = generateChoices(answer, 1, 3, 4);
   const visualChoices = choiceValues.map((v) => ({
     value: v,
     display: Array(v).fill(icon).join(" "),
