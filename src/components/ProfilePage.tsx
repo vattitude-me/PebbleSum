@@ -14,6 +14,7 @@ interface ProfilePageProps {
   settings: AppSettings;
   onSettingsChange: (settings: AppSettings) => void;
   onNavigate: (page: string) => void;
+  onProfileChange?: (profile: UserProfile) => void;
   onDevJumpToStage?: (stageId: string) => void;
 }
 
@@ -25,7 +26,7 @@ function getAvatarSrc(avatarId: string) {
   return `/assets/icons/${AVATAR_ICON_MAP[avatarId] || `icon-${avatarId}.webp`}`;
 }
 
-export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate, onDevJumpToStage }: ProfilePageProps) {
+export default function ProfilePage({ profile, progress, gameState, settings, onSettingsChange, onNavigate, onProfileChange, onDevJumpToStage }: ProfilePageProps) {
   const { user, username, isGuest, signOut, deleteAccount, linkAccount } = useAuth();
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -82,6 +83,9 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
     saveProfile(updatedProfile);
     setEditingName(false);
     setNameError("");
+    if (onProfileChange) {
+      onProfileChange(updatedProfile);
+    }
   };
 
   const handleCancelEditName = () => {

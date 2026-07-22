@@ -281,6 +281,25 @@ export default function Home() {
     }
   }, [user]);
 
+  const handleProfileChange = useCallback((updated: UserProfile) => {
+    setProfile(updated);
+    if (user) {
+      const currentGameState = gameState || loadGameState();
+      const currentSettings = settings || loadSettings();
+      const currentBadges = badges.length > 0 ? badges : loadBadges();
+      const currentProgress = progress || loadProgress();
+      const data: FirestoreUserData = {
+        profile: updated,
+        gameState: currentGameState,
+        settings: currentSettings,
+        badges: currentBadges,
+        progress: currentProgress,
+        onboardingComplete: true,
+      };
+      saveUserData(user.uid, data);
+    }
+  }, [user, gameState, settings, badges, progress]);
+
   if (screen === "splash") {
     return <SplashScreen onComplete={handleSplashComplete} />;
   }
@@ -416,6 +435,7 @@ export default function Home() {
             gameState={gameState}
             settings={settings}
             onSettingsChange={handleSettingsChange}
+            onProfileChange={handleProfileChange}
             onNavigate={handleNavigate}
             onDevJumpToStage={(stageId) => {
               const updated = { ...progress, currentStageId: stageId };
