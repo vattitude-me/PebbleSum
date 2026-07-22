@@ -17,7 +17,7 @@ export default function TopBar() {
 
   useEffect(() => {
     const checkStandalone = () => {
-      return window.matchMedia("(display-mode: standalone)").matches || 
+      return window.matchMedia("(display-mode: standalone)").matches ||
              (window.navigator as any).standalone === true;
     };
 
@@ -26,17 +26,21 @@ export default function TopBar() {
       return;
     }
 
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
       (navigator.userAgent.includes("Mac") && "ontouchend" in document);
     setIsIOS(isIOSDevice);
 
     const handler = (e: Event) => {
       e.preventDefault();
       setInstallPrompt(e as BeforeInstallPromptEvent);
+      console.log("PWA install prompt ready");
     };
 
     window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", () => setIsInstalled(true));
+    window.addEventListener("appinstalled", () => {
+      setIsInstalled(true);
+      console.log("App installed");
+    });
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);

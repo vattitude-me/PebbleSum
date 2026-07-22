@@ -20,7 +20,7 @@ export const STAGES: Stage[] = [
   {
     id: "6A",
     name: "Know Your Numbers",
-    description: "Learn and recognise numerals 1–3",
+    description: "Identify and match numerals 0–3",
     category: "Number Recognition",
     clearingType: "practice-then-pass",
     problemStyle: "multiple-choice",
@@ -174,7 +174,7 @@ export function getNextStage(currentId: string): Stage | undefined {
 
 export function getStartingStageForAge(age: number): string {
   if (age <= 4) return "6A";
-  if (age <= 6) return "5A";
+  if (age <= 5) return "4A";
   if (age <= 8) return "3A";
   if (age <= 10) return "2A";
   return "A";
