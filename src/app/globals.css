@@ -2539,9 +2539,103 @@ body {
   height: 64px;
 }
 
+.profile-page__name-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
 .profile-page__name {
   font-size: 22px;
   font-weight: 800;
+}
+
+.profile-page__edit-name-btn {
+  width: 28px;
+  height: 28px;
+  background: var(--primary-light);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-page__edit-name-btn:hover {
+  background: var(--primary);
+  transform: scale(1.1);
+}
+
+.profile-page__edit-name-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-page__edit-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.profile-page__edit-name-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--primary-light);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.profile-page__edit-name-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.profile-page__edit-name-error {
+  font-size: 12px;
+  color: #e74c3c;
+  margin: 0;
+}
+
+.profile-page__edit-name-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.profile-page__edit-name-btn-secondary,
+.profile-page__edit-name-btn-primary {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-page__edit-name-btn-secondary {
+  background: #f0ecfa;
+  color: var(--primary);
+}
+
+.profile-page__edit-name-btn-secondary:hover {
+  background: #e8e1f5;
+}
+
+.profile-page__edit-name-btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.profile-page__edit-name-btn-primary:hover {
+  background: var(--primary-dark);
 }
 
 .profile-page__username {

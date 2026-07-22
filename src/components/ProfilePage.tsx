@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { UserProfile, GameState, AppSettings, saveSettings } from "@/lib/user-store";
+import { UserProfile, GameState, AppSettings, saveSettings, saveProfile } from "@/lib/user-store";
 import { UserProgress, loadProgress, saveProgress } from "@/lib/progress-store";
 import { STAGES } from "@/lib/stages";
 
@@ -42,6 +42,9 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
   const [devMode, setDevMode] = useState(false);
   const devTapCount = useRef(0);
   const devTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [editingName, setEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(profile.name);
+  const [nameError, setNameError] = useState("");
 
   const handleDevTap = () => {
     devTapCount.current += 1;
@@ -63,6 +66,28 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
     if (onDevJumpToStage) {
       onDevJumpToStage(stageId);
     }
+  };
+
+  const handleSaveProfileName = () => {
+    const trimmedName = editedName.trim();
+    if (!trimmedName) {
+      setNameError("Nickname cannot be empty.");
+      return;
+    }
+    if (trimmedName.length > 50) {
+      setNameError("Nickname must be 50 characters or less.");
+      return;
+    }
+    const updatedProfile: UserProfile = { ...profile, name: trimmedName };
+    saveProfile(updatedProfile);
+    setEditingName(false);
+    setNameError("");
+  };
+
+  const handleCancelEditName = () => {
+    setEditedName(profile.name);
+    setEditingName(false);
+    setNameError("");
   };
 
   const level = Math.floor(progress.xp / 500) + 1;
@@ -142,7 +167,45 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
         <div className="profile-page__avatar">
           <img src={getAvatarSrc(profile.avatarId)} alt="Avatar" className="profile-page__avatar-img" />
         </div>
-        <h2 className="profile-page__name">{profile.name}</h2>
+        {!editingName ? (
+          <div className="profile-page__name-section">
+            <h2 className="profile-page__name">{profile.name}</h2>
+            <button
+              onClick={() => setEditingName(true)}
+              className="profile-page__edit-name-btn"
+              title="Edit nickname"
+            >
+              <img src="/assets/icons/icon-edit.webp" alt="Edit" className="profile-page__edit-name-icon" />
+            </button>
+          </div>
+        ) : (
+          <div className="profile-page__edit-name-form">
+            <input
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              placeholder="Enter your nickname"
+              className="profile-page__edit-name-input"
+              maxLength={50}
+              autoFocus
+            />
+            {nameError && <p className="profile-page__edit-name-error">{nameError}</p>}
+            <div className="profile-page__edit-name-actions">
+              <button
+                onClick={handleCancelEditName}
+                className="profile-page__edit-name-btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveProfileName}
+                className="profile-page__edit-name-btn-primary"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        )}
         {user && <p className="profile-page__username">@{username}</p>}
         {isGuest && <p className="profile-page__username">Guest</p>}
         <p className="profile-page__title">Level {level} Learner</p>
