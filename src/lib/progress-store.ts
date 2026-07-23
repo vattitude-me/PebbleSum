@@ -59,9 +59,11 @@ export function getToday(): string {
 
 export function isStreakActive(lastDate: string | null): boolean {
   if (!lastDate) return false;
-  const last = new Date(lastDate);
-  const now = new Date();
-  const diffMs = now.getTime() - last.getTime();
-  const diffDays = diffMs / (1000 * 60 * 60 * 24);
-  return diffDays <= 1.5;
+  const lastStr = lastDate.split("T")[0];
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const todayStr = today.toISOString().split("T")[0];
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+  return lastStr === todayStr || lastStr === yesterdayStr;
 }
