@@ -540,7 +540,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
           <div className="practice__exit-modal">
             <p className="practice__exit-title">Take a breath! 🌤️</p>
             <p className="practice__exit-sub">
-              You&apos;ve answered {currentIndex}/{problems.length} questions. The timer is paused &mdash; take a quick break, then tap OK when you&apos;re ready to continue.
+              {`You've answered ${currentIndex}/${problems.length} questions.`} The timer is paused &mdash; take a quick break, then tap OK when you&apos;re ready to continue.
             </p>
             <div className="practice__exit-actions">
               <button onClick={resumeFromBreak} className="practice__exit-btn practice__exit-btn--stay">
