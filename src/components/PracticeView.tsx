@@ -49,13 +49,34 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
   const finishedDataRef = useRef<{ updatedProgress: UserProgress; updatedGameState: GameState } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Break every ~1/3 of the test, only for level-clear runs long enough to need one.
+  const breakEvery = isLevelClear ? Math.floor(questionCount / 3) : 0;
+  const shouldBreakAfter = useCallback(
+    (questionNumber: number) =>
+      breakEvery >= 2 &&
+      questionNumber % breakEvery === 0 &&
+      questionNumber < problems.length,
+    [breakEvery, problems.length]
+  );
+  const [isOnBreak, setIsOnBreak] = useState(false);
+  const pausedMsRef = useRef(0);
+  const breakStartRef = useRef<number | null>(null);
+
   useEffect(() => {
-    if (isFinished) return;
+    if (isFinished || isOnBreak) return;
     const interval = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+      setElapsed(Math.floor((Date.now() - startTime - pausedMsRef.current) / 1000));
     }, 1000);
     return () => clearInterval(interval);
-  }, [startTime, isFinished]);
+  }, [startTime, isFinished, isOnBreak]);
+
+  const resumeFromBreak = useCallback(() => {
+    if (breakStartRef.current !== null) {
+      pausedMsRef.current += Date.now() - breakStartRef.current;
+      breakStartRef.current = null;
+    }
+    setIsOnBreak(false);
+  }, []);
 
   // Focus the container on mount and after each question advance
   useEffect(() => {
@@ -65,7 +86,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
   // Keyboard event handling
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isFinished || feedback !== null) return;
+      if (isFinished || feedback !== null || isOnBreak) return;
 
       if (e.key >= "0" && e.key <= "9") {
         e.preventDefault();
@@ -81,7 +102,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFinished, feedback]);
+  }, [isFinished, feedback, isOnBreak]);
 
   const encouragements = [
     "Great job! 🌟",
@@ -116,13 +137,18 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
       setFeedback(null);
       setUserAnswer("");
       setShowEncouragement("");
-      if (currentIndex + 1 >= problems.length || (!isCorrect && hearts <= 1)) {
+      const nextQuestionNumber = currentIndex + 1;
+      if (nextQuestionNumber >= problems.length || (!isCorrect && hearts <= 1)) {
         finishSession(isCorrect ? correctCount + 1 : correctCount);
+      } else if (shouldBreakAfter(nextQuestionNumber)) {
+        breakStartRef.current = Date.now();
+        setIsOnBreak(true);
+        setCurrentIndex(nextQuestionNumber);
       } else {
-        setCurrentIndex((i) => i + 1);
+        setCurrentIndex(nextQuestionNumber);
       }
     }, isCorrect ? 500 : 800);
-  }, [userAnswer, currentIndex, problems, correctCount, hearts, comboCount, feedback]);
+  }, [userAnswer, currentIndex, problems, correctCount, hearts, comboCount, feedback, shouldBreakAfter]);
 
   const handleSubmitRef = useRef(handleSubmit);
   handleSubmitRef.current = handleSubmit;
@@ -162,17 +188,22 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
       setFeedback(null);
       setUserAnswer("");
       setShowEncouragement("");
-      if (currentIndex + 1 >= problems.length || (!isCorrect && hearts <= 1)) {
+      const nextQuestionNumber = currentIndex + 1;
+      if (nextQuestionNumber >= problems.length || (!isCorrect && hearts <= 1)) {
         finishSession(isCorrect ? correctCount + 1 : correctCount);
+      } else if (shouldBreakAfter(nextQuestionNumber)) {
+        breakStartRef.current = Date.now();
+        setIsOnBreak(true);
+        setCurrentIndex(nextQuestionNumber);
       } else {
-        setCurrentIndex((i) => i + 1);
+        setCurrentIndex(nextQuestionNumber);
       }
     }, isCorrect ? 500 : 800);
-  }, [currentIndex, problems, correctCount, hearts, comboCount, feedback]);
+  }, [currentIndex, problems, correctCount, hearts, comboCount, feedback, shouldBreakAfter]);
 
   const finishSession = (finalCorrect: number) => {
     setIsFinished(true);
-    const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
+    const timeSeconds = Math.floor((Date.now() - startTime - pausedMsRef.current) / 1000);
     const perfect = finalCorrect === problems.length;
     const withinTime = timeSeconds <= timeLimit;
     const xpGain = calculateXpGain(finalCorrect, problems.length, withinTime);
@@ -251,7 +282,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
 
 
   if (isFinished) {
-    const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
+    const timeSeconds = Math.floor((Date.now() - startTime - pausedMsRef.current) / 1000);
     const perfect = correctCount === problems.length;
     const withinTime = timeSeconds <= timeLimit;
     const levelCleared = isLevelClear && perfect && withinTime;
@@ -451,7 +482,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
             <button
               key={vc.value}
               onClick={() => handleChoiceSelect(vc.value)}
-              disabled={feedback !== null}
+              disabled={feedback !== null || isOnBreak}
               className={`practice__choice-btn practice__choice-btn--visual ${isYoung ? "practice__choice-btn--large" : ""}`}
             >
               {vc.display}
@@ -464,7 +495,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
             <button
               key={choice}
               onClick={() => handleChoiceSelect(choice)}
-              disabled={feedback !== null}
+              disabled={feedback !== null || isOnBreak}
               className={`practice__choice-btn ${isYoung ? "practice__choice-btn--large" : ""}`}
             >
               {choice}
@@ -478,7 +509,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
             <button
               key={key}
               onClick={() => handleNumpad(key)}
-              disabled={feedback !== null}
+              disabled={feedback !== null || isOnBreak}
               className={`practice__numpad-btn ${key === "go" ? "practice__numpad-btn--go" : ""} ${key === "del" ? "practice__numpad-btn--del" : ""} ${isYoung ? "practice__numpad-btn--large" : ""}`}
             >
               {key === "del" ? "⌫" : key === "go" ? "✓" : key}
@@ -498,6 +529,22 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
               </button>
               <button onClick={onBack} className="practice__exit-btn practice__exit-btn--leave">
                 Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isOnBreak && (
+        <div className="practice__exit-overlay">
+          <div className="practice__exit-modal">
+            <p className="practice__exit-title">Take a breath! 🌤️</p>
+            <p className="practice__exit-sub">
+              You&apos;ve answered {currentIndex}/{problems.length} questions. The timer is paused &mdash; take a quick break, then tap OK when you&apos;re ready to continue.
+            </p>
+            <div className="practice__exit-actions">
+              <button onClick={resumeFromBreak} className="practice__exit-btn practice__exit-btn--stay">
+                OK, Continue
               </button>
             </div>
           </div>
