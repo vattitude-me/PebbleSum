@@ -59,8 +59,17 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
     [breakEvery, problems.length]
   );
   const [isOnBreak, setIsOnBreak] = useState(false);
+  const [breakMessage, setBreakMessage] = useState("");
   const pausedMsRef = useRef(0);
   const breakStartRef = useRef<number | null>(null);
+
+  const breakMessages = [
+    "You're doing great! Take your time, then tap Continue.",
+    "Nice work so far. Stretch a little, then tap Continue.",
+    "Keep up the momentum! Take a moment to reset.",
+    "You've earned a moment to relax. No rush.",
+    "Awesome effort! Tap Continue whenever you're ready.",
+  ];
 
   useEffect(() => {
     if (isFinished || isOnBreak) return;
@@ -142,6 +151,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         finishSession(isCorrect ? correctCount + 1 : correctCount);
       } else if (shouldBreakAfter(nextQuestionNumber)) {
         breakStartRef.current = Date.now();
+        setBreakMessage(breakMessages[Math.floor(Math.random() * breakMessages.length)]);
         setIsOnBreak(true);
         setCurrentIndex(nextQuestionNumber);
       } else {
@@ -193,6 +203,7 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
         finishSession(isCorrect ? correctCount + 1 : correctCount);
       } else if (shouldBreakAfter(nextQuestionNumber)) {
         breakStartRef.current = Date.now();
+        setBreakMessage(breakMessages[Math.floor(Math.random() * breakMessages.length)]);
         setIsOnBreak(true);
         setCurrentIndex(nextQuestionNumber);
       } else {
@@ -540,11 +551,11 @@ export default function PracticeView({ stage, mode, progress, gameState, profile
           <div className="practice__exit-modal">
             <p className="practice__exit-title">Take a breath! 🌤️</p>
             <p className="practice__exit-sub">
-              {`You've answered ${currentIndex}/${problems.length} questions.`} The timer is paused &mdash; take a quick break, then tap OK when you&apos;re ready to continue.
+              {breakMessage}
             </p>
             <div className="practice__exit-actions">
               <button onClick={resumeFromBreak} className="practice__exit-btn practice__exit-btn--stay">
-                OK, Continue
+                Continue
               </button>
             </div>
           </div>
