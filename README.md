@@ -8,30 +8,38 @@ A gamified math learning Progressive Web App designed for children aged 2-15. Bu
 
 ### Math Curriculum
 
-12 stages across 6 themed worlds, following a strict linear progression:
+32 stages across 8 themed worlds, following a linear progression from counting (age 3) to two-step equations (age 15):
 
-| World | Stages | Topics |
-|-------|--------|--------|
-| Pebble Meadow | 6A, 5A | Number recognition, counting (1-10) |
-| Number Forest | 4A, 3A | Counting (5-30), number sequences |
-| Addition River | 2A, A, B | Addition (+1 to +20) |
-| Subtraction Cave | C, D | Subtraction (within 10 and 20) |
-| Multiply Castle | E | Multiplication (2, 5, 10 tables) |
-| Division Galaxy | F | Division (2, 5, 10 divisors) |
+| World | Ages | Topics |
+|-------|------|--------|
+| Pebble Meadow | 3–5 | Number recognition, counting to 10 |
+| Number Forest | 4–6 | Counting to 30, number patterns, comparing numbers |
+| Addition River | 5–8 | +1 to +3, sums to 10, make 10, bridging ten, two-digit addition with and without carrying |
+| Subtraction Cave | 6–9 | Within 10 and 20, two-digit subtraction with and without borrowing, missing numbers |
+| Multiply Castle | 7–10 | ×2/5/10, ×3/4, all tables to 12, two-digit × one-digit |
+| Division Galaxy | 8–11 | ÷2/5/10, division facts to 12, two- and three-digit ÷ one-digit |
+| Fraction Falls | 9–12 | Fraction of an amount, like-denominator fractions, decimals, percentages |
+| Algebra Summit | 11–15 | Integers, BEDMAS, powers & roots, one- and two-step equations |
 
-Problems are procedurally generated each session to teach methods rather than memorisation. Input modes include multiple-choice for foundational skills and numpad for computation stages.
+Problems are procedurally generated each session (`src/lib/math-engine.ts`):
+
+- Each generator takes a difficulty from 0 to 1, and a session ramps from a warm-up to a stretch.
+- Practice difficulty adapts to the learner's recent sessions. Level tests use a fixed range so everyone meets the same bar.
+- Every problem carries a method hint, which is shown after a wrong answer. In practice, missed questions are asked again at the end.
+
+See [`docs/design-review.md`](docs/design-review.md) for the design rationale.
 
 ### Progression System
 
-- **Practice-then-pass** (Stages 6A-3A): Requires repeated daily practice sessions before attempting a level clear
-- **Timed-pass** (Stages 2A-F): Must achieve 100% accuracy within a Standard Clear Time threshold
-- **Age-based starting points**: The app places learners at an appropriate stage based on their age
+- **Practice-then-pass** (foundation stages): Repeated practice sessions unlock the level test
+- **Timed-pass** (computation stages): Pass the level test within the time target, with at most one mistake (hearts show how many are left)
+- **Placement**: Onboarding asks what the learner can already do and starts them at one of six points in the curriculum
 
 ### Gamification
 
 - **XP & Levels**: Earn XP per correct answer with bonuses for perfect sessions and speed. Level up every 500 XP.
 - **Daily Streaks**: Consecutive days of practice tracked with a 1.5-day window
-- **Hearts**: 5 per attempt during Level Clear mode — wrong answers cost a heart
+- **Hearts**: Shown only in level tests — each mistake costs one, and the test ends when they run out
 - **Coins**: Earned through practice sessions
 - **Daily Goals**: Configurable targets (5, 10, 15, or 20 minutes)
 
@@ -74,6 +82,7 @@ Problems are procedurally generated each session to teach methods rather than me
 - **Styling**: Tailwind CSS 4
 - **Backend**: Firebase Authentication + Firestore
 - **Analytics**: Vercel Analytics
+- **Tests**: Vitest
 - **Font**: Nunito (400-900 weights)
 
 ## Getting Started
@@ -81,6 +90,7 @@ Problems are procedurally generated each session to teach methods rather than me
 ```bash
 npm install
 npm run dev
+npm test      # curriculum & generator tests (vitest)
 ```
 
 Create a `.env.local` file based on `.env.local.example` with your Firebase credentials.
