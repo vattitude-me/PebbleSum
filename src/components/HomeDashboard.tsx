@@ -3,7 +3,9 @@
 import { useEffect, useState, useRef } from "react";
 import { UserProgress, getToday } from "@/lib/progress-store";
 import { UserProfile, GameState } from "@/lib/user-store";
-import { STAGES } from "@/lib/stages";
+import { STAGES, getStageById, getStageIndex } from "@/lib/stages";
+import { getWorldForStage } from "@/lib/worlds";
+import { getTone } from "@/lib/tone";
 import { PracticeMode } from "@/components/PracticeView";
 import IOSInstallModal from "@/components/IOSInstallModal";
 
@@ -25,7 +27,10 @@ export default function HomeDashboard({
   gameState,
   onStartPractice,
 }: HomeDashboardProps) {
-  const currentStage = STAGES.find((s) => s.id === progress.currentStageId);
+  const currentStage = getStageById(progress.currentStageId) ?? STAGES[0];
+  const stageIndex = getStageIndex(currentStage.id);
+  const world = getWorldForStage(currentStage.id);
+  const tone = getTone(profile.ageGroup);
   const today = getToday();
   const isSameDay = gameState.practiceDate === today;
 
@@ -33,10 +38,15 @@ export default function HomeDashboard({
   const goalMinutes = profile.dailyGoalMinutes;
   const goalProgress = Math.min(todayPracticeMinutes / goalMinutes, 1);
   const todayCompleted = gameState.dailyGoalCompleted && isSameDay;
-  const practiceCount = progress.stagePracticeCounts?.[progress.currentStageId] || 0;
-  const canAttemptLevelClear = practiceCount >= (currentStage?.practiceSessionsRequired || 3);
+  const practiceCount = progress.stagePracticeCounts?.[currentStage.id] || 0;
+  const practicesNeeded = currentStage.practiceSessionsRequired;
+  const isAutoClear = currentStage.id === "6A";
+  const canAttemptLevelClear = !isAutoClear && practiceCount >= practicesNeeded;
+  const practicesLeft = Math.max(0, practicesNeeded - practiceCount);
   const level = Math.floor(progress.xp / 500) + 1;
   const xpInLevel = progress.xp % 500;
+  const upNext = STAGES.slice(stageIndex + 1, stageIndex + 4);
+  const isFinalStage = stageIndex === STAGES.length - 1;
 
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
@@ -113,22 +123,22 @@ export default function HomeDashboard({
       <div className="dashboard__overlay" />
 
       <div className="dashboard__content">
-        {/* Header: Greeting + Stats Strip */}
         <header className="dashboard__header">
           <div className="dashboard__greeting">
             <p className="dashboard__greeting-hello">{getGreeting()},</p>
             <h2 className="dashboard__greeting-name">{profile.name}!</h2>
           </div>
           <div className="dashboard__stats-strip">
-            <div className="dashboard__stat-chip">
-              <img src="/assets/icons/icon-fire.webp" alt="Streak" className="dashboard__stat-icon" />
+            <div className="dashboard__stat-chip" title="Day streak">
+              <img src="/assets/icons/icon-fire.webp" alt="" className="dashboard__stat-icon" />
               <span className="dashboard__stat-value">{progress.streak}</span>
+              <span className="dashboard__stat-unit">{progress.streak === 1 ? "day" : "days"}</span>
             </div>
-            <div className="dashboard__stat-chip">
-              <img src="/assets/icons/icon-coin-star.webp" alt="Coins" className="dashboard__stat-icon" />
+            <div className="dashboard__stat-chip" title="Coins">
+              <img src="/assets/icons/icon-coin-star.webp" alt="" className="dashboard__stat-icon" />
               <span className="dashboard__stat-value">{gameState.coins}</span>
             </div>
-            <div className="dashboard__stat-chip dashboard__stat-chip--xp">
+            <div className="dashboard__stat-chip dashboard__stat-chip--xp" title={`${xpInLevel}/500 XP to level ${level + 1}`}>
               <span className="dashboard__xp-label">Lv {level}</span>
               <div className="dashboard__xp-bar">
                 <div className="dashboard__xp-fill" style={{ width: `${(xpInLevel / 500) * 100}%` }} />
@@ -137,81 +147,78 @@ export default function HomeDashboard({
           </div>
         </header>
 
-        {/* Primary Action: Practice CTA + Level Strip */}
-        <section className="dashboard__primary-action">
-          {todayCompleted ? (
-            <div className="dashboard__goal-complete">
-              <div className="dashboard__goal-complete-icon">
-                <img src="/assets/icons/icon-checkmark.webp" alt="Done" className="dashboard__complete-img" />
-              </div>
-              <div className="dashboard__goal-complete-text">
-                <h3 className="dashboard__goal-complete-title">Today&apos;s Goal Complete!</h3>
-                <p className="dashboard__goal-complete-sub">Amazing work! Come back tomorrow.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="dashboard__action-row">
-              <div className="dashboard__action-left">
-                <div className="dashboard__goal-info">
-                  <span className="dashboard__goal-label">Daily Goal</span>
-                  <div className="dashboard__goal-progress-row">
-                    <div className="dashboard__goal-bar">
-                      <div className="dashboard__goal-fill" style={{ width: `${goalProgress * 100}%` }} />
-                    </div>
-                    <span className="dashboard__goal-text">{todayPracticeMinutes}/{goalMinutes} min</span>
-                  </div>
-                </div>
-                <button onClick={() => onStartPractice("practice")} className="dashboard__practice-btn">
-                  <img src="/assets/icons/icon-play.webp" alt="Start" className="dashboard__practice-icon" />
-                  <span>Practice</span>
-                </button>
-              </div>
-              {progress.currentStageId === "6A" ? (
-                <div className="dashboard__action-level">
-                  <div className="dashboard__action-level-badge">📖</div>
-                  <span className="dashboard__action-level-title">Know Your Numbers</span>
-                  <span className="dashboard__action-level-stage">Auto-clears after 10 practices</span>
-                  <div className="dashboard__action-level-progress">
-                    <div className="dashboard__action-level-bar">
-                      <div
-                        className="dashboard__action-level-fill"
-                        style={{ width: `${(practiceCount / 10) * 100}%` }}
-                      />
-                    </div>
-                    <span className="dashboard__action-level-count">
-                      {practiceCount}/10 practices
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className={`dashboard__action-level ${canAttemptLevelClear ? "dashboard__action-level--unlocked" : ""}`}>
-                  <div className="dashboard__action-level-badge">
-                    {canAttemptLevelClear ? "🏆" : "🔒"}
-                  </div>
-                  <span className="dashboard__action-level-title">{currentStage?.name || "Test"}</span>
-                  <span className="dashboard__action-level-stage">To clear the level</span>
-                  {canAttemptLevelClear ? (
-                    <button onClick={() => onStartPractice("levelClear")} className="dashboard__action-level-btn">
-                      Start
-                    </button>
-                  ) : (
-                    <div className="dashboard__action-level-progress">
-                      <div className="dashboard__action-level-bar">
-                        <div
-                          className="dashboard__action-level-fill"
-                          style={{ width: `${(practiceCount / (currentStage?.practiceSessionsRequired || 3)) * 100}%` }}
-                        />
-                      </div>
-                      <span className="dashboard__action-level-count">
-                        {practiceCount}/{currentStage?.practiceSessionsRequired || 3} practices
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+        <section className="mission" style={{ "--world-color": world?.color ?? "var(--primary)" } as React.CSSProperties}>
+          <div className="mission__top">
+            <span className="mission__world">{world?.icon} {world?.name}</span>
+            <span className="mission__step">Stage {stageIndex + 1} of {STAGES.length}</span>
+          </div>
+          <h3 className="mission__title">{currentStage.name}</h3>
+          <p className="mission__desc">{currentStage.description}</p>
+
+          {/* Practice → test path: each dot is one practice session */}
+          <div className="mission__path" aria-label={isAutoClear ? `${practiceCount} of 10 practices` : `${Math.min(practiceCount, practicesNeeded)} of ${practicesNeeded} practices before the test`}>
+            {Array.from({ length: isAutoClear ? 10 : practicesNeeded }).map((_, i) => (
+              <span key={i} className={`mission__dot ${i < practiceCount ? "mission__dot--done" : ""}`} />
+            ))}
+            {!isAutoClear && (
+              <>
+                <span className="mission__path-line" />
+                <span className={`mission__trophy ${canAttemptLevelClear ? "mission__trophy--open" : ""}`}>{canAttemptLevelClear ? "🏆" : "🔒"}</span>
+              </>
+            )}
+          </div>
+          <p className="mission__path-caption">
+            {isAutoClear
+              ? `${Math.max(0, 10 - practiceCount)} more to finish this stage`
+              : canAttemptLevelClear
+                ? "Test unlocked — clear it to move on!"
+                : `${practicesLeft} more ${practicesLeft === 1 ? "practice" : "practices"} to unlock the test`}
+          </p>
+
+          <div className="mission__actions">
+            <button onClick={() => onStartPractice("practice")} className={`mission__play ${canAttemptLevelClear ? "mission__play--secondary" : ""}`}>
+              <img src="/assets/icons/icon-play.webp" alt="" className="mission__play-icon" />
+              <span>{tone.practiceCta}</span>
+            </button>
+            {canAttemptLevelClear && (
+              <button onClick={() => onStartPractice("levelClear")} className="mission__test">
+                <span>🏆 Take the test</span>
+                <span className="mission__test-meta">{currentStage.levelClearQuestions} questions · {Math.round(currentStage.levelClearSeconds / 6) / 10} min</span>
+              </button>
+            )}
+          </div>
         </section>
+
+        <section className={`goal-card ${todayCompleted ? "goal-card--done" : ""}`}>
+          <div className="goal-card__ring" style={{ "--goal": `${goalProgress * 360}deg` } as React.CSSProperties}>
+            <span>{todayCompleted ? "✓" : `${Math.round(goalProgress * 100)}%`}</span>
+          </div>
+          <div className="goal-card__text">
+            <p className="goal-card__title">{todayCompleted ? "Daily goal done!" : "Daily goal"}</p>
+            <p className="goal-card__sub">{todayCompleted ? "Extra practice still earns XP." : `${todayPracticeMinutes} of ${goalMinutes} minutes today`}</p>
+          </div>
+        </section>
+
+        {upNext.length > 0 ? (
+          <section className="up-next">
+            <p className="up-next__label">Coming up</p>
+            <div className="up-next__row">
+              {upNext.map((stage) => {
+                const w = getWorldForStage(stage.id);
+                return (
+                  <div key={stage.id} className="up-next__item">
+                    <span className="up-next__icon">{w?.icon}</span>
+                    <span className="up-next__name">{stage.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : isFinalStage && (
+          <section className="up-next">
+            <p className="up-next__label">Final stage — you&apos;ve reached the summit 🏔️</p>
+          </section>
+        )}
 
         {showInstallBanner && (
           <section className="dashboard__install-banner">

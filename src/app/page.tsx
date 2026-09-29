@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { STAGES, getStartingStageForAge, getStartingStageForSkill } from "@/lib/stages";
+import { STAGES, getStartingStageForSkill } from "@/lib/stages";
 import { UserProgress, loadProgress, saveProgress, isStreakActive, getToday } from "@/lib/progress-store";
 import {
   UserProfile,
@@ -184,6 +184,14 @@ export default function Home() {
     setScreen("onboarding");
   }, [skipLogin]);
 
+  // A guest who reloads lands on Welcome again; let them resume instead of
+  // re-onboarding (which used to reset their current stage).
+  const savedProfile = screen === "welcome" && isOnboardingComplete() ? loadProfile() : null;
+  const handleContinueAsGuest = useCallback(() => {
+    skipLogin();
+    setScreen("home");
+  }, [skipLogin]);
+
   const handleGoToSignIn = useCallback(() => {
     setScreen("auth");
   }, []);
@@ -191,7 +199,7 @@ export default function Home() {
 
   const handleOnboardingComplete = useCallback(async (newProfile: UserProfile) => {
     setProfile(newProfile);
-    const startingStage = getStartingStageForSkill(newProfile.ageGroup);
+    const startingStage = newProfile.startStageId ?? getStartingStageForSkill(newProfile.ageGroup);
     const baseProgress = progress || loadProgress();
     const updatedProgress = { ...baseProgress, currentStageId: startingStage };
     saveProgress(updatedProgress);
@@ -307,7 +315,12 @@ export default function Home() {
   if (screen === "welcome") {
     return (
       <div className="app-shell app-shell--middle">
-        <WelcomeScreen onGetStarted={handleGetStarted} onSignIn={handleGoToSignIn} />
+        <WelcomeScreen
+          onGetStarted={handleGetStarted}
+          onSignIn={handleGoToSignIn}
+          returningName={savedProfile?.name}
+          onContinue={handleContinueAsGuest}
+        />
       </div>
     );
   }

@@ -4480,3 +4480,756 @@ body {
   text-transform: capitalize;
   opacity: 0.7;
 }
+/* ==========================================================================
+   REDESIGN — mission card, goal ring, journey trail, practice hints.
+   Touch targets are ≥ 48px (≥ 56px for young learners) throughout.
+   ========================================================================== */
+
+/* ---------- Home: mission card ---------- */
+.dashboard__stat-unit {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a84a8;
+}
+
+.mission {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 18px 16px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow-lg);
+  border-top: 6px solid var(--world-color);
+}
+
+.mission__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mission__world {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--world-color);
+  background: color-mix(in srgb, var(--world-color) 12%, transparent);
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+
+.mission__step {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a84a8;
+}
+
+.mission__title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--foreground);
+  line-height: 1.15;
+  margin-top: 4px;
+}
+
+.mission__desc {
+  font-size: 14px;
+  color: #6b6590;
+}
+
+.mission__path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.mission__dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ece8f7;
+  border: 2px solid #ddd6f3;
+  transition: all 0.3s;
+}
+
+.mission__dot--done {
+  background: var(--world-color);
+  border-color: var(--world-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--world-color) 20%, transparent);
+}
+
+.mission__path-line {
+  flex: 1;
+  height: 3px;
+  min-width: 16px;
+  background: repeating-linear-gradient(90deg, #ddd6f3 0 6px, transparent 6px 10px);
+}
+
+.mission__trophy {
+  font-size: 22px;
+  filter: grayscale(0.6);
+  opacity: 0.7;
+}
+
+.mission__trophy--open {
+  filter: none;
+  opacity: 1;
+  animation: pulse-glow 2s ease-in-out infinite;
+  border-radius: 50%;
+}
+
+.mission__path-caption {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b6590;
+}
+
+.mission__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.mission__play,
+.mission__test {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 58px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.mission__play {
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  box-shadow: 0 5px 0 var(--primary-dark), 0 8px 20px rgba(108, 92, 231, 0.3);
+}
+
+.mission__play:active,
+.mission__test:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--primary-dark);
+}
+
+.mission__play--secondary {
+  min-height: 50px;
+  font-size: 17px;
+  color: var(--primary-dark);
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--primary) 25%, white);
+}
+
+.mission__play-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.mission__test {
+  flex-direction: column;
+  gap: 2px;
+  color: #5a3a00;
+  background: linear-gradient(135deg, #ffd166, #fdcb6e);
+  box-shadow: 0 5px 0 #e0a800, 0 8px 20px rgba(253, 203, 110, 0.45);
+}
+
+.mission__test-meta {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+/* ---------- Home: goal ring & up next ---------- */
+.goal-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-md);
+  box-shadow: var(--card-shadow);
+}
+
+.goal-card__ring {
+  --goal: 0deg;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--success) var(--goal), #ece8f7 0);
+  position: relative;
+}
+
+.goal-card__ring::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--card-bg);
+}
+
+.goal-card__ring span {
+  position: relative;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--foreground);
+}
+
+.goal-card--done .goal-card__ring span {
+  font-size: 18px;
+  color: var(--success);
+}
+
+.goal-card__title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.goal-card__sub {
+  font-size: 12px;
+  color: #6b6590;
+}
+
+.up-next {
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--card-bg) 85%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: var(--radius-md);
+}
+
+.up-next__label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6b6590;
+}
+
+.up-next__row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.up-next__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.up-next__icon {
+  font-size: 20px;
+}
+
+.up-next__name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+/* ---------- Journey: winding trail ---------- */
+.journey__world {
+  background: color-mix(in srgb, var(--card-bg) 94%, transparent);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow-lg);
+  overflow: hidden;
+}
+
+.journey__world--active {
+  box-shadow: 0 0 0 3px var(--world-color), var(--card-shadow-xl);
+}
+
+.journey__world-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.journey__world-count {
+  font-size: 14px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 10px;
+  border-radius: 99px;
+}
+
+.journey__world-ages {
+  font-size: 10px;
+  font-weight: 800;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.journey__world-progress-fill {
+  background: var(--world-color);
+}
+
+.journey__trail {
+  list-style: none;
+  margin: 0;
+  padding: 18px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.journey__step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 78%;
+}
+
+.journey__step--left { align-self: flex-start; }
+.journey__step--center { align-self: center; }
+.journey__step--right { align-self: flex-end; }
+
+.journey__node {
+  position: relative;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.journey__node:disabled {
+  cursor: default;
+}
+
+.journey__node-disc {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 56px;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+  transition: transform 0.12s;
+}
+
+.journey__node:active:not(:disabled) .journey__node-disc {
+  transform: translateY(4px);
+}
+
+.journey__node--mastered .journey__node-disc {
+  background: var(--world-color);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--world-color) 70%, black);
+}
+
+.journey__node--current .journey__node-disc {
+  background: linear-gradient(135deg, #ffd166, #fdcb6e);
+  color: #7a4f00;
+  box-shadow: 0 5px 0 #e0a800, 0 0 0 6px color-mix(in srgb, #fdcb6e 35%, transparent);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.journey__node--locked .journey__node-disc {
+  background: #e7e3f2;
+  box-shadow: 0 5px 0 #cfc8e4;
+  font-size: 18px;
+}
+
+.journey__node-now {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: white;
+  background: var(--primary);
+  padding: 2px 6px;
+  border-radius: 99px;
+}
+
+.journey__node-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.journey__step .journey__skip-btn {
+  flex-basis: 100%;
+}
+
+.journey__step:has(.journey__skip-btn) {
+  flex-wrap: wrap;
+}
+
+/* ---------- Practice ---------- */
+.practice__title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.practice__stage-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.practice__mode-tag {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+}
+
+.practice--test .practice__mode-tag {
+  color: #c78a00;
+}
+
+.practice__segments {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.practice__segment {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: #ece8f7;
+  transition: background 0.3s;
+}
+
+.practice__segment--current {
+  background: color-mix(in srgb, var(--primary) 45%, #ece8f7);
+}
+
+.practice__segment--done {
+  background: var(--success);
+}
+
+.practice__segment--missed {
+  background: #f0a35e;
+}
+
+.practice__status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 26px;
+  margin-bottom: 4px;
+}
+
+.practice__status-row .practice__combo,
+.practice__status-row .practice__encouragement {
+  position: static;
+  margin: 0;
+  padding: 0;
+}
+
+.practice__retry-tag {
+  position: absolute;
+  top: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #c7641e;
+  background: #fff1e4;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.practice__problem-text {
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.practice__expr--md.practice__problem-text,
+.practice__expr--md .practice__problem-text {
+  font-size: 30px;
+}
+
+.practice__expr--sm.practice__problem-text,
+.practice__expr--sm .practice__problem-text {
+  font-size: 24px;
+}
+
+.practice__algebra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.practice__problem-text--answer {
+  font-size: 30px;
+}
+
+.practice__answer-slot--reveal {
+  color: var(--danger);
+  border-bottom-color: var(--danger);
+}
+
+.practice__visual-question--big {
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.practice__choices--pair,
+.practice__choices--trio {
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+}
+
+.practice__hint-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  margin: 4px 0 8px;
+  background: #fff8ec;
+  border: 2px solid #ffd9a0;
+  border-radius: var(--radius-lg);
+}
+
+.practice__hint-answer {
+  font-size: 18px;
+  font-weight: 700;
+  color: #7a4200;
+}
+
+.practice__hint-answer strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.practice__hint-text {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #5c4a2e;
+}
+
+.practice__hint-note {
+  font-size: 12px;
+  font-weight: 700;
+  color: #a0784a;
+}
+
+.practice__hint-btn,
+.practice__check-btn {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 900;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+}
+
+.practice__hint-btn {
+  background: linear-gradient(135deg, #f0a35e, #e17055);
+  box-shadow: 0 4px 0 #b9543c;
+}
+
+.practice__check-btn {
+  background: linear-gradient(135deg, var(--success), #2ecc71);
+  box-shadow: 0 4px 0 #008a6e;
+}
+
+.practice__check-btn--large {
+  min-height: 64px;
+  font-size: 22px;
+}
+
+.practice__hint-btn:active,
+.practice__check-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #008a6e;
+}
+
+.practice__check-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.practice__keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.practice__keypad .practice__numpad {
+  max-width: none;
+}
+
+.practice__numpad-btn--extra {
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  color: var(--primary-dark);
+  font-size: 26px;
+}
+
+/* ---------- Results ---------- */
+.practice-complete__stars {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.practice-complete__star {
+  font-size: 40px;
+  color: #e2ddf0;
+  animation: pop-in 0.4s ease both;
+}
+
+.practice-complete__star--on {
+  color: #fdcb6e;
+  text-shadow: 0 2px 0 #e0a800;
+}
+
+.practice-complete__review {
+  width: 100%;
+  max-width: 340px;
+  padding: 12px 16px;
+  background: #fff8ec;
+  border-radius: var(--radius-md);
+}
+
+.practice-complete__review-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a0784a;
+  margin-bottom: 6px;
+}
+
+.practice-complete__review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.practice-complete__review-item {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Onboarding placement ---------- */
+.onboarding__skill-grid--placement {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-width: 340px;
+}
+
+.onboarding__skill-grid--placement .onboarding__skill-btn {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  min-height: 108px;
+}
+
+/* ---------- Dark (Space) theme adjustments ---------- */
+.theme-space .mission__desc,
+.theme-space .mission__path-caption,
+.theme-space .goal-card__sub,
+.theme-space .up-next__label,
+.theme-space .dashboard__stat-unit {
+  color: #b8b4d8;
+}
+
+.theme-space .mission__dot,
+.theme-space .practice__segment {
+  background: #3d3d5c;
+  border-color: #4d4d6c;
+}
+
+.theme-space .up-next__item {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.theme-space .practice__hint-card,
+.theme-space .practice-complete__review {
+  background: #3a3226;
+  border-color: #6b5530;
+}
+
+.theme-space .practice__hint-answer,
+.theme-space .practice__hint-text {
+  color: #f5e3c4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission__trophy--open,
+  .journey__node--current .journey__node-disc,
+  .practice-complete__star {
+    animation: none;
+  }
+}
+
+.practice-complete {
+  overflow-y: auto;
+}
+
+.practice-complete__mascot {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.practice-complete__review {
+  margin: 4px 0 16px;
+}
+
+.practice__hint-btn:focus-visible,
+.practice__check-btn:focus-visible,
+.mission__play:focus-visible,
+.mission__test:focus-visible,
+.journey__node:focus-visible .journey__node-disc {
+  outline: 3px solid color-mix(in srgb, var(--primary) 60%, white);
+  outline-offset: 3px;
+}
+
+.practice__hint-btn:focus:not(:focus-visible) {
+  outline: none;
+}

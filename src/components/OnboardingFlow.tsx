@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { UserProfile, AgeGroup, saveProfile, setOnboardingComplete } from "@/lib/user-store";
+import { UserProfile, saveProfile, setOnboardingComplete } from "@/lib/user-store";
+import { PLACEMENTS, getStageById } from "@/lib/stages";
 
 interface OnboardingFlowProps {
   onComplete: (profile: UserProfile) => void;
@@ -28,16 +29,10 @@ const DAILY_GOALS = [
   { minutes: 20, label: "20 min", description: "Super scholar" },
 ];
 
-const SKILL_LEVELS: { id: AgeGroup; icon: string; title: string; description: string }[] = [
-  { id: "young", icon: "🔢", title: "I'm learning numbers", description: "Counting and recognizing numbers" },
-  { id: "middle", icon: "➕", title: "I can add and subtract", description: "Simple addition and subtraction" },
-  { id: "older", icon: "✖️", title: "I know multiplication", description: "Multiplication and beyond" },
-];
-
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
-  const [skillLevel, setSkillLevel] = useState<AgeGroup>("middle");
+  const [placementId, setPlacementId] = useState("adding");
   const [avatarId, setAvatarId] = useState("pebble-wave");
   const [themeId, setThemeId] = useState("default");
   const [dailyGoal, setDailyGoal] = useState(10);
@@ -45,11 +40,15 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const totalSteps = 4;
 
   const handleFinish = () => {
-    const ageFromSkill = skillLevel === "young" ? 4 : skillLevel === "middle" ? 8 : 12;
+    const placement = PLACEMENTS.find((p) => p.id === placementId) ?? PLACEMENTS[1];
+    const startStage = getStageById(placement.startStageId);
+    // Approximate age from the start of the stage's typical age range, e.g. "7–8" → 7.
+    const approxAge = parseInt(startStage?.ages ?? "8", 10) || 8;
     const profile: UserProfile = {
       name: name || "Learner",
-      age: ageFromSkill,
-      ageGroup: skillLevel,
+      age: approxAge,
+      ageGroup: placement.ageGroup,
+      startStageId: placement.startStageId,
       avatarId,
       themeId,
       dailyGoalMinutes: dailyGoal,
@@ -94,19 +93,19 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         {step === 1 && (
           <div className="onboarding__step">
-            <img src="/assets/icons/icon-pebble-thinking.webp" alt="Thinking" className="onboarding__mascot" />
-            <h2 className="onboarding__title">What do you know?</h2>
-            <p className="onboarding__subtitle">Pick what fits you best!</p>
-            <div className="onboarding__skill-grid">
-              {SKILL_LEVELS.map((level) => (
+            <h2 className="onboarding__title">What can you already do?</h2>
+            <p className="onboarding__subtitle">We&apos;ll start you in the right place. You can always go back.</p>
+            <div className="onboarding__skill-grid onboarding__skill-grid--placement">
+              {PLACEMENTS.map((placement) => (
                 <button
-                  key={level.id}
-                  onClick={() => setSkillLevel(level.id)}
-                  className={`onboarding__skill-btn ${skillLevel === level.id ? "onboarding__skill-btn--selected" : ""}`}
+                  key={placement.id}
+                  onClick={() => setPlacementId(placement.id)}
+                  className={`onboarding__skill-btn ${placementId === placement.id ? "onboarding__skill-btn--selected" : ""}`}
+                  aria-pressed={placementId === placement.id}
                 >
-                  <span className="onboarding__skill-icon">{level.icon}</span>
-                  <span className="onboarding__skill-title">{level.title}</span>
-                  <span className="onboarding__skill-desc">{level.description}</span>
+                  <span className="onboarding__skill-icon">{placement.icon}</span>
+                  <span className="onboarding__skill-title">{placement.title}</span>
+                  <span className="onboarding__skill-desc">{placement.description}</span>
                 </button>
               ))}
             </div>

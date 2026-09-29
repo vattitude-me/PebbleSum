@@ -2,14 +2,8 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Stage, getNextStage } from "@/lib/stages";
-import {
-  UserProgress,
-  saveProgress,
-  calculateXpGain,
-  getToday,
-  isStreakActive,
-  SessionRecord,
-} from "@/lib/progress-store";
+import { UserProgress, saveProgress, calculateXpGain } from "@/lib/progress-store";
+import { applySessionResult } from "@/lib/session";
 import { AgeGroup, GameState, UserProfile, saveGameState } from "@/lib/user-store";
 
 interface NumberLearningViewProps {
@@ -122,64 +116,20 @@ export default function NumberLearningView({
 
   const finishSession = (finalCorrect: number) => {
     setIsFinished(true);
-    const timeSeconds = Math.floor((Date.now() - startTime) / 1000);
-    const total = quiz.length;
-    const perfect = finalCorrect === total;
-    const withinTime = true;
-    const xpGain = calculateXpGain(finalCorrect, total, withinTime);
-    const coinsGained = Math.floor(xpGain / 5) + (perfect ? 10 : 0);
-
-    const today = getToday();
-    const streakActive = isStreakActive(progress.lastPracticeDate);
-    const newStreak = streakActive ? progress.streak + (progress.lastPracticeDate === today ? 0 : 1) : 1;
-
     const newPracticeCount = currentPracticeCount + 1;
     const levelCleared = newPracticeCount >= LEVEL_CLEAR_THRESHOLD;
-    const nextStage = getNextStage(stage.id);
-    const shouldAdvance = levelCleared && nextStage;
-
-    const session: SessionRecord = {
-      date: today,
-      stageId: stage.id,
+    const { updatedProgress, updatedGameState } = applySessionResult({
+      stage,
+      mode: "practice",
+      progress,
+      gameState,
+      dailyGoalMinutes: profile.dailyGoalMinutes,
       correct: finalCorrect,
-      total,
-      timeSeconds,
-      perfect,
-      withinSCT: withinTime,
-    };
-
-    const updatedProgress: UserProgress = {
-      ...progress,
-      xp: progress.xp + xpGain,
-      streak: newStreak,
-      lastPracticeDate: today,
-      consecutivePerfectDays: perfect ? progress.consecutivePerfectDays + 1 : 0,
-      currentStageId: shouldAdvance ? nextStage!.id : progress.currentStageId,
-      completedSessions: [...progress.completedSessions, session],
-      stagePracticeCounts: {
-        ...progress.stagePracticeCounts,
-        [stage.id]: newPracticeCount,
-      },
-    };
-
-    const isSameDay = gameState.practiceDate === today;
-    const newPracticeSeconds = (isSameDay ? gameState.todayPracticeSeconds : 0) + timeSeconds;
-    const goalSeconds = profile.dailyGoalMinutes * 60;
-    const goalReached = newPracticeSeconds >= goalSeconds;
-
-    const updatedGameState: GameState = {
-      ...gameState,
-      coins: gameState.coins + coinsGained,
-      hearts: gameState.hearts,
-      dailyGoalCompleted: goalReached,
-      todayPracticeSeconds: newPracticeSeconds,
-      practiceDate: today,
-      todaySessionCount: (isSameDay ? gameState.todaySessionCount : 0) + 1,
-      longestStreak: Math.max(gameState.longestStreak, newStreak),
-      totalSessionsCompleted: gameState.totalSessionsCompleted + 1,
-      totalCorrectAnswers: gameState.totalCorrectAnswers + finalCorrect,
-      totalQuestionsAnswered: gameState.totalQuestionsAnswered + total,
-    };
+      total: quiz.length,
+      mistakes: quiz.length - finalCorrect,
+      timeSeconds: Math.floor((Date.now() - startTime) / 1000),
+      forceAdvance: levelCleared,
+    });
 
     saveProgress(updatedProgress);
     saveGameState(updatedGameState);

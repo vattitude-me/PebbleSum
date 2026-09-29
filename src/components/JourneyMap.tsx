@@ -28,91 +28,92 @@ export default function JourneyMap({ progress, onSelectStage, onSkipStage }: Jou
     return "locked";
   };
 
+  const totalMastered = currentStageIndex;
+
   return (
     <div className="journey">
       <h2 className="journey__title">Your Learning Journey</h2>
-      <p className="journey__subtitle">Master each world to progress through math!</p>
+      <p className="journey__subtitle">
+        {totalMastered} of {STAGES.length} stages mastered · tap any unlocked stage to practise
+      </p>
 
       <div className="journey__worlds">
         {WORLDS.map((world, worldIdx) => {
           const worldProgress = getWorldProgress(world.stageIds, progress.currentStageId, completedStageIds);
+          const masteredInWorld = world.stageIds.filter((id) => completedStageIds.includes(id)).length;
           const isActiveWorld = world.stageIds.includes(progress.currentStageId);
           const isPastWorld = world.stageIds.every((id) => completedStageIds.includes(id));
-          const isFutureWorld = !isActiveWorld && !isPastWorld && worldIdx > 0;
+          const isFutureWorld = !isActiveWorld && !isPastWorld;
 
           return (
-            <div key={world.id} className={`journey__world ${isFutureWorld ? "journey__world--locked" : ""}`}>
-              {/* World Header */}
+            <section
+              key={world.id}
+              className={`journey__world ${isFutureWorld ? "journey__world--locked" : ""} ${isActiveWorld ? "journey__world--active" : ""}`}
+              style={{ "--world-color": world.color } as React.CSSProperties}
+            >
               <div className={`journey__world-header bg-gradient-to-r ${world.gradient}`}>
                 <span className="journey__world-icon">{world.icon}</span>
                 <div className="journey__world-info">
                   <h3 className="journey__world-name">{world.name}</h3>
                   <p className="journey__world-desc">{world.description}</p>
                 </div>
-                {isPastWorld && (
-                  <div className="journey__world-complete">
+                <div className="journey__world-meta">
+                  {isPastWorld ? (
                     <img src="/assets/icons/icon-checkmark.webp" alt="Complete" className="journey__world-check" />
-                  </div>
-                )}
+                  ) : (
+                    <span className="journey__world-count">{masteredInWorld}/{world.stageIds.length}</span>
+                  )}
+                  <span className="journey__world-ages">Ages {world.ages}</span>
+                </div>
               </div>
 
-              {/* World Progress Bar */}
               <div className="journey__world-progress-bar">
                 <div className="journey__world-progress-fill" style={{ width: `${worldProgress}%` }} />
               </div>
 
-              {/* Stages in World */}
-              <div className="journey__stages">
-                {world.stageIds.map((stageId) => {
+              {/* Stages as a winding trail of nodes */}
+              <ol className="journey__trail">
+                {world.stageIds.map((stageId, i) => {
                   const stage = STAGES.find((s) => s.id === stageId)!;
                   const stageIdx = STAGES.findIndex((s) => s.id === stageId);
                   const state = getStageState(stageId, stageIdx);
+                  const lane = ["center", "right", "center", "left"][i % 4];
 
                   return (
-                    <div key={stageId} className="journey__stage-wrapper">
+                    <li key={stageId} className={`journey__step journey__step--${lane}`}>
                       <button
                         ref={state === "current" ? currentStageRef : undefined}
-                        className={`journey__stage journey__stage--${state}`}
+                        className={`journey__node journey__node--${state}`}
                         onClick={() => state !== "locked" && onSelectStage(stageId)}
                         disabled={state === "locked"}
+                        aria-label={`${stage.name}: ${state === "mastered" ? "mastered, tap to replay" : state === "current" ? "current stage" : "locked"}`}
                       >
-                        <div className="journey__stage-marker">
-                          {state === "mastered" && <img src="/assets/icons/icon-checkmark.webp" alt="Done" className="journey__stage-icon" />}
-                          {state === "current" && <img src="/assets/icons/icon-star-purple.webp" alt="Current" className="journey__stage-icon journey__stage-icon--pulse" />}
-                          {state === "locked" && <span className="journey__stage-lock">🔒</span>}
-                        </div>
-                        <div className="journey__stage-info">
-                          <span className="journey__stage-name">{stage.name}</span>
-                          <span className="journey__stage-desc">{stage.description}</span>
-                        </div>
-                        {state === "current" && (
-                          <span className="journey__stage-badge">NOW</span>
-                        )}
-                        {state === "mastered" && (
-                          <span className="journey__stage-badge journey__stage-badge--replay">REPLAY</span>
-                        )}
+                        <span className="journey__node-disc">
+                          {state === "mastered" ? "✓" : state === "current" ? "★" : "🔒"}
+                        </span>
+                        {state === "current" && <span className="journey__node-now">NOW</span>}
                       </button>
+                      <div className="journey__node-label">
+                        <span className="journey__stage-name">{stage.name}</span>
+                        <span className="journey__stage-desc">{stage.description}</span>
+                      </div>
                       {stageId === "6A" && state === "current" && onSkipStage && (
-                        <button
-                          className="journey__skip-btn"
-                          onClick={() => onSkipStage(stageId)}
-                        >
-                          I know my numbers — skip to counting →
+                        <button className="journey__skip-btn" onClick={() => onSkipStage(stageId)}>
+                          I know my numbers — skip ahead →
                         </button>
                       )}
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
 
-              {/* Path connector between worlds */}
               {worldIdx < WORLDS.length - 1 && (
                 <div className="journey__path-connector">
                   <div className="journey__path-line" />
                   <div className="journey__path-dot" />
                 </div>
               )}
-            </div>
+            </section>
           );
         })}
       </div>

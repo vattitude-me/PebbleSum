@@ -1,3 +1,5 @@
+import { getStageIndex } from "./stages";
+
 export type AgeGroup = "young" | "middle" | "older";
 
 export interface UserProfile {
@@ -9,6 +11,8 @@ export interface UserProfile {
   dailyGoalMinutes: number;
   createdAt: string;
   parentPin?: string;
+  /** Stage chosen by the onboarding placement question. */
+  startStageId?: string;
 }
 
 export interface BadgeDefinition {
@@ -200,8 +204,7 @@ export function checkNewBadges(
   if (!earned.includes("seedling") && gameState.totalSessionsCompleted >= 7) {
     newBadges.push({ badgeId: "seedling", earnedAt: now });
   }
-  const advancedStages = ["C", "D", "E", "F"];
-  if (!earned.includes("champion") && advancedStages.includes(currentStageId)) {
+  if (!earned.includes("champion") && getStageIndex(currentStageId) >= getStageIndex("C")) {
     newBadges.push({ badgeId: "champion", earnedAt: now });
   }
 
