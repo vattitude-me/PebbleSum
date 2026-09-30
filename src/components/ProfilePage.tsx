@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import AppVersion from "@/components/AppVersion";
 import { UserProfile, GameState, AppSettings, saveSettings, saveProfile } from "@/lib/user-store";
 import { UserProgress, loadProgress, saveProgress } from "@/lib/progress-store";
 import { STAGES } from "@/lib/stages";
@@ -477,6 +478,8 @@ export default function ProfilePage({ profile, progress, gameState, settings, on
           Buy Me A Coffee ☕
         </a>
       </section>
+
+      <AppVersion />
 
       {/* Footer */}
       <footer className="profile-page__footer">

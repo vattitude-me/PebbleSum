@@ -1,6 +1,6 @@
 {
-  "name": "temp_init",
-  "version": "0.1.0",
+  "name": "pebblesum",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

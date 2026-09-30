@@ -1,8 +1,6 @@
-const CACHE_NAME = "pebblesum-v1";
-const urlsToCache = [
-  "/",
-  "/manifest.json",
-];
+// Bump when the caching strategy changes; old caches are deleted on activate.
+const CACHE_NAME = "pebblesum-v2";
+const urlsToCache = ["/", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -18,44 +16,43 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((cacheNames) =>
+      Promise.all(cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name)))
+    )
   );
   self.clients.claim();
 });
 
+function cacheResponse(request, response) {
+  if (response && response.status === 200 && response.type !== "error") {
+    const copy = response.clone();
+    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+  }
+  return response;
+}
+
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
+  const { request } = event;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+
+  // Always ask the server which build is live.
+  if (url.pathname === "/version.json") return;
+
+  // Pages: network first so a refresh picks up a new deploy; cache is the offline fallback.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => cacheResponse(request, response))
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
+    );
     return;
   }
 
+  // Static assets (content-hashed by Next.js): cache first.
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type === "error") {
-          return response;
-        }
-
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      }).catch(() => {
-        return caches.match(event.request);
-      });
-    })
+    caches.match(request).then(
+      (cached) => cached || fetch(request).then((response) => cacheResponse(request, response)).catch(() => caches.match(request))
+    )
   );
 });
